@@ -29,9 +29,9 @@ import static org.hamcrest.core.IsNull.notNullValue;
  * Time: 17:03
  * To change this template use File | Settings | File Templates.
  */
-public class AkkaTCPServerTest {
+public class StompServerProtocolFrameTest {
 
-    private static Logger LOG = LoggerFactory.getLogger(AkkaTCPServerTest.class);
+    private static Logger LOG = LoggerFactory.getLogger(StompServerProtocolFrameTest.class);
 
     private  TCPTestClient testClient;
     private ActorSystem system;
@@ -68,7 +68,7 @@ public class AkkaTCPServerTest {
             InetSocketAddress remote = new InetSocketAddress("localhost", 9999);
             system = ActorSystem.create("TestServerApp");
             final ActorRef listener = system.actorOf(Props.create(ServerListener.class), "serverlistener");
-            final ActorRef server = system.actorOf(Props.create(AkkaTCPServer.class, remote, listener));
+            final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, listener));
         }
 
         @Override
@@ -91,9 +91,11 @@ public class AkkaTCPServerTest {
         return writer.getBuffer().toString().trim();
     }
 
-    @Test
-    public void shouldChangeStateToConnectedAfterSuccessfulConnect() throws Exception {
-
+    /**
+     * Goes to CONNECTED state.
+     * @throws Exception
+     */
+    private void doConnectedClient() throws Exception{
         //  given
         assertThat(testClient, is(notNullValue()));
 
@@ -103,6 +105,28 @@ public class AkkaTCPServerTest {
 
         //  then
         assertThat(response, is(equalTo(readResource("/CONNECT/basic_response.txt"))));
+    }
 
+    @Test
+    public void shouldChangeStateToConnectedAfterSuccessfulConnect() throws Exception {
+
+        //  given
+        assertThat(testClient, is(notNullValue()));
+
+        //  when
+        String response = testClient.connectSendAndGrabAnswer("/CONNECT/basic.txt");
+
+        //  then
+        assertThat(response, is(equalTo(readResource("/CONNECT/basic_response.txt"))));
+    }
+
+    @Test
+    public void shouldAcceptCorrectSendFrame() throws Exception{
+
+        //  given
+        doConnectedClient();
+
+        //  when
+        testClient.sendFrame("/SEND/send_destination_topic.txt");
     }
 }

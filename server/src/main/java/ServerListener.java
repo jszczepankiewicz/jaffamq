@@ -16,6 +16,6 @@ public class ServerListener extends UntypedActor {
 
     @Override
     public void onReceive(Object o) throws Exception {
-        log.info("ServerListener.onReceive: {}", o);
+        //log.info("ServerListener.onReceive: {}", o);
     }
 }

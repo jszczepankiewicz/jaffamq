@@ -39,7 +39,10 @@ public class TCPTestClient {
 
         out.write("DISCONNECT\n\n\000\n");
         out.flush();
-        String responseIgnored = getResponse();
+        /*
+            Need to add some timeout, gracefull shutdown
+         */
+        //String responseIgnored = getResponse();
 
         LOG.debug("Before closing()");
         if(out!=null){
@@ -92,8 +95,16 @@ public class TCPTestClient {
         return writer.getBuffer().toString();
     }
 
+    public void sendFrame(String frameResource) throws IOException{
+        LOG.debug("Sending client frame from resource: {}", frameResource);
+
+        out.write(readResource(frameResource));
+        out.write("\000");
+        out.write("\n");
+        out.flush();
+    }
+
     public String connectSendAndGrabAnswer(String requestResourcePath) throws IOException {
-        LOG.debug("connectSendAndGrabAnswer({})", requestResourcePath);
 
         if(isOpen){
             throw new IllegalStateException("Close before connect");
@@ -103,10 +114,7 @@ public class TCPTestClient {
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-        out.write(readResource(requestResourcePath));
-        out.write("\000");
-        out.write("\n");
-        out.flush();
+        sendFrame(requestResourcePath);
 
         return getResponse();
 
