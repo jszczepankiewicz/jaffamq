@@ -1,0 +1,7 @@
+SEND
+destination:/topic/testtopic
+content-type:text/plain
+
+hello queue a
+some line two
+
