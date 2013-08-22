@@ -31,6 +31,8 @@ import static org.hamcrest.core.IsNull.notNullValue;
  */
 public class StompServerProtocolFrameTest {
 
+    private static final int TEST_TIMEOUT_MS=900;
+
     private static Logger LOG = LoggerFactory.getLogger(StompServerProtocolFrameTest.class);
 
     private  TCPTestClient testClient;
@@ -91,6 +93,15 @@ public class StompServerProtocolFrameTest {
         return writer.getBuffer().toString().trim();
     }
 
+    private void expectResponseForRequest(String requestResource, String expectedResponseResource) throws IOException{
+
+        //  when
+        String response = testClient.sendFrameAndWaitForResponseFrame(requestResource);
+
+        //  then
+        assertThat(response, is(equalTo(readResource(expectedResponseResource))));
+    }
+
     /**
      * Goes to CONNECTED state.
      * @throws Exception
@@ -107,7 +118,7 @@ public class StompServerProtocolFrameTest {
         assertThat(response, is(equalTo(readResource("/CONNECT/basic_response.txt"))));
     }
 
-    @Test
+    @Test(timeout = TEST_TIMEOUT_MS)
     public void shouldChangeStateToConnectedAfterSuccessfulConnect() throws Exception {
 
         //  given
@@ -120,13 +131,13 @@ public class StompServerProtocolFrameTest {
         assertThat(response, is(equalTo(readResource("/CONNECT/basic_response.txt"))));
     }
 
-    @Test
+    @Test(timeout = TEST_TIMEOUT_MS)
     public void shouldAcceptCorrectSendFrame() throws Exception{
 
         //  given
         doConnectedClient();
 
         //  when
-        testClient.sendFrame("/SEND/send_destination_topic.txt");
+        testClient.sendFrameAndWaitForResponseFrame("/SEND/send_destination_topic.txt");
     }
 }

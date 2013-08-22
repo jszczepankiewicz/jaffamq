@@ -103,8 +103,14 @@ public class StompServer extends ParserFrameState {
                 getSender().tell(TcpMessage.close(), getSender());
                 return;
             } else {
-                throw new IllegalStateException("Unimplemented when currentFrameCommand = " + currentFrameCommand);
+                //  unimplemented command
+                log.warning("Unimplemented client command: {}", currentFrameCommand);
+                getSender().tell(init.command(String.format("ERROR\nmessage:unimplemented client command %s\n\000\n", currentFrameCommand)), getSelf());
             }
+
+
+
+
         }
 
     }

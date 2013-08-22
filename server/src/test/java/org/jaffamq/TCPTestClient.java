@@ -81,7 +81,10 @@ public class TCPTestClient {
             builder.append("\n");
         }
 
-        return builder.toString().trim();
+        String response = builder.toString().trim();
+        LOG.debug("Retrieved server response:\n==============================================================================\n{" +
+                "}\n==============================================================================", response);
+        return response;
     }
 
     private String readResource(String classpathResource) throws IOException {
@@ -93,6 +96,11 @@ public class TCPTestClient {
         }
         IOUtils.copy(is, writer, ENC);
         return writer.getBuffer().toString();
+    }
+
+    public String sendFrameAndWaitForResponseFrame(String frameResource) throws IOException{
+        sendFrame(frameResource);
+        return getResponse();
     }
 
     public void sendFrame(String frameResource) throws IOException{
