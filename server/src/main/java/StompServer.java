@@ -97,7 +97,7 @@ public class StompServer extends ParserFrameState {
 
                 if (receiptHeader != null) {
                     //  todo add encoding
-                    getSender().tell(init.command("RECEIPT\nreceipt-id:" + receiptHeader + "\n\000\n"), getSelf());
+                    getSender().tell(init.command("RECEIPT\nreceipt-id:" + Frame.encodeHeaderValue(receiptHeader) + "\n\000\n"), getSelf());
                 }
 
                 getSender().tell(TcpMessage.close(), getSender());

@@ -2,9 +2,7 @@ package org.jaffamq;
 
 import akka.actor.UntypedActor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,9 +29,8 @@ public abstract class ParserFrameState extends UntypedActor{
     private void addHeader(String line){
 
         int ind = line.indexOf( ':' );
-        //  todo add decoding (see spec)
         String k = line.substring( 0, ind );
-        String v = line.substring( ind+1, line.length() );
+        String v = Frame.decodeHeaderValue(line.substring(ind + 1, line.length()));
 
         //  only the first occurence of key is important, see spec: "Repeated Header Entries"
         if(!headers.containsKey(k)){
