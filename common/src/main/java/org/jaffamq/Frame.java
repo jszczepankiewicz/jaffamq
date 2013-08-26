@@ -99,7 +99,7 @@ public class Frame {
 
     public enum Command {
 
-        //  to-server
+        //  to-broker
         SEND("SEND"),
         SUBSCRIBE("SUBSCRIBE"),
         UNSUBSCRIBE("UNSUBSCRIBE"),

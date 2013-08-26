@@ -47,7 +47,7 @@ public class StompServer extends ParserFrameState {
             listener.tell(msg, getSelf());
 
         } else if (msg instanceof Connected) {
-            // create a javax.net.ssl.SSLEngine for our peer in server mode
+            // create a javax.net.ssl.SSLEngine for our peer in broker mode
             final InetSocketAddress remote = ((Connected) msg).remoteAddress();
 
             // build pipeline and set up context for communicating with TcpPipelineHandler

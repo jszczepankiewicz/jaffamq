@@ -9,7 +9,7 @@ package org.jaffamq;
  */
 public enum Command {
 
-    //  to-server
+    //  to-broker
     NONE("NONE"),
     SEND("SEND"),
     SUBSCRIBE("SUBSCRIBE"),

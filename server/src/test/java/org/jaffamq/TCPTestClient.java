@@ -82,7 +82,7 @@ public class TCPTestClient {
         }
 
         String response = builder.toString().trim();
-        LOG.debug("Retrieved server response:\n==============================================================================\n{" +
+        LOG.debug("Retrieved broker response:\n==============================================================================\n{" +
                 "}\n==============================================================================", response);
         return response;
     }
