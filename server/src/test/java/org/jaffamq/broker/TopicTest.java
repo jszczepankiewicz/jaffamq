@@ -5,26 +5,20 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.testkit.JavaTestKit;
-import org.jaffamq.TCPTestClient;
 import org.jaffamq.broker.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.duration.FiniteDuration;
-
-import java.io.IOException;
 
 /**
  * Integration test for Topic
  */
 public class TopicTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Topic.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TopicTest.class);
 
     private static ActorSystem system;
 
@@ -37,31 +31,34 @@ public class TopicTest {
         }
 
         @Override
-        protected void after(){
+        protected void after() {
             JavaTestKit.shutdownActorSystem(system);
             system = null;
         }
     };
 
+
+    /*
+        TODO:   add multiple subscribers
+     */
     @Test
-    public void shouldCorrectlyCommunicateWithTopic(){
+    public void shouldCorrectlyCommunicateWithTopic() {
 
         new JavaTestKit(system) {{
 
             //  given
-            final Props props = Props.create(Topic.class);
+            final Props props = Props.create(Topic.class, "destination1");
             final ActorRef topic = system.actorOf(props);
 
-            final JavaTestKit probe = new JavaTestKit(system);
+            //final JavaTestKit probe = new JavaTestKit(system);
 
             LOG.debug("Sending unsubscribed message");
             StompMessage tz = new StompMessage("destinationz", null, null);
             expectNoMsg();
 
-
             //  warning: this only registers one subscriber
             LOG.debug("Subscribing to topic");
-            topic.tell(new SubscriberRegister(), getRef());
+            topic.tell(new SubscriberRegister("destination1"), getRef());
 
             StompMessage t1 = new StompMessage("destination1", null, null);
 

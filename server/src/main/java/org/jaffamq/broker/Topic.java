@@ -7,6 +7,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.jaffamq.broker.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
+import org.jaffamq.broker.messages.Unsubscribe;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -20,10 +21,16 @@ import java.util.Set;
  */
 public class Topic extends UntypedActor{
 
+    private final String destination;
+
     private final LoggingAdapter log = Logging
             .getLogger(getContext().system(), getSelf());
 
     private Set<ActorRef> subscribers = new LinkedHashSet<ActorRef>();
+
+    Topic(String destination){
+        this.destination = destination;
+    }
 
     @Override
     public void onReceive(Object o) throws Exception {
@@ -36,7 +43,7 @@ public class Topic extends UntypedActor{
                 subscriber.tell(o, getSelf());
             }
         }
-        else if(o instanceof Terminated){
+        else if(o instanceof Terminated || o instanceof Unsubscribe){
             log.debug("Received Terminated from {}", getSender());
             subscribers.remove(getSender());
         }
