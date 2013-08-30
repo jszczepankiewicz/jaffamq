@@ -5,6 +5,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
 import org.jaffamq.broker.messages.StompMessage;
+import org.jaffamq.broker.messages.SubscribedStompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
 import org.jaffamq.broker.messages.Unsubscribe;
 import org.junit.Rule;
@@ -59,29 +60,32 @@ public class DestinationManagerTest {
             StompMessage ta = new StompMessage("destinationa", null, null);
             StompMessage tb = new StompMessage("destinationb", null, null);
 
-            destinationManager.tell(new SubscriberRegister("destinationa"), getRef());
+            destinationManager.tell(new SubscriberRegister("destinationa", "1"), getRef());
             LOG.debug("Subscribed to destinationa");
             expectNoMsg();
-            destinationManager.tell(new SubscriberRegister("destinationb"), getRef());
+            destinationManager.tell(new SubscriberRegister("destinationb", "2"), getRef());
             LOG.debug("Subscribed to destinationb");
             expectNoMsg();
 
             destinationManager.tell(ta, getRef());
             LOG.debug("Message to destinationa sent");
-            expectMsgEquals(ta);
+            SubscribedStompMessage expected1 = new SubscribedStompMessage(ta, "1");
+            expectMsgEquals(expected1);
 
             destinationManager.tell(tb, getRef());
             LOG.debug("Message to destinationb sent");
-            expectMsgEquals(tb);
+            SubscribedStompMessage expected2 = new SubscribedStompMessage(tb, "2");
+            expectMsgEquals(expected2);
 
             //  TODO: add more subscribers, test lifecycle
-            destinationManager.tell(new Unsubscribe("destinationb"), getRef());
+            destinationManager.tell(new Unsubscribe("destinationb", "2"), getRef());
             LOG.debug("Unsubscribed from destinationb");
             expectNoMsg();
 
             destinationManager.tell(ta, getRef());
             LOG.debug("Message to destinationa sent");
-            expectMsgEquals(ta);
+            SubscribedStompMessage expected3 = new SubscribedStompMessage(ta, "1");
+            expectMsgEquals(expected3);
 
             destinationManager.tell(tb, getRef());
             LOG.debug("Message to destinationb sent");

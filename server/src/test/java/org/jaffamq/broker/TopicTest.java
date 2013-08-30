@@ -6,6 +6,7 @@ import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.testkit.JavaTestKit;
 import org.jaffamq.broker.messages.StompMessage;
+import org.jaffamq.broker.messages.SubscribedStompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,13 +59,14 @@ public class TopicTest {
 
             //  warning: this only registers one subscriber
             LOG.debug("Subscribing to topic");
-            topic.tell(new SubscriberRegister("destination1"), getRef());
+            topic.tell(new SubscriberRegister("destination1", "1"), getRef());
 
             StompMessage t1 = new StompMessage("destination1", null, null);
 
             LOG.debug("Sending message to subscribed topic");
             topic.tell(t1, getRef());
-            expectMsgEquals(t1);
+            SubscribedStompMessage expected = new SubscribedStompMessage(t1, "1");
+            expectMsgEquals(expected);
 
             topic.tell(new Terminated(null, false, false), getRef());
             expectNoMsg();

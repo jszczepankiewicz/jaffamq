@@ -6,9 +6,15 @@ package org.jaffamq.broker.messages;
 public class SubscriberRegister {
 
     private final String destination;
+    private final String subscriptionId;
 
-    public SubscriberRegister(String destination) {
+    public SubscriberRegister(String destination, String subscriptionId) {
         this.destination = destination;
+        this.subscriptionId = subscriptionId;
+    }
+
+    public String getSubscriptionId() {
+        return subscriptionId;
     }
 
     public String getDestination() {

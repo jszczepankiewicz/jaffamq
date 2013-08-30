@@ -1,6 +1,7 @@
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import org.jaffamq.broker.DestinationManager;
 
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
@@ -19,7 +20,8 @@ public class ServerApp{
         InetSocketAddress remote = new InetSocketAddress("localhost", 9907);
         ActorSystem system = ActorSystem.create("ServerApp");
         final ActorRef listener = system.actorOf(Props.create(ServerListener.class), "serverlistener");
-        final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, listener));
+        final ActorRef destinationManager = system.actorOf(Props.create(DestinationManager.class), DestinationManager.NAME);
+        final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, listener, destinationManager));
 
     }
 

@@ -17,14 +17,17 @@ import static akka.io.PipelineStage.sequence;
 
 public class StompServer extends ParserFrameState {
 
+    final ActorRef destinationManager;
+
     final ActorRef listener;
 
     final LoggingAdapter log = Logging
             .getLogger(getContext().system(), getSelf());
 
-    public StompServer(InetSocketAddress remote, ActorRef listener) {
+    public StompServer(InetSocketAddress remote, ActorRef listener, ActorRef destinationManager) {
 
         this.listener = listener;
+        this.destinationManager = destinationManager;
 
         // bind to a socket, registering ourselves as incoming connection handler
         Tcp.get(getContext().system()).getManager().tell(

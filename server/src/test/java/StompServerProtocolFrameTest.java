@@ -1,10 +1,12 @@
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
 import org.apache.commons.io.IOUtils;
 import org.jaffamq.TCPTestClient;
+import org.jaffamq.broker.DestinationManager;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
@@ -70,7 +72,13 @@ public class StompServerProtocolFrameTest {
             InetSocketAddress remote = new InetSocketAddress("localhost", 9999);
             system = ActorSystem.create("TestServerApp");
             final ActorRef listener = system.actorOf(Props.create(ServerListener.class), "serverlistener");
-            final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, listener));
+            final ActorRef destinationManager = system.actorOf(Props.create(DestinationManager.class), DestinationManager.NAME);
+            final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, listener, destinationManager));
+
+            ActorSelection destinationM = system.actorSelection(DestinationManager.NAME);
+            System.out.println(destinationM.toString());
+
+
         }
 
         @Override
@@ -123,6 +131,7 @@ public class StompServerProtocolFrameTest {
 
         //  given
         assertThat(testClient, is(notNullValue()));
+
 
         //  when
         String response = testClient.connectSendAndGrabAnswer("/CONNECT/basic.txt");

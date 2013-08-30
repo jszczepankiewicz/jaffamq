@@ -10,9 +10,15 @@ package org.jaffamq.broker.messages;
 public class Unsubscribe {
 
     private final String destination;
+    private final String subscriptionId;
 
-    public Unsubscribe(String destination) {
+    public Unsubscribe(String destination, String subscriptionId) {
         this.destination = destination;
+        this.subscriptionId = subscriptionId;
+    }
+
+    public String getSubscriptionId() {
+        return subscriptionId;
     }
 
     public String getDestination() {

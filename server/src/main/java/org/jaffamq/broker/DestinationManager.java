@@ -18,6 +18,8 @@ import java.util.Map;
  */
 public class DestinationManager extends UntypedActor{
 
+    public static final String NAME="destinationManager";
+
     //  TODO: weak references?
     private Map<String, ActorRef> topics = new HashMap<String, ActorRef>();
 
@@ -66,6 +68,7 @@ public class DestinationManager extends UntypedActor{
             ActorRef topic = topics.get(message.getDestination());
 
             if(topic != null){
+                log.info("Found topic for destination {}", message.getDestination());
                 topic.tell(o, getSender());
             }
             else{
