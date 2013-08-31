@@ -1,3 +1,5 @@
+package org.jaffamq.broker;
+
 import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;

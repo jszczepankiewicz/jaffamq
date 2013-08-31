@@ -7,6 +7,8 @@ import akka.testkit.JavaTestKit;
 import org.apache.commons.io.IOUtils;
 import org.jaffamq.TCPTestClient;
 import org.jaffamq.broker.DestinationManager;
+import org.jaffamq.broker.ServerListener;
+import org.jaffamq.broker.StompServer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
@@ -158,9 +160,9 @@ public class StompServerProtocolFrameTest {
         //  given
         doConnectedClient();
 
-
        //   when
        testClient.sendFrame("/SUBSCRIBE/subscribe_topic.txt");
+
 
     }
 }

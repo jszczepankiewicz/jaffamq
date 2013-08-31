@@ -1,7 +1,8 @@
+package org.jaffamq.broker;
+
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import org.jaffamq.broker.DestinationManager;
 
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
@@ -13,9 +14,9 @@ import java.security.NoSuchAlgorithmException;
  * Time: 16:29
  * To change this template use File | Settings | File Templates.
  */
-public class ServerApp{
+public class ServerApp {
 
-    public static void main(String...args) throws NoSuchAlgorithmException {
+    public static void main(String... args) throws NoSuchAlgorithmException {
         //SSLContext ctx = SSLContext.getDefault();
         InetSocketAddress remote = new InetSocketAddress("localhost", 9907);
         ActorSystem system = ActorSystem.create("ServerApp");

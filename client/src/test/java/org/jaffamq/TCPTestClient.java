@@ -31,7 +31,7 @@ public class TCPTestClient {
 
     }
 
-    public String connectSendAndGrabAnswer(String requestResourcePath, boolean closeAfterNullReceive) throws IOException {
+    /*public String connectSendAndGrabAnswer(String requestResourcePath, boolean closeAfterNullReceive) throws IOException {
 
         if(isOpen){
             throw new IllegalStateException("Close before connect");
@@ -42,6 +42,6 @@ public class TCPTestClient {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
 
-    }
+    }*/
 
 }
