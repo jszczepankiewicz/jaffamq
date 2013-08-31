@@ -31,6 +31,7 @@ public class DestinationManager extends UntypedActor{
         ActorRef topic = topics.get(destination);
 
         if(topic == null){
+            log.info("Creating topic for destination: {}", destination);
             final Props props = Props.create(Topic.class, destination);
             topic = getContext().system().actorOf(props);
             topics.put(destination, topic);

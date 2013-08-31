@@ -25,11 +25,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
- * Created with IntelliJ IDEA.
- * User: win7
- * Date: 18.08.13
- * Time: 17:03
- * To change this template use File | Settings | File Templates.
+ * Group of tests that are using full TCP/IP stack. Client is simple blocking test sending class.
  */
 public class StompServerProtocolFrameTest {
 
@@ -83,6 +79,12 @@ public class StompServerProtocolFrameTest {
 
         @Override
         protected void after() {
+            try {
+                //  sleep a little before shutdowning actors to fill all logs
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                //  do nothing
+            }
             JavaTestKit.shutdownActorSystem(system);
             system = null;
         }
@@ -148,5 +150,17 @@ public class StompServerProtocolFrameTest {
 
         //  when
         testClient.sendFrameAndWaitForResponseFrame("/SEND/send_destination_topic.txt");
+    }
+
+    @Test(timeout = TEST_TIMEOUT_MS)
+    public void shouldAcceptCorrectSubscribeFrame() throws Exception{
+
+        //  given
+        doConnectedClient();
+
+
+       //   when
+       testClient.sendFrame("/SUBSCRIBE/subscribe_topic.txt");
+
     }
 }

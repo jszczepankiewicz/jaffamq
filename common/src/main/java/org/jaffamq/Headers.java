@@ -1,0 +1,14 @@
+package org.jaffamq;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: urwisy
+ * Date: 31.08.13
+ * Time: 20:37
+ * To change this template use File | Settings | File Templates.
+ */
+public interface Headers {
+    static final String DESTINATION="destination";
+    static final String SUBSCRIPTION_ID="id";
+    static final String ACK="ack";
+}

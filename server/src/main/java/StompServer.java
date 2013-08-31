@@ -7,9 +7,10 @@ import akka.io.Tcp.Connected;
 import akka.io.TcpPipelineHandler.Init;
 import akka.io.TcpPipelineHandler.WithinActorContext;
 import akka.util.ByteString;
-import org.jaffamq.Command;
 import org.jaffamq.Frame;
+import org.jaffamq.Headers;
 import org.jaffamq.ParserFrameState;
+import org.jaffamq.broker.messages.SubscriberRegister;
 
 import java.net.InetSocketAddress;
 
@@ -79,41 +80,63 @@ public class StompServer extends ParserFrameState {
         }
     }
 
+    private void handleUnimplementedFrame() {
+        System.out.println("WARNING: unimplemented client frame command: " + currentFrameCommand);
+        getSender().tell(init.command(String.format("ERROR\nmessage:unimplemented client command %s\n\000\n", currentFrameCommand)), getSelf());
+    }
+
+    private void handleConnectFrame() {
+        getSender().tell(init.command("CONNECTED\nversion:1.2\n\000\n"), getSelf());
+    }
+
+    private void handleDisconnectFrame() {
+
+        String receiptHeader = headers.get("receipt");
+
+        if (receiptHeader != null) {
+            //  todo add encoding
+            getSender().tell(init.command("RECEIPT\nreceipt-id:" + Frame.encodeHeaderValue(receiptHeader) + "\n\000\n"), getSelf());
+        }
+
+        getSender().tell(TcpMessage.close(), getSender());
+    }
+
+    private void handleSubscribeFrame() {
+
+        //  TODO: validate headers
+        String destination = headers.get(Headers.DESTINATION);
+        String subscriptionId = headers.get(Headers.SUBSCRIPTION_ID);
+        log.info("Received SUBSCRIBE to destination: {} with id: {}", destination, subscriptionId);
+
+        destinationManager.tell(new SubscriberRegister(destination, subscriptionId), getSender());
+    }
+
+    private void reactToCommandParsed() {
+        log.debug("Finished parsing client frame: {}", currentFrameCommand);
+
+        switch (currentFrameCommand) {
+
+            case CONNECT:
+                handleConnectFrame();
+                break;
+            case DISCONNECT:
+                handleDisconnectFrame();
+                break;
+            case SUBSCRIBE:
+                handleSubscribeFrame();
+                break;
+            default:
+                handleUnimplementedFrame();
+                break;
+        }
+    }
 
     @Override
     protected void transition(Frame.FrameParsingState old, Frame.FrameParsingState next) {
         log.debug("Transition state from {} to {}", old, next);
-        System.out.println("Transition from: " + old + " to: " + next);
 
         if (next == Frame.FrameParsingState.FINISHED_PARSING) {
-
-            log.debug("Finished parsing client frame: {}", currentFrameCommand);
-
-            if (currentFrameCommand == Command.CONNECT) {
-
-                getSender().tell(init.command("CONNECTED\nversion:1.2\n\000\n"), getSelf());
-                return;
-            }
-            if (currentFrameCommand == Command.DISCONNECT) {
-
-                String receiptHeader = headers.get("receipt");
-
-                if (receiptHeader != null) {
-                    //  todo add encoding
-                    getSender().tell(init.command("RECEIPT\nreceipt-id:" + Frame.encodeHeaderValue(receiptHeader) + "\n\000\n"), getSelf());
-                }
-
-                getSender().tell(TcpMessage.close(), getSender());
-                return;
-            } else {
-                //  unimplemented command
-                log.warning("Unimplemented client command: {}", currentFrameCommand);
-                getSender().tell(init.command(String.format("ERROR\nmessage:unimplemented client command %s\n\000\n", currentFrameCommand)), getSelf());
-            }
-
-
-
-
+            reactToCommandParsed();
         }
 
     }
