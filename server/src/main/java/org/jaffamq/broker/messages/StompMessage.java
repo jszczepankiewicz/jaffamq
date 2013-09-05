@@ -2,7 +2,7 @@ package org.jaffamq.broker.messages;
 
 import akka.util.ByteString;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Message class that contains typical Stomp message:
@@ -12,9 +12,9 @@ public class StompMessage {
 
     private final String destination;
     private final ByteString body;
-    private final HashMap<String, String> headers;
+    private final Map<String, String> headers;
 
-    public StompMessage(String destination, ByteString body, HashMap<String, String> headers) {
+    public StompMessage(String destination, ByteString body, Map<String, String> headers) {
         this.destination = destination;
         this.body = body;
         this.headers = headers;
@@ -28,7 +28,7 @@ public class StompMessage {
         return body;
     }
 
-    public HashMap<String, String> getHeaders() {
+    public Map<String, String> getHeaders() {
         return headers;
     }
 }

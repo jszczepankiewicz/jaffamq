@@ -11,5 +11,12 @@
 
     <artifactId>qa-perfomance</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.jmeter</groupId>
+            <artifactId>ApacheJMeter_tcp</artifactId>
+            <version>2.9</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>

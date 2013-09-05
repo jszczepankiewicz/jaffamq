@@ -1,6 +1,7 @@
 package org.jaffamq;
 
 import akka.actor.UntypedActor;
+import akka.util.ByteString;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,8 @@ public abstract class ParserFrameState extends UntypedActor{
     protected SessionState sessionState = SessionState.WAITING_FOR_CONNECTION;
 
     protected Map<String, String> headers = new HashMap<String, String>();
+
+    protected ByteString currentFrameBody;
 
     private void addHeader(String line){
 

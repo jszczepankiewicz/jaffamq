@@ -5,7 +5,8 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
 import org.apache.commons.io.IOUtils;
-import org.jaffamq.TCPTestClient;
+import org.jaffamq.org.jaffamq.test.StompTestClient;
+import org.jaffamq.org.jaffamq.test.StompTestBlockingClient;
 import org.jaffamq.broker.DestinationManager;
 import org.jaffamq.broker.ServerListener;
 import org.jaffamq.broker.StompServer;
@@ -31,11 +32,14 @@ import static org.hamcrest.core.IsNull.notNullValue;
  */
 public class StompServerProtocolFrameTest {
 
-    private static final int TEST_TIMEOUT_MS=900;
+    private static final int TEST_TIMEOUT_MS=9000;
 
     private static Logger LOG = LoggerFactory.getLogger(StompServerProtocolFrameTest.class);
 
-    private  TCPTestClient testClient;
+    private StompTestClient testClient;
+    private StompTestClient testClient2;
+    private StompTestClient testClient3;
+
     private ActorSystem system;
     private static final Charset ENC=Charset.forName("UTF-8");
 
@@ -45,18 +49,40 @@ public class StompServerProtocolFrameTest {
         @Override
         protected void before() throws Throwable {
             LOG.debug("clientResource.before()");
-            testClient = new TCPTestClient(9999, "localhost", 3000);
+            testClient = new StompTestBlockingClient(9999, "localhost", 3000);
+            testClient2 = new StompTestBlockingClient(9999, "localhost", 3000);
+            testClient3 = new StompTestBlockingClient(9999, "localhost", 3000);
+
         }
 
         @Override
         protected void after(){
             LOG.debug("clientResource.after()");
+
             try {
                 testClient.close();
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
+
             testClient = null;
+
+            try {
+                testClient2.close();
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+            testClient2 = null;
+
+            try {
+                testClient3.close();
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+            testClient3 = null;
+
         }
     };
 
@@ -66,7 +92,7 @@ public class StompServerProtocolFrameTest {
         @Override
         protected void before() throws Throwable {
 
-           // testClient = new TCPTestClient(9999, "localhost", 3000);
+           // testClient = new StompTestBlockingClient(9999, "localhost", 3000);
             InetSocketAddress remote = new InetSocketAddress("localhost", 9999);
             system = ActorSystem.create("TestServerApp");
             final ActorRef listener = system.actorOf(Props.create(ServerListener.class), "serverlistener");
@@ -130,6 +156,30 @@ public class StompServerProtocolFrameTest {
         assertThat(response, is(equalTo(readResource("/CONNECT/basic_response.txt"))));
     }
 
+    private void doConnectedClient2() throws Exception{
+        //  given
+        assertThat(testClient2, is(notNullValue()));
+
+        //  when
+        String response = testClient2.connectSendAndGrabAnswer("/CONNECT/basic.txt");
+
+
+        //  then
+        assertThat(response, is(equalTo(readResource("/CONNECT/basic_response.txt"))));
+    }
+
+    private void doConnectedClient3() throws Exception{
+        //  given
+        assertThat(testClient3, is(notNullValue()));
+
+        //  when
+        String response = testClient3.connectSendAndGrabAnswer("/CONNECT/basic.txt");
+
+
+        //  then
+        assertThat(response, is(equalTo(readResource("/CONNECT/basic_response.txt"))));
+    }
+
     @Test(timeout = TEST_TIMEOUT_MS)
     public void shouldChangeStateToConnectedAfterSuccessfulConnect() throws Exception {
 
@@ -162,7 +212,17 @@ public class StompServerProtocolFrameTest {
 
        //   when
        testClient.sendFrame("/SUBSCRIBE/subscribe_topic.txt");
+    }
 
+    @Test
+    public void shouldSubscribeToTopic() throws Exception{
 
+        //  given
+        doConnectedClient();
+        doConnectedClient2();
+        doConnectedClient3();
+        //  when
+
+        //  then
     }
 }

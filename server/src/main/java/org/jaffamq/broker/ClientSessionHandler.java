@@ -1,16 +1,12 @@
 package org.jaffamq.broker;
 
 import akka.actor.ActorRef;
-import akka.actor.Props;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import akka.io.*;
-import akka.io.Tcp.CommandFailed;
-import akka.io.Tcp.Connected;
-import akka.io.TcpPipelineHandler.Init;
-import akka.io.TcpPipelineHandler.WithinActorContext;
-import akka.util.ByteString;
+import akka.io.Tcp;
+import akka.io.TcpMessage;
+import akka.io.TcpPipelineHandler;
 import org.jaffamq.Frame;
 import org.jaffamq.Headers;
 import org.jaffamq.ParserFrameState;
@@ -18,79 +14,66 @@ import org.jaffamq.broker.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscribedStompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
 
-import java.net.InetSocketAddress;
+/**
+ * Actor that represents conversation state
+ * between client and server. It has mutable state.
+ */
+public class ClientSessionHandler extends ParserFrameState {
 
-import static akka.io.PipelineStage.sequence;
-
-public class StompServer extends UntypedActor {
-
-    final ActorRef destinationManager;
-
-    final ActorRef listener;
-
-    final LoggingAdapter log = Logging
+    private final LoggingAdapter log = Logging
             .getLogger(getContext().system(), getSelf());
 
-    public StompServer(InetSocketAddress remote, ActorRef listener, ActorRef destinationManager) {
+    private final ActorRef destinationManager;
 
-        this.listener = listener;
+    // this will hold the pipeline handler’s context
+    private final TcpPipelineHandler.Init<TcpPipelineHandler.WithinActorContext, String, String> init;
+
+    public ClientSessionHandler(ActorRef destinationManager, TcpPipelineHandler.Init<TcpPipelineHandler.WithinActorContext, String, String> init) {
         this.destinationManager = destinationManager;
-
-        // bind to a socket, registering ourselves as incoming connection handler
-        Tcp.get(getContext().system()).getManager().tell(
-                TcpMessage.bind(getSelf(), remote, 100),
-                getSelf());
+        this.init = init;
     }
 
     @Override
-    public void onReceive(Object msg) {
+    public void onReceive(Object msg) throws Exception {
 
-        log.info("StompServer.onReceive: {}", msg);
+        log.info("ClientSessionHandler.onReceive: {}", msg);
 
-        if (msg instanceof CommandFailed) {
+        if (msg instanceof Tcp.CommandFailed) {
             getContext().stop(getSelf());
 
-        } else if (msg instanceof Tcp.Bound) {
-            listener.tell(msg, getSelf());
-
-        } else if (msg instanceof Connected) {
-
-            // build pipeline and set up context for communicating with TcpPipelineHandler
-            Init<WithinActorContext, String, String> init  = TcpPipelineHandler.withLogger(log, sequence(sequence(sequence(
-                    new StringByteStringAdapter("utf-8"),
-                    new DelimiterFraming(1024, ByteString.fromString("\n"), true)),
-                    new TcpReadWriteAdapter()),
-                    new BackpressureBuffer(1000, 10000, 1000000)));
-
-            //  create session handler which will handle conversation state
-            ActorRef sessionHandler = getContext().actorOf(Props.create
-                    (ClientSessionHandler.class, destinationManager, init));
-
-            // create handler for pipeline, setting ourselves as payload recipient
-            final ActorRef handler = getContext().actorOf(
-                    TcpPipelineHandler.props(init, getSender(), sessionHandler));
-
-            // register the session handler with the connection
-            getSender().tell(TcpMessage.register(handler), getSelf());
+        }
+        else if(msg instanceof SubscribedStompMessage){
+            onSubscribedMessage((SubscribedStompMessage)msg);
 
         }
+        else if (msg instanceof TcpPipelineHandler.Init.Event) {
 
+            // unwrap TcpPipelineHandler’s event to get a Tcp.Event
+            final String recv = init.event(msg);
+
+            // inform someone of the received message
+            //listener.tell(recv, getSelf());
+
+            parseLine(recv);
+        }
         else{
+            log.warning("unhandled message: {}", msg);
             unhandled(msg);
         }
+
     }
 
-    /*private void onSubscribedMessage(SubscribedStompMessage msg){
-
-    }*/
-
-    /*private void handleUnimplementedFrame() {
+    private void handleUnimplementedFrame() {
         log.warning("WARNING: unimplemented client frame command: {}", currentFrameCommand);
         getSender().tell(init.command(String.format("ERROR\nmessage:unimplemented client command %s\n\000\n", currentFrameCommand)), getSelf());
     }
 
     private void handleConnectFrame() {
         getSender().tell(init.command("CONNECTED\nversion:1.2\n\000\n"), getSelf());
+    }
+
+    private void onSubscribedMessage(SubscribedStompMessage msg){
+        log.warning("onSubscribedMessage");
     }
 
     private void handleDisconnectFrame() {
@@ -119,9 +102,9 @@ public class StompServer extends UntypedActor {
         //  TODO: validate headers
         String destination = headers.get(Headers.DESTINATION);
         destinationManager.tell(new StompMessage(destination, null, headers), getSender());
-    }*/
+    }
 
-    /*private void reactToCommandParsed() {
+    private void reactToCommandParsed() {
         log.debug("Finished parsing client frame: {}", currentFrameCommand);
 
         switch (currentFrameCommand) {
@@ -152,6 +135,5 @@ public class StompServer extends UntypedActor {
 
 
     }
-*/
 
 }

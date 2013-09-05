@@ -1,4 +1,4 @@
-package org.jaffamq;
+package org.jaffamq.org.jaffamq.test;
 
 
 import org.apache.commons.io.IOUtils;
@@ -16,8 +16,8 @@ import java.nio.charset.Charset;
  * Time: 16:07
  * To change this template use File | Settings | File Templates.
  */
-public class TCPTestClient {
-    private static Logger LOG = LoggerFactory.getLogger(TCPTestClient.class);
+public class StompTestBlockingClient implements StompTestClient {
+    private static Logger LOG = LoggerFactory.getLogger(StompTestBlockingClient.class);
 
     private final int port;
     private final String host;
@@ -26,19 +26,23 @@ public class TCPTestClient {
     private Socket clientSocket;
     private Writer out;
     private BufferedReader in;
-    private static final Charset ENC=Charset.forName("UTF-8");
 
-    public TCPTestClient(int port, String host, int timeoutInMs){
-        LOG.debug("Constructing TCPTestClient with host: {}:{}", host, port);
+
+    public StompTestBlockingClient(int port, String host, int timeoutInMs){
+        LOG.debug("Constructing StompTestBlockingClient with host: {}:{}", host, port);
         this.port = port;
         this.host = host;
         this.timeoutInMs = timeoutInMs;
     }
 
+    @Override
     public void close() throws IOException {
 
-        out.write("DISCONNECT\n\n\000\n");
-        out.flush();
+        if(out != null){
+            out.write("DISCONNECT\n\n\000\n");
+            out.flush();
+        }
+
         /*
             Need to add some timeout, gracefull shutdown
          */
@@ -98,11 +102,13 @@ public class TCPTestClient {
         return writer.getBuffer().toString();
     }
 
+    @Override
     public String sendFrameAndWaitForResponseFrame(String frameResource) throws IOException{
         sendFrame(frameResource);
         return getResponse();
     }
 
+    @Override
     public void sendFrame(String frameResource) throws IOException{
         LOG.debug("Sending client frame from resource: {}", frameResource);
 
@@ -112,6 +118,7 @@ public class TCPTestClient {
         out.flush();
     }
 
+    @Override
     public String connectSendAndGrabAnswer(String requestResourcePath) throws IOException {
 
         if(isOpen){
@@ -119,6 +126,11 @@ public class TCPTestClient {
         }
 
         clientSocket = new Socket(host, port);
+
+        if(timeoutInMs > 0){
+            clientSocket.setSoTimeout(timeoutInMs);
+        }
+
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
