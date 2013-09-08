@@ -1,5 +1,0 @@
-SUBSCRIBE
-id:0
-destination:/topic/foo
-ack:auto
-
