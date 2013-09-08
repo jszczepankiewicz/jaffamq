@@ -1,7 +1,5 @@
 package org.jaffamq.broker.messages;
 
-import akka.util.ByteString;
-
 import java.util.Map;
 
 /**
@@ -11,10 +9,10 @@ import java.util.Map;
 public class StompMessage {
 
     private final String destination;
-    private final ByteString body;
+    private final String body;
     private final Map<String, String> headers;
 
-    public StompMessage(String destination, ByteString body, Map<String, String> headers) {
+    public StompMessage(String destination, String body, Map<String, String> headers) {
         this.destination = destination;
         this.body = body;
         this.headers = headers;
@@ -24,7 +22,7 @@ public class StompMessage {
         return destination;
     }
 
-    public ByteString getBody() {
+    public String getBody() {
         return body;
     }
 

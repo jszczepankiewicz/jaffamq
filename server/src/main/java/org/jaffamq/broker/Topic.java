@@ -5,6 +5,7 @@ import akka.actor.Terminated;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import org.jaffamq.Headers;
 import org.jaffamq.broker.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscribedStompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
@@ -28,7 +29,6 @@ public class Topic extends UntypedActor{
     private final LoggingAdapter log = Logging
             .getLogger(getContext().system(), getSelf());
 
-    //private Set<ActorRef> subscribers = new LinkedHashSet<ActorRef>();
     private Set<Subscription> subscriptions = new LinkedHashSet<Subscription>();
 
     Topic(String destination){
@@ -38,17 +38,16 @@ public class Topic extends UntypedActor{
     @Override
     public void onReceive(Object o) throws Exception {
 
-        if(o instanceof StompMessage){
+        log.info("Topic: [{}] onReceive: {}", destination, o);
 
-            log.debug("Received StompMessage from {}", getSender());
+        if(o instanceof StompMessage){
             StompMessage m = (StompMessage)o;
-            /*
-            for(ActorRef subscriber:subscribers){
-                subscriber.tell(o, getSelf());
-            }
-            */
+
+            log.info("Received StompMessage from {} with set-message-id: {}, number of current subscriptions: {}", getSender(), m.getHeaders().get(Headers.SET_MESSAGE_ID), subscriptions.size());
+
             for(Subscription subscription:subscriptions){
                 subscription.getSubscriber().tell(new SubscribedStompMessage(m, subscription.getSubscriptionId()), getSelf());
+                log.info("Sent message to subscriber: {}", subscription.getSubscriber());
             }
         }
         else if(o instanceof Terminated || o instanceof Unsubscribe){
@@ -77,13 +76,14 @@ public class Topic extends UntypedActor{
             }
         }
         else if(o instanceof SubscriberRegister){
-            log.debug("Received SubscriberRegister from {}", getSender());
+            log.info("Received SubscriberRegister from {} to destination: {}", getSender(), destination);
             //subscribers.add(getSender());
             SubscriberRegister register = (SubscriberRegister)o;
             Subscription subscription = new Subscription(register.getSubscriptionId(), getSender());
             subscriptions.add(subscription);
         }
         else{
+            log.warning("Received unknow message: {}", o);
             unhandled(o);
         }
     }

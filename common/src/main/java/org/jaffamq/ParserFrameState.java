@@ -15,6 +15,8 @@ import java.util.Map;
  */
 public abstract class ParserFrameState extends UntypedActor{
 
+    /** this should be the same as StompServer.PAYLOAD_LINE_SEPARATOR */
+    private final int PAYLOAD_LINE_SEPARATOR_LENGTH=1;
 
     protected Frame.FrameParsingState frameParsingState = Frame.FrameParsingState.READING_COMMAND;
 
@@ -25,15 +27,35 @@ public abstract class ParserFrameState extends UntypedActor{
 
     protected SessionState sessionState = SessionState.WAITING_FOR_CONNECTION;
 
-    protected Map<String, String> headers = new HashMap<String, String>();
+    protected Map<String, String> headers;
 
-    protected ByteString currentFrameBody;
+    //protected ByteString currentFrameBody;
+    //  TODO: change it to ByteString
+    protected StringBuilder currentFrameBody;
+
+    public ParserFrameState(){
+        prepareForNewFrame();
+    }
+
+    protected String getCurrentFrameBody(){
+        return currentFrameBody.toString();
+    }
 
     private void addHeader(String line){
+        /*
+            Unfortunatelly spec (1.2) do not precise what EOL should be exactly.
+            It may be CR NL or NL. We need to test it before trimming line.
+            Please note that according to spec (1.2) we SHOULD NOT use trim()!.
+         */
+        int lengthOfEOL = 1;
+
+        if(line.endsWith("\r\n")){
+            lengthOfEOL = 2;
+        }
 
         int ind = line.indexOf( ':' );
         String k = line.substring( 0, ind );
-        String v = Frame.decodeHeaderValue(line.substring(ind + 1, line.length()));
+        String v = Frame.decodeHeaderValue(line.substring(ind + 1, line.length() - lengthOfEOL));
 
         //  only the first occurence of key is important, see spec: "Repeated Header Entries"
         if(!headers.containsKey(k)){
@@ -66,6 +88,7 @@ public abstract class ParserFrameState extends UntypedActor{
                     //setState(Frame.FrameParsingState.READING_COMMAND);
                     return;
                 }
+                currentFrameBody.append(line);
                 break;
 
             case FINISHED_PARSING:
@@ -76,10 +99,20 @@ public abstract class ParserFrameState extends UntypedActor{
 
     }
 
+    /**
+     * Reinitialize content before parsing next frame.
+     */
+    private void prepareForNewFrame(){
+        currentFrameBody = new StringBuilder();
+        headers = new HashMap<String, String>();
+    }
+
     protected void setState(Frame.FrameParsingState s) {
 
         if (frameParsingState != s) {
+            //  here we should do all things with content
             transition(frameParsingState, s);
+
 
             if(s == Frame.FrameParsingState.FINISHED_PARSING){
                 /*
@@ -89,6 +122,10 @@ public abstract class ParserFrameState extends UntypedActor{
                     confirmed as executed.
                  */
                 frameParsingState = Frame.FrameParsingState.READING_COMMAND;
+
+                //  last moment before reseting the parser state
+                prepareForNewFrame();
+                //  all content of the current frame is reinitialized
             }
             else{
                 frameParsingState = s;

@@ -1,0 +1,5 @@
+SUBSCRIBE
+id:0
+destination:/topic/x
+ack:auto
+

@@ -1,8 +1,8 @@
-SEND
+MESSAGE
+subscription:0
+message-id:007
 destination:/topic/foo
 content-type:text/plain
-set-message-id:007
 
 hello queue a
 some line two
-

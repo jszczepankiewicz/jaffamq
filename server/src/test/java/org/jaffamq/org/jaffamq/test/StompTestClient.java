@@ -27,6 +27,7 @@ public interface StompTestClient {
      * @throws IOException
      */
     String sendFrameAndWaitForResponseFrame(String frameResource) throws IOException;
+    String getResponseOrTimeout() throws IOException;
 
     void sendFrame(String frameResource) throws IOException;
 

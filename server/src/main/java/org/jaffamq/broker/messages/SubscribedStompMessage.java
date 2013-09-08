@@ -1,5 +1,8 @@
 package org.jaffamq.broker.messages;
 
+import akka.util.ByteString;
+import org.jaffamq.Headers;
+
 /**
  * Indicates messages that should be send to specific TCP client. It contains individual subscriptionId specific for client.
  */
@@ -32,5 +35,36 @@ public class SubscribedStompMessage extends StompMessage {
     @Override
     public int hashCode() {
         return subscriptionId != null ? subscriptionId.hashCode() : 0;
+    }
+
+    /**
+     * Serializes to String to be transmitted.
+     * TODO: change that to ByteString
+     * @return
+     */
+    public String toTransmit(){
+        final String NL="\r\n";
+        StringBuilder builder = new StringBuilder();
+        builder.append("MESSAGE");
+        builder.append(NL);
+        builder.append("subscription:");
+        builder.append(subscriptionId);
+        System.out.println("XXXXXXXXXXXX: " + subscriptionId);
+        System.out.println("XXXXXXXXXXXX: " + subscriptionId.length());
+        builder.append(NL);
+        builder.append("message-id:");
+        builder.append(getHeaders().get(Headers.SET_MESSAGE_ID));
+        builder.append(NL);
+        builder.append("destination:");
+        builder.append(getDestination());
+        builder.append(NL);
+        builder.append("content-type:");
+        builder.append(getHeaders().get(Headers.CONTENT_TYPE));
+        builder.append(NL);
+        builder.append(NL);
+        builder.append(getBody());
+        builder.append("\000\n");
+
+        return builder.toString();
     }
 }

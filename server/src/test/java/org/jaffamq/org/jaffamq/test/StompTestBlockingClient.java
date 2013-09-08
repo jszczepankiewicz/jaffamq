@@ -70,6 +70,30 @@ public class StompTestBlockingClient implements StompTestClient {
     }
 
     /**
+     * Get response, wait maximum of timeoutInMs. Returns on end or on timeout (without exception). Usuefull if you want to check if the
+     * client DID NOT received message (in specified amount of time).
+     * @return
+     * @throws IOException
+     */
+    public String getResponseOrTimeout() throws IOException{
+
+        StringBuilder builder = new StringBuilder();
+        String line;
+
+        try{
+            while ((line = in.readLine()) != null && !line.equals("\000")) {
+                builder.append(line);
+                builder.append("\n");
+            }
+        }
+        catch(java.net.SocketTimeoutException ex){
+            //  timeout
+        }
+
+        String response = builder.toString().trim();
+        return response;
+    }
+    /**
      * WARNIG: it trims the values
      * @return
      * @throws IOException

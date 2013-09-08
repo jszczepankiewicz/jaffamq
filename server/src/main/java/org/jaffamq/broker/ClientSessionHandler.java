@@ -7,6 +7,7 @@ import akka.event.LoggingAdapter;
 import akka.io.Tcp;
 import akka.io.TcpMessage;
 import akka.io.TcpPipelineHandler;
+import akka.util.ByteString;
 import org.jaffamq.Frame;
 import org.jaffamq.Headers;
 import org.jaffamq.ParserFrameState;
@@ -25,12 +26,16 @@ public class ClientSessionHandler extends ParserFrameState {
 
     private final ActorRef destinationManager;
 
+    private final ActorRef connection;
+
     // this will hold the pipeline handler’s context
     private final TcpPipelineHandler.Init<TcpPipelineHandler.WithinActorContext, String, String> init;
 
-    public ClientSessionHandler(ActorRef destinationManager, TcpPipelineHandler.Init<TcpPipelineHandler.WithinActorContext, String, String> init) {
+    public ClientSessionHandler(ActorRef connection, ActorRef destinationManager, TcpPipelineHandler.Init<TcpPipelineHandler.WithinActorContext, String, String> init) {
         this.destinationManager = destinationManager;
         this.init = init;
+        this.connection = connection;
+        //this.connection = null;
     }
 
     @Override
@@ -43,7 +48,9 @@ public class ClientSessionHandler extends ParserFrameState {
 
         }
         else if(msg instanceof SubscribedStompMessage){
-            onSubscribedMessage((SubscribedStompMessage)msg);
+            SubscribedStompMessage m = (SubscribedStompMessage)msg;
+            log.info("Received SubscribedStompMessage with set-message-id: {}", m.getHeaders().get(Headers.SET_MESSAGE_ID));
+            onSubscribedMessage(m);
 
         }
         else if (msg instanceof TcpPipelineHandler.Init.Event) {
@@ -64,16 +71,21 @@ public class ClientSessionHandler extends ParserFrameState {
     }
 
     private void handleUnimplementedFrame() {
-        log.warning("WARNING: unimplemented client frame command: {}", currentFrameCommand);
+        log.error("ERROR: unimplemented client frame command: {}", currentFrameCommand);
         getSender().tell(init.command(String.format("ERROR\nmessage:unimplemented client command %s\n\000\n", currentFrameCommand)), getSelf());
+        //connection.tell(TcpMessage.write(response), )
+        //ByteString response = ByteString.fromString()
     }
 
     private void handleConnectFrame() {
-        getSender().tell(init.command("CONNECTED\nversion:1.2\n\000\n"), getSelf());
+        log.error("XXX: connection: {}, getSender(): {}", connection, getSender());
+        final ByteString response = ByteString.fromString("CONNECTED\nversion:1.2\n\000\n");
+        connection.tell(TcpMessage.write(response), getSelf());
     }
 
     private void onSubscribedMessage(SubscribedStompMessage msg){
         log.warning("onSubscribedMessage");
+        connection.tell(TcpMessage.write(ByteString.fromString(msg.toTransmit())), getSender());
     }
 
     private void handleDisconnectFrame() {
@@ -95,13 +107,15 @@ public class ClientSessionHandler extends ParserFrameState {
         String subscriptionId = headers.get(Headers.SUBSCRIPTION_ID);
         log.info("Received SUBSCRIBE to destination: {} with id: {}", destination, subscriptionId);
 
-        destinationManager.tell(new SubscriberRegister(destination, subscriptionId), getSender());
+        //  passing self as the subscriber
+        destinationManager.tell(new SubscriberRegister(destination, subscriptionId), getSelf());
     }
 
     private void handleSendFrame(){
         //  TODO: validate headers
+        //  TODO: headers + body should be in some struct on stack and not on heap.
         String destination = headers.get(Headers.DESTINATION);
-        destinationManager.tell(new StompMessage(destination, null, headers), getSender());
+        destinationManager.tell(new StompMessage(destination, getCurrentFrameBody(), headers), getSender());
     }
 
     private void reactToCommandParsed() {
@@ -114,6 +128,9 @@ public class ClientSessionHandler extends ParserFrameState {
                 break;
             case DISCONNECT:
                 handleDisconnectFrame();
+                break;
+            case SEND:
+                handleSendFrame();
                 break;
             case SUBSCRIBE:
                 handleSubscribeFrame();

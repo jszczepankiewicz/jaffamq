@@ -6,6 +6,7 @@ import akka.actor.Terminated;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import org.jaffamq.Headers;
 import org.jaffamq.broker.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
 import org.jaffamq.broker.messages.Unsubscribe;
@@ -43,8 +44,13 @@ public class DestinationManager extends UntypedActor{
     @Override
     public void onReceive(Object o) throws Exception {
 
+        log.info("DestinationHandler.onReceive: {}", o);
+
         if(o instanceof StompMessage){
-            ActorRef topic = getOrCreateTopicForDestination((((StompMessage) o).getDestination()));
+
+            StompMessage m = (StompMessage)o;
+            log.info("Received stomp message wit set-message-id: {}", m.getHeaders().get(Headers.SET_MESSAGE_ID));
+            ActorRef topic = getOrCreateTopicForDestination(m.getDestination());
             topic.tell(o, getSender());
             return;
         }
@@ -79,6 +85,7 @@ public class DestinationManager extends UntypedActor{
             return;
         }
         else{
+            log.warning("Received unexpected message: {}", o);
             unhandled(o);
         }
     }

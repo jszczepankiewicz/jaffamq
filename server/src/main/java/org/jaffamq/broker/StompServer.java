@@ -23,7 +23,10 @@ import java.net.InetSocketAddress;
 import static akka.io.PipelineStage.sequence;
 
 public class StompServer extends UntypedActor {
-
+    /**
+     * If you change this change also ParserFrameState.PAYLOAD_LINE_SEPARATOR_LENGTH
+     */
+    public static final String PAYLOAD_LINE_SEPARATOR="\n";
     final ActorRef destinationManager;
 
     final ActorRef listener;
@@ -58,17 +61,18 @@ public class StompServer extends UntypedActor {
             // build pipeline and set up context for communicating with TcpPipelineHandler
             Init<WithinActorContext, String, String> init  = TcpPipelineHandler.withLogger(log, sequence(sequence(sequence(
                     new StringByteStringAdapter("utf-8"),
-                    new DelimiterFraming(1024, ByteString.fromString("\n"), true)),
+                    new DelimiterFraming(1024, ByteString.fromString(PAYLOAD_LINE_SEPARATOR), true)),
                     new TcpReadWriteAdapter()),
                     new BackpressureBuffer(1000, 10000, 1000000)));
 
+            ActorRef connection = getSender();
             //  create session handler which will handle conversation state
             ActorRef sessionHandler = getContext().actorOf(Props.create
-                    (ClientSessionHandler.class, destinationManager, init));
+                    (ClientSessionHandler.class, connection, destinationManager, init));
 
-            // create handler for pipeline, setting ourselves as payload recipient
+
             final ActorRef handler = getContext().actorOf(
-                    TcpPipelineHandler.props(init, getSender(), sessionHandler));
+                    TcpPipelineHandler.props(init, connection, sessionHandler));
 
             // register the session handler with the connection
             getSender().tell(TcpMessage.register(handler), getSelf());
