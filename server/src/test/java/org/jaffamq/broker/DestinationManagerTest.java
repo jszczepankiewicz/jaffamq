@@ -4,10 +4,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
-import org.jaffamq.broker.messages.StompMessage;
-import org.jaffamq.broker.messages.SubscribedStompMessage;
-import org.jaffamq.broker.messages.SubscriberRegister;
-import org.jaffamq.broker.messages.Unsubscribe;
+import org.jaffamq.broker.messages.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
@@ -50,15 +47,15 @@ public class DestinationManagerTest {
 
 
 
-            StompMessage tz = new StompMessage("destinationz", null, null);
+            StompMessage tz = new StompMessage("destinationz", null, null, "1");
 
             destinationManager.tell(tz, getRef());
             LOG.debug("Message to destinationz sent");
             //  we were no subscribing, nothing should be retrieved
             expectNoMsg();
 
-            StompMessage ta = new StompMessage("destinationa", null, null);
-            StompMessage tb = new StompMessage("destinationb", null, null);
+            StompMessage ta = new StompMessage("destinationa", null, null, "2");
+            StompMessage tb = new StompMessage("destinationb", null, null, "3");
 
             destinationManager.tell(new SubscriberRegister("destinationa", "1"), getRef());
             LOG.debug("Subscribed to destinationa");
@@ -80,7 +77,8 @@ public class DestinationManagerTest {
             //  TODO: add more subscribers, test lifecycle
             destinationManager.tell(new Unsubscribe("destinationb", "2"), getRef());
             LOG.debug("Unsubscribed from destinationb");
-            expectNoMsg();
+            UnsubscriptionConfirmed expectedC = new UnsubscriptionConfirmed("2", "destinationb");
+            expectMsgEquals(expectedC);
 
             destinationManager.tell(ta, getRef());
             LOG.debug("Message to destinationa sent");

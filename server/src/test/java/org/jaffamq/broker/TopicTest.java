@@ -54,14 +54,14 @@ public class TopicTest {
             //final JavaTestKit probe = new JavaTestKit(system);
 
             LOG.debug("Sending unsubscribed message");
-            StompMessage tz = new StompMessage("destinationz", null, null);
+            StompMessage tz = new StompMessage("destinationz", null, null, "3");
             expectNoMsg();
 
             //  warning: this only registers one subscriber
             LOG.debug("Subscribing to topic");
             topic.tell(new SubscriberRegister("destination1", "1"), getRef());
 
-            StompMessage t1 = new StompMessage("destination1", null, null);
+            StompMessage t1 = new StompMessage("destination1", null, null, "3");
 
             LOG.debug("Sending message to subscribed topic");
             topic.tell(t1, getRef());

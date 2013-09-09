@@ -11,7 +11,7 @@ public class SubscribedStompMessage extends StompMessage {
     private final String subscriptionId;
 
     public SubscribedStompMessage(StompMessage source, String subscriptionId) {
-        super(source.getDestination(), source.getBody(), source.getHeaders());
+        super(source.getDestination(), source.getBody(), source.getHeaders(), source.getMessageId());
         this.subscriptionId = subscriptionId;
     }
 
@@ -53,7 +53,7 @@ public class SubscribedStompMessage extends StompMessage {
         System.out.println("XXXXXXXXXXXX: " + subscriptionId.length());
         builder.append(NL);
         builder.append("message-id:");
-        builder.append(getHeaders().get(Headers.SET_MESSAGE_ID));
+        builder.append(this.getMessageId());
         builder.append(NL);
         builder.append("destination:");
         builder.append(getDestination());

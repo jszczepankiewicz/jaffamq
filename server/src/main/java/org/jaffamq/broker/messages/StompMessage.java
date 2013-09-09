@@ -11,11 +11,13 @@ public class StompMessage {
     private final String destination;
     private final String body;
     private final Map<String, String> headers;
+    private final String messageId;
 
-    public StompMessage(String destination, String body, Map<String, String> headers) {
+    public StompMessage(String destination, String body, Map<String, String> headers, String messageId) {
         this.destination = destination;
         this.body = body;
         this.headers = headers;
+        this.messageId = messageId;
     }
 
     public String getDestination() {
@@ -28,5 +30,9 @@ public class StompMessage {
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    public String getMessageId() {
+        return messageId;
     }
 }

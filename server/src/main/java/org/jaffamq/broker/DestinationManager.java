@@ -49,7 +49,7 @@ public class DestinationManager extends UntypedActor{
         if(o instanceof StompMessage){
 
             StompMessage m = (StompMessage)o;
-            log.info("Received stomp message wit set-message-id: {}", m.getHeaders().get(Headers.SET_MESSAGE_ID));
+            log.info("Received stomp message wit message-id: {}", m.getMessageId());
             ActorRef topic = getOrCreateTopicForDestination(m.getDestination());
             topic.tell(o, getSender());
             return;

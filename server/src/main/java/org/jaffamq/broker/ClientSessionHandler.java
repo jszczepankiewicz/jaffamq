@@ -22,6 +22,8 @@ import java.util.Map;
  */
 public class ClientSessionHandler extends ParserFrameState {
 
+    private long nextMessageIdPart;
+
     private final LoggingAdapter log = Logging
             .getLogger(getContext().system(), getSelf());
 
@@ -144,11 +146,22 @@ public class ClientSessionHandler extends ParserFrameState {
         destinationManager.tell(new SubscriberRegister(destination, subscriptionId), getSelf());
     }
 
+    private String getNextMessageId(){
+        /*  Is this unique ? */
+        return getSelf().path().name() + "_" + System.currentTimeMillis() + "_" + nextMessageIdPart++;
+    }
+
     private void handleSendFrame(){
         //  TODO: validate headers
         //  TODO: headers + body should be in some struct on stack and not on heap.
         String destination = headers.get(Headers.DESTINATION);
-        destinationManager.tell(new StompMessage(destination, getCurrentFrameBody(), headers), getSender());
+        String messageId = headers.get(Headers.SET_MESSAGE_ID);
+
+        if(messageId==null){
+            messageId = getNextMessageId();
+        }
+
+        destinationManager.tell(new StompMessage(destination, getCurrentFrameBody(), headers, messageId), getSender());
     }
 
     private void reactToCommandParsed() {

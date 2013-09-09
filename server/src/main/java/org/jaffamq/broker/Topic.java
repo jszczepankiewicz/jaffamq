@@ -40,7 +40,7 @@ public class Topic extends UntypedActor{
         if(o instanceof StompMessage){
             StompMessage m = (StompMessage)o;
 
-            log.info("Received StompMessage from {} with set-message-id: {}, number of current subscriptions: {}", getSender(), m.getHeaders().get(Headers.SET_MESSAGE_ID), subscriptions.size());
+            log.info("Received StompMessage from {} with message-id: {}, number of current subscriptions: {}", getSender(), m.getMessageId(), subscriptions.size());
 
             for(Subscription subscription:subscriptions){
                 subscription.getSubscriber().tell(new SubscribedStompMessage(m, subscription.getSubscriptionId()), getSelf());
