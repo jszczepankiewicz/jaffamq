@@ -6,10 +6,7 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.jaffamq.Headers;
-import org.jaffamq.broker.messages.StompMessage;
-import org.jaffamq.broker.messages.SubscribedStompMessage;
-import org.jaffamq.broker.messages.SubscriberRegister;
-import org.jaffamq.broker.messages.Unsubscribe;
+import org.jaffamq.broker.messages.*;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -68,6 +65,10 @@ public class Topic extends UntypedActor{
                     if(subscription.getSubscriptionId().equals(unsubscribe.getSubscriptionId()) && subscription.getSubscriber().equals(getSender())){
                         log.info("Found subscription to unsubscribe");
                         iterator.remove();
+
+                        //  we need to inform back the session that the unsubscription was successfull
+                        getSender().tell(new UnsubscriptionConfirmed(unsubscribe.getSubscriptionId(), unsubscribe.getDestination()), getSelf());
+                        break;
                     }
                 }
             }

@@ -11,9 +11,10 @@ import akka.util.ByteString;
 import org.jaffamq.Frame;
 import org.jaffamq.Headers;
 import org.jaffamq.ParserFrameState;
-import org.jaffamq.broker.messages.StompMessage;
-import org.jaffamq.broker.messages.SubscribedStompMessage;
-import org.jaffamq.broker.messages.SubscriberRegister;
+import org.jaffamq.broker.messages.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Actor that represents conversation state
@@ -27,6 +28,13 @@ public class ClientSessionHandler extends ParserFrameState {
     private final ActorRef destinationManager;
 
     private final ActorRef connection;
+
+    /*
+        Unfortunatelly the unsubscribe client frame contains only subscription id (unique among client session), but no destination.
+        In order to correctly unsubscribe we need also destinationId. Best place to store the mapping between destination and subscriptionId (per client)
+        is the ClientSessionHandler. Question is where should we un
+     */
+    private Map<String, String> destinationBySubscriptionId = new HashMap<>();
 
     // this will hold the pipeline handler’s context
     private final TcpPipelineHandler.Init<TcpPipelineHandler.WithinActorContext, String, String> init;
@@ -51,6 +59,13 @@ public class ClientSessionHandler extends ParserFrameState {
             SubscribedStompMessage m = (SubscribedStompMessage)msg;
             log.info("Received SubscribedStompMessage with set-message-id: {}", m.getHeaders().get(Headers.SET_MESSAGE_ID));
             onSubscribedMessage(m);
+
+        }
+        else if(msg instanceof UnsubscriptionConfirmed){
+
+            UnsubscriptionConfirmed u = (UnsubscriptionConfirmed)msg;
+            log.info("Received UnsubsciptionConfirmed with destination: {} and subscriptionId: {}", u.getDestination(), u.getSubscriptionId());
+            destinationBySubscriptionId.remove(u.getSubscriptionId());
 
         }
         else if (msg instanceof TcpPipelineHandler.Init.Event) {
@@ -100,11 +115,29 @@ public class ClientSessionHandler extends ParserFrameState {
         getSender().tell(TcpMessage.close(), getSender());
     }
 
+    private void handleUnsubscribeFrame(){
+        //  TODO: validate headers
+        String subscriptionId = headers.get(Headers.SUBSCRIPTION_ID);
+
+        //  need to find out the destination by subscriptionId
+        String destination = destinationBySubscriptionId.get(subscriptionId);
+        if(destination == null){
+            log.error("Can not found destination for subscriptionId: {}, unsubscription can not proceed!", subscriptionId);
+        }
+        else{
+            destinationManager.tell(new Unsubscribe(destination, subscriptionId), getSelf());
+        }
+
+    }
+
     private void handleSubscribeFrame() {
 
         //  TODO: validate headers
         String destination = headers.get(Headers.DESTINATION);
         String subscriptionId = headers.get(Headers.SUBSCRIPTION_ID);
+
+        //  we need to store destination by subscriptionId to able to quickly serve unsubscribe with only subscriptionId
+        destinationBySubscriptionId.put(subscriptionId, destination);
         log.info("Received SUBSCRIBE to destination: {} with id: {}", destination, subscriptionId);
 
         //  passing self as the subscriber
@@ -134,6 +167,9 @@ public class ClientSessionHandler extends ParserFrameState {
                 break;
             case SUBSCRIBE:
                 handleSubscribeFrame();
+                break;
+            case UNSUBSCRIBE:
+                handleUnsubscribeFrame();
                 break;
             default:
                 handleUnimplementedFrame();

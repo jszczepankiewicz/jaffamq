@@ -117,6 +117,10 @@ public class BlackBoxServerTest {
         }
     };
 
+    private static void waitToPropagateTCP() throws InterruptedException {
+        Thread.sleep(1000);
+    }
+
     private String readResource(String classpathResource) throws IOException {
 
         StringWriter writer = new StringWriter();
@@ -216,7 +220,7 @@ public class BlackBoxServerTest {
         /*
          * Unfortunatelly we need to wait a little to make sure that all buffers are flushed to server and interpreted by it.
          */
-        Thread.sleep(1000);
+        waitToPropagateTCP();
 
         //  clients[3] does not subscribe to anything
         clients[4].sendFrame("/SEND/send_destination_topic.txt");
@@ -228,6 +232,41 @@ public class BlackBoxServerTest {
         expectResponse(clients[2], "/MESSAGE/message_topic_subscription_100_response.txt");
         expectNoResponse(clients[3]);
         expectNoResponse(clients[4]);
+    }
+
+    @Test
+    public void shouldUnsubscribeFromTopic() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(3);
+        connectClients(clients);
+
+        //  when
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_topic_id_0.txt");     //  subscribe to /topic/foo
+        clients[2].sendFrame("/SUBSCRIBE/subscribe_topic_id_100.txt");   //  subscribe to /topic/foo
+
+        /*
+         * Unfortunatelly we need to wait a little to make sure that all buffers are flushed to server and interpreted by it.
+         */
+        waitToPropagateTCP();
+        clients[0].sendFrame("/SEND/send_destination_topic.txt");
+
+        //  then
+        expectNoResponse(clients[0]);
+        expectResponse(clients[1], "/MESSAGE/message_topic_subscription_0_response.txt");
+        expectResponse(clients[2], "/MESSAGE/message_topic_subscription_100_response.txt");
+
+        clients[2].sendFrame("/UNSUBSCRIBE/unsubscribe_id_100.txt");
+
+        waitToPropagateTCP();
+
+
+        clients[0].sendFrame("/SEND/send_destination_topic.txt");
+        expectResponse(clients[1], "/MESSAGE/message_topic_subscription_0_response.txt");
+        expectNoResponse(clients[2]);
+
+
+
     }
 
 
