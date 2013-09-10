@@ -2,6 +2,7 @@ package org.jaffamq.org.jaffamq.test;
 
 
 import org.apache.commons.io.IOUtils;
+import org.jaffamq.broker.ClientSessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,12 @@ public class StompTestBlockingClient implements StompTestClient {
             out.write("DISCONNECT\n\n\000\n");
             out.flush();
         }
-
+        try {
+            //  we want to make sure that the SERVER closes the connection
+            Thread.sleep(ClientSessionHandler.MILISECONDS_BEFORE_CLOSE *2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         /*
             Need to add some timeout, gracefull shutdown
          */

@@ -41,6 +41,20 @@ public abstract class ParserFrameState extends UntypedActor{
         return currentFrameBody.toString();
     }
 
+    protected String getRequiredHeaderValue(String requiredHeader, Errors.Code errorCode) throws RequestValidationFailedException{
+
+        String headerValue = headers.get(requiredHeader);
+
+        /*
+            Please note that according to the 1.2 spec we can not use trim()
+         */
+        if(headerValue == null || headerValue.length() == 0){
+            throw new RequestValidationFailedException(errorCode);
+        }
+
+        return headerValue;
+    }
+
     private void addHeader(String line){
         /*
             Unfortunatelly spec (1.2) do not precise what EOL should be exactly.

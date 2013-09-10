@@ -1,0 +1,4 @@
+ERROR
+message:STM-10004 Missing [host] header
+
+CONNECT / STOMP frame requires host header

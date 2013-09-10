@@ -1,26 +1,27 @@
 package org.jaffamq.broker;
 
 import akka.actor.ActorRef;
-import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.io.Tcp;
 import akka.io.TcpMessage;
 import akka.io.TcpPipelineHandler;
 import akka.util.ByteString;
-import org.jaffamq.Frame;
-import org.jaffamq.Headers;
-import org.jaffamq.ParserFrameState;
+import org.jaffamq.*;
 import org.jaffamq.broker.messages.*;
+import scala.concurrent.duration.Duration;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Actor that represents conversation state
  * between client and server. It has mutable state.
  */
 public class ClientSessionHandler extends ParserFrameState {
+
+    public static final int MILISECONDS_BEFORE_CLOSE = 30;
 
     private long nextMessageIdPart;
 
@@ -56,21 +57,18 @@ public class ClientSessionHandler extends ParserFrameState {
         if (msg instanceof Tcp.CommandFailed) {
             getContext().stop(getSelf());
 
-        }
-        else if(msg instanceof SubscribedStompMessage){
-            SubscribedStompMessage m = (SubscribedStompMessage)msg;
+        } else if (msg instanceof SubscribedStompMessage) {
+            SubscribedStompMessage m = (SubscribedStompMessage) msg;
             log.info("Received SubscribedStompMessage with set-message-id: {}", m.getHeaders().get(Headers.SET_MESSAGE_ID));
             onSubscribedMessage(m);
 
-        }
-        else if(msg instanceof UnsubscriptionConfirmed){
+        } else if (msg instanceof UnsubscriptionConfirmed) {
 
-            UnsubscriptionConfirmed u = (UnsubscriptionConfirmed)msg;
+            UnsubscriptionConfirmed u = (UnsubscriptionConfirmed) msg;
             log.info("Received UnsubsciptionConfirmed with destination: {} and subscriptionId: {}", u.getDestination(), u.getSubscriptionId());
             destinationBySubscriptionId.remove(u.getSubscriptionId());
 
-        }
-        else if (msg instanceof TcpPipelineHandler.Init.Event) {
+        } else if (msg instanceof TcpPipelineHandler.Init.Event) {
 
             // unwrap TcpPipelineHandler’s event to get a Tcp.Event
             final String recv = init.event(msg);
@@ -79,8 +77,7 @@ public class ClientSessionHandler extends ParserFrameState {
             //listener.tell(recv, getSelf());
 
             parseLine(recv);
-        }
-        else{
+        } else {
             log.warning("unhandled message: {}", msg);
             unhandled(msg);
         }
@@ -90,17 +87,20 @@ public class ClientSessionHandler extends ParserFrameState {
     private void handleUnimplementedFrame() {
         log.error("ERROR: unimplemented client frame command: {}", currentFrameCommand);
         getSender().tell(init.command(String.format("ERROR\nmessage:unimplemented client command %s\n\000\n", currentFrameCommand)), getSelf());
-        //connection.tell(TcpMessage.write(response), )
-        //ByteString response = ByteString.fromString()
+
+        scheduleClosingConnection();
     }
 
-    private void handleConnectFrame() {
-        log.error("XXX: connection: {}, getSender(): {}", connection, getSender());
+    private void handleConnectFrame() throws RequestValidationFailedException {
+
+        getRequiredHeaderValue(Headers.ACCEPT_VERSION, Errors.HEADERS_MISSING_ACCEPT_VERSION);
+        getRequiredHeaderValue(Headers.HOST, Errors.HEADERS_MISSING_HOST);
+
         final ByteString response = ByteString.fromString("CONNECTED\nversion:1.2\n\000\n");
         connection.tell(TcpMessage.write(response), getSelf());
     }
 
-    private void onSubscribedMessage(SubscribedStompMessage msg){
+    private void onSubscribedMessage(SubscribedStompMessage msg) {
         log.warning("onSubscribedMessage");
         connection.tell(TcpMessage.write(ByteString.fromString(msg.toTransmit())), getSender());
     }
@@ -114,29 +114,27 @@ public class ClientSessionHandler extends ParserFrameState {
             getSender().tell(init.command("RECEIPT\nreceipt-id:" + Frame.encodeHeaderValue(receiptHeader) + "\n\000\n"), getSelf());
         }
 
-        getSender().tell(TcpMessage.close(), getSender());
+        scheduleClosingConnection();
     }
 
-    private void handleUnsubscribeFrame(){
-        //  TODO: validate headers
-        String subscriptionId = headers.get(Headers.SUBSCRIPTION_ID);
+    private void handleUnsubscribeFrame() throws RequestValidationFailedException {
+
+        String subscriptionId = getRequiredHeaderValue(Headers.SUBSCRIPTION_ID, Errors.HEADERS_MISSING_SUBSCRIPTION_ID);
 
         //  need to find out the destination by subscriptionId
         String destination = destinationBySubscriptionId.get(subscriptionId);
-        if(destination == null){
+        if (destination == null) {
             log.error("Can not found destination for subscriptionId: {}, unsubscription can not proceed!", subscriptionId);
-        }
-        else{
+        } else {
             destinationManager.tell(new Unsubscribe(destination, subscriptionId), getSelf());
         }
 
     }
 
-    private void handleSubscribeFrame() {
+    private void handleSubscribeFrame() throws RequestValidationFailedException {
 
-        //  TODO: validate headers
-        String destination = headers.get(Headers.DESTINATION);
-        String subscriptionId = headers.get(Headers.SUBSCRIPTION_ID);
+        String destination = getRequiredHeaderValue(Headers.DESTINATION, Errors.HEADERS_MISSING_DESTINATION);
+        String subscriptionId = getRequiredHeaderValue(Headers.SUBSCRIPTION_ID, Errors.HEADERS_MISSING_SUBSCRIPTION_ID);
 
         //  we need to store destination by subscriptionId to able to quickly serve unsubscribe with only subscriptionId
         destinationBySubscriptionId.put(subscriptionId, destination);
@@ -146,18 +144,38 @@ public class ClientSessionHandler extends ParserFrameState {
         destinationManager.tell(new SubscriberRegister(destination, subscriptionId), getSelf());
     }
 
-    private String getNextMessageId(){
+    private String getNextMessageId() {
         /*  Is this unique ? */
         return getSelf().path().name() + "_" + System.currentTimeMillis() + "_" + nextMessageIdPart++;
     }
 
-    private void handleSendFrame(){
-        //  TODO: validate headers
+    private void scheduleClosingConnection() {
+        /*
+            TODO: we should probably change the state of the session to something WAIRING_FOR_CLOSE.
+            so no other frames are consumed from client.
+         */
+        getContext().system().scheduler().scheduleOnce(Duration.create(MILISECONDS_BEFORE_CLOSE, TimeUnit.MILLISECONDS),
+                connection, TcpMessage.close(), getContext().system().dispatcher(), null);
+
+    }
+
+    private void handleErrorFrame(RequestValidationFailedException ex) {
+
+        Errors.Code e = ex.getErrorCode();
+        ByteString response = ByteString.fromString(String.format("ERROR\nmessage:%s %s\n\n%s\n\000\n", e.getId(), e.getDescription(), e.getCause()));
+        connection.tell(TcpMessage.write(response), getSender());
+
+        scheduleClosingConnection();
+    }
+
+    private void handleSendFrame() throws RequestValidationFailedException {
+
+        String destination = getRequiredHeaderValue(Headers.DESTINATION, Errors.HEADERS_MISSING_DESTINATION);
+
         //  TODO: headers + body should be in some struct on stack and not on heap.
-        String destination = headers.get(Headers.DESTINATION);
         String messageId = headers.get(Headers.SET_MESSAGE_ID);
 
-        if(messageId==null){
+        if (messageId == null) {
             messageId = getNextMessageId();
         }
 
@@ -166,27 +184,31 @@ public class ClientSessionHandler extends ParserFrameState {
 
     private void reactToCommandParsed() {
         log.debug("Finished parsing client frame: {}", currentFrameCommand);
+        try {
+            switch (currentFrameCommand) {
 
-        switch (currentFrameCommand) {
-
-            case CONNECT:
-                handleConnectFrame();
-                break;
-            case DISCONNECT:
-                handleDisconnectFrame();
-                break;
-            case SEND:
-                handleSendFrame();
-                break;
-            case SUBSCRIBE:
-                handleSubscribeFrame();
-                break;
-            case UNSUBSCRIBE:
-                handleUnsubscribeFrame();
-                break;
-            default:
-                handleUnimplementedFrame();
-                break;
+                case CONNECT:
+                    handleConnectFrame();
+                    break;
+                case DISCONNECT:
+                    handleDisconnectFrame();
+                    break;
+                case SEND:
+                    handleSendFrame();
+                    break;
+                case SUBSCRIBE:
+                    handleSubscribeFrame();
+                    break;
+                case UNSUBSCRIBE:
+                    handleUnsubscribeFrame();
+                    break;
+                default:
+                    handleUnimplementedFrame();
+                    break;
+            }
+        } catch (RequestValidationFailedException ex) {
+            log.warning("Validation exception: {} for client: {}", ex.getErrorCode());
+            handleErrorFrame(ex);
         }
     }
 
@@ -197,7 +219,6 @@ public class ClientSessionHandler extends ParserFrameState {
         if (next == Frame.FrameParsingState.FINISHED_PARSING) {
             reactToCommandParsed();
         }
-
 
 
     }

@@ -100,8 +100,6 @@ public class BlackBoxServerTest {
             final ActorRef destinationManager = system.actorOf(Props.create(DestinationManager.class), DestinationManager.NAME);
             final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, listener, destinationManager));
 
-
-
         }
 
         @Override
@@ -235,6 +233,17 @@ public class BlackBoxServerTest {
     }
 
     @Test
+    public void shouldRespondErrorForMissingHost() throws Exception{
+        //  given
+        StompTestClient client = createClient();
+        connectClient(client);
+
+        //   when
+        client.sendFrame("/CONNECT/invalid_frame_connect_headers_missing_host.txt");
+        expectResponse(client, "/ERROR/error_headers_missing_host.txt");
+    }
+
+    @Test
     public void shouldUnsubscribeFromTopic() throws Exception{
 
         //  given
@@ -264,9 +273,6 @@ public class BlackBoxServerTest {
         clients[0].sendFrame("/SEND/send_destination_topic.txt");
         expectResponse(clients[1], "/MESSAGE/message_topic_subscription_0_response.txt");
         expectNoResponse(clients[2]);
-
-
-
     }
 
 
