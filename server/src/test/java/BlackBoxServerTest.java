@@ -73,6 +73,12 @@ public class BlackBoxServerTest {
         return createClients(1)[0];
     }
 
+    private StompTestClient createConnectedClient() throws IOException{
+        StompTestClient client = createClient();
+        connectClient(client);
+        return client;
+    }
+
     private StompTestClient[] createClients(int numberOfClients) {
 
         if (initializedClients != null) {
@@ -233,14 +239,73 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondErrorForMissingHost() throws Exception{
+    public void shouldRespondToConnectWithErrorForMissingHost() throws Exception{
+
         //  given
-        StompTestClient client = createClient();
-        connectClient(client);
+        StompTestClient client = createConnectedClient();
 
         //   when
         client.sendFrame("/CONNECT/invalid_frame_connect_headers_missing_host.txt");
         expectResponse(client, "/ERROR/error_headers_missing_host.txt");
+    }
+
+    @Test
+    public void shouldRespondToConnectWithErrorForMissingAcceptVersion() throws Exception{
+
+        //  given
+        StompTestClient client = createConnectedClient();
+
+        //   when
+        client.sendFrame("/CONNECT/invalid_frame_connect_headers_missing_accept_version.txt");
+        expectResponse(client, "/ERROR/error_headers_missing_accept_version.txt");
+    }
+
+    @Test
+    public void shouldRespondToSendToTopicWithErrorForMissingDestination() throws Exception{
+
+        //  given
+        StompTestClient client = createConnectedClient();
+
+        //   when
+        client.sendFrame("/SEND/invalid_frame_send_headers_missing_destination.txt");
+        expectResponse(client, "/ERROR/error_headers_missing_destination.txt");
+
+    }
+
+    @Test
+    public void shouldRespondToSubscribeToTopicWithErrorForMissingId() throws Exception{
+
+        //  given
+        StompTestClient client = createConnectedClient();
+
+        //   when
+        client.sendFrame("/SUBSCRIBE/invalid_frame_subscribe_headers_missing_id.txt");
+        expectResponse(client, "/ERROR/error_headers_missing_id.txt");
+
+    }
+
+    @Test
+    public void shouldRespondToSubscribeToTopicWithErrorForMissingDestination() throws Exception{
+
+        //  given
+        StompTestClient client = createConnectedClient();
+
+        //   when
+        client.sendFrame("/SUBSCRIBE/invalid_frame_subscribe_headers_missing_destination.txt");
+        expectResponse(client, "/ERROR/error_headers_missing_destination.txt");
+
+    }
+
+    @Test
+    public void shouldRespondToUnsubscribeToTopicWithErrorForMissingId() throws Exception{
+
+        //  given
+        StompTestClient client = createConnectedClient();
+
+        //   when
+        client.sendFrame("/UNSUBSCRIBE/invalid_frame_unsubscribe_headers_missing_id.txt");
+        expectResponse(client, "/ERROR/error_headers_missing_id.txt");
+
     }
 
     @Test

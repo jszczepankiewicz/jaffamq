@@ -1,0 +1,4 @@
+ERROR
+message:STM-10003 Missing [accept-version] header
+
+CONNECT / STOMP frame requires accept-version header

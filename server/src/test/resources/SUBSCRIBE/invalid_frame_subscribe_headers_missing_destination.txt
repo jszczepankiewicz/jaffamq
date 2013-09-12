@@ -1,0 +1,4 @@
+SUBSCRIBE
+id:0
+ack:auto
+

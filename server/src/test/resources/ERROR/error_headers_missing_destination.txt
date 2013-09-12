@@ -1,0 +1,4 @@
+ERROR
+message:STM-10001 Missing [destination] header
+
+SEND / SUBSCRIBE / MESSAGE requires destination header

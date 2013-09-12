@@ -1,0 +1,6 @@
+ERROR
+message:STM-10002 Missing [id] header
+
+SUBSCRIBE / UNSUBSCRIBE frame requires id header
+
+

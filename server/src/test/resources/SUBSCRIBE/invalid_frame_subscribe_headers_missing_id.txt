@@ -1,0 +1,4 @@
+SUBSCRIBE
+destination:/topic/foo
+ack:auto
+

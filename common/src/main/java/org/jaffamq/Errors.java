@@ -35,7 +35,7 @@ public class Errors {
         }
     }
 
-    public static final Code HEADERS_MISSING_DESTINATION = new Code("STM-10001", "Missing [destination] header", "SEND / SUBSCRIBE / MESSAGE requires id header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
+    public static final Code HEADERS_MISSING_DESTINATION = new Code("STM-10001", "Missing [destination] header", "SEND / SUBSCRIBE / MESSAGE requires destination header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
     public static final Code HEADERS_MISSING_SUBSCRIPTION_ID = new Code("STM-10002", "Missing [id] header", "SUBSCRIBE / UNSUBSCRIBE frame requires id header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
     public static final Code HEADERS_MISSING_ACCEPT_VERSION = new Code("STM-10003", "Missing [accept-version] header", "CONNECT / STOMP frame requires accept-version header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
     public static final Code HEADERS_MISSING_HOST = new Code("STM-10004", "Missing [host] header", "CONNECT / STOMP frame requires host header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
