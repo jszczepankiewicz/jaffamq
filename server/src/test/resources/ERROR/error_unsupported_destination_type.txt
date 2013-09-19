@@ -1,0 +1,4 @@
+ERROR
+message:STM-20001 Unsupported destination type
+
+Supported destination types are /queue/... and /topic/...

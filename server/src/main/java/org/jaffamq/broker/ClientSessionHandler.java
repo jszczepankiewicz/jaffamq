@@ -21,14 +21,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class ClientSessionHandler extends ParserFrameState {
 
-    public static final int MILISECONDS_BEFORE_CLOSE = 30;
+    public static final int MILISECONDS_BEFORE_CLOSE = 100;
 
     private long nextMessageIdPart;
 
     private final LoggingAdapter log = Logging
             .getLogger(getContext().system(), getSelf());
 
-    private final ActorRef destinationManager;
+    private final ActorRef topicDestinationManager;
+
+    private final ActorRef queueDestinationManager;
 
     private final ActorRef connection;
 
@@ -42,11 +44,11 @@ public class ClientSessionHandler extends ParserFrameState {
     // this will hold the pipeline handler’s context
     private final TcpPipelineHandler.Init<TcpPipelineHandler.WithinActorContext, String, String> init;
 
-    public ClientSessionHandler(ActorRef connection, ActorRef destinationManager, TcpPipelineHandler.Init<TcpPipelineHandler.WithinActorContext, String, String> init) {
-        this.destinationManager = destinationManager;
+    public ClientSessionHandler(ActorRef connection, ActorRef topicDestinationManager, ActorRef queueDestinationManager, TcpPipelineHandler.Init<TcpPipelineHandler.WithinActorContext, String, String> init) {
+        this.topicDestinationManager = topicDestinationManager;
+        this.queueDestinationManager = queueDestinationManager;
         this.init = init;
         this.connection = connection;
-        //this.connection = null;
     }
 
     @Override
@@ -126,7 +128,7 @@ public class ClientSessionHandler extends ParserFrameState {
         if (destination == null) {
             log.error("Can not found destination for subscriptionId: {}, unsubscription can not proceed!", subscriptionId);
         } else {
-            destinationManager.tell(new Unsubscribe(destination, subscriptionId), getSelf());
+            topicDestinationManager.tell(new Unsubscribe(destination, subscriptionId), getSelf());
         }
 
     }
@@ -141,7 +143,7 @@ public class ClientSessionHandler extends ParserFrameState {
         log.info("Received SUBSCRIBE to destination: {} with id: {}", destination, subscriptionId);
 
         //  passing self as the subscriber
-        destinationManager.tell(new SubscriberRegister(destination, subscriptionId), getSelf());
+        topicDestinationManager.tell(new SubscriberRegister(destination, subscriptionId), getSelf());
     }
 
     private String getNextMessageId() {
@@ -172,14 +174,13 @@ public class ClientSessionHandler extends ParserFrameState {
 
         String destination = getRequiredHeaderValue(Headers.DESTINATION, Errors.HEADERS_MISSING_DESTINATION);
 
-        //  TODO: headers + body should be in some struct on stack and not on heap.
         String messageId = headers.get(Headers.SET_MESSAGE_ID);
 
         if (messageId == null) {
             messageId = getNextMessageId();
         }
 
-        destinationManager.tell(new StompMessage(destination, getCurrentFrameBody(), headers, messageId), getSender());
+        getDestinationManager(destination).tell(new StompMessage(destination, getCurrentFrameBody(), headers, messageId), getSender());
     }
 
     private void reactToCommandParsed() {
@@ -220,7 +221,24 @@ public class ClientSessionHandler extends ParserFrameState {
             reactToCommandParsed();
         }
 
+    }
 
+    private ActorRef getDestinationManager(String destination) throws RequestValidationFailedException{
+
+        //  checking if there is at least one character in destination name
+        if(destination.length() == 7){
+            throw new RequestValidationFailedException(Errors.INVALID_DESTINATION_NAME);
+        }
+
+        if(destination.startsWith("/topic/")){
+            return topicDestinationManager;
+        }
+
+        if(destination.startsWith("/queue/")){
+            return queueDestinationManager;
+        }
+
+        throw new RequestValidationFailedException(Errors.UNSUPPORTED_DESTINATION_TYPE);
     }
 
 }

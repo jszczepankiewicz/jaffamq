@@ -4,8 +4,9 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
 import org.apache.commons.io.IOUtils;
-import org.jaffamq.broker.DestinationManager;
-import org.jaffamq.broker.ServerListener;
+import org.jaffamq.broker.QueueDestinationManager;
+import org.jaffamq.broker.TopicDestinationManager;
+
 import org.jaffamq.broker.StompServer;
 import org.jaffamq.org.jaffamq.test.StompTestBlockingClient;
 import org.jaffamq.org.jaffamq.test.StompTestClient;
@@ -102,9 +103,10 @@ public class BlackBoxServerTest {
 
             InetSocketAddress remote = new InetSocketAddress("localhost", 9999);
             system = ActorSystem.create("TestServerApp");
-            final ActorRef listener = system.actorOf(Props.create(ServerListener.class), "serverlistener");
-            final ActorRef destinationManager = system.actorOf(Props.create(DestinationManager.class), DestinationManager.NAME);
-            final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, listener, destinationManager));
+
+            final ActorRef topicDestinationManager = system.actorOf(Props.create(TopicDestinationManager.class), TopicDestinationManager.NAME);
+            final ActorRef queueDestinationManager = system.actorOf(Props.create(QueueDestinationManager.class), QueueDestinationManager.NAME);
+            final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, topicDestinationManager, queueDestinationManager));
 
         }
 
@@ -282,6 +284,39 @@ public class BlackBoxServerTest {
         client.sendFrame("/SUBSCRIBE/invalid_frame_subscribe_headers_missing_id.txt");
         expectResponse(client, "/ERROR/error_headers_missing_id.txt");
 
+    }
+
+    @Test
+    public void shouldRespondToUnknownDestinationTypeWithError() throws Exception{
+
+        //  given
+        StompTestClient client = createConnectedClient();
+
+        //   when
+        client.sendFrame("/SEND/invalid_frame_send_unsupported_destination_type.txt");
+        expectResponse(client, "/ERROR/error_unsupported_destination_type.txt");
+    }
+
+    @Test
+    public void shouldRespondToInvalidQueueDestinationNameWithError() throws Exception{
+
+        //  given
+        StompTestClient client = createConnectedClient();
+
+        //   when
+        client.sendFrame("/SEND/invalid_frame_send_invalid_queue_destination_name.txt");
+        expectResponse(client, "/ERROR/error_invalid_destination_name.txt");
+    }
+
+    @Test
+    public void shouldRespondToInvalidTopicDestinationNameWithError() throws Exception{
+
+        //  given
+        StompTestClient client = createConnectedClient();
+
+        //   when
+        client.sendFrame("/SEND/invalid_frame_send_invalid_topic_destination_name.txt");
+        expectResponse(client, "/ERROR/error_invalid_destination_name.txt");
     }
 
     @Test

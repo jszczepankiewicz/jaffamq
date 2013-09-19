@@ -15,11 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Actor responsible for managing destinations. Currently limited to only topics.
+ * Actor responsible for managing topic destinations. Currently limited to only topics.
  */
-public class DestinationManager extends UntypedActor{
+public class TopicDestinationManager extends UntypedActor{
 
-    public static final String NAME="destinationManager";
+    public static final String NAME="topicDestinationManager";
 
     //  TODO: weak references?
     private Map<String, ActorRef> topics = new HashMap<String, ActorRef>();

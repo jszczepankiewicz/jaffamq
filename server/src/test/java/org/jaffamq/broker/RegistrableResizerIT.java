@@ -13,11 +13,9 @@ import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-
 public class RegistrableResizerIT {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DestinationManagerTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TopicDestinationManagerTest.class);
 
     private static ActorSystem system;
 

@@ -1,0 +1,5 @@
+ERROR
+message:STM-20002 Invalid destination name
+
+Valid destination names should have at least one character after destination type
+

@@ -11,12 +11,6 @@ import akka.io.Tcp.Connected;
 import akka.io.TcpPipelineHandler.Init;
 import akka.io.TcpPipelineHandler.WithinActorContext;
 import akka.util.ByteString;
-import org.jaffamq.Frame;
-import org.jaffamq.Headers;
-import org.jaffamq.ParserFrameState;
-import org.jaffamq.broker.messages.StompMessage;
-import org.jaffamq.broker.messages.SubscribedStompMessage;
-import org.jaffamq.broker.messages.SubscriberRegister;
 
 import java.net.InetSocketAddress;
 
@@ -27,17 +21,18 @@ public class StompServer extends UntypedActor {
      * If you change this change also ParserFrameState.PAYLOAD_LINE_SEPARATOR_LENGTH
      */
     public static final String PAYLOAD_LINE_SEPARATOR="\n";
-    final ActorRef destinationManager;
 
-    final ActorRef listener;
+    private final ActorRef topicDestinationManager;
+    private final ActorRef queueDestinationManager;
 
     final LoggingAdapter log = Logging
             .getLogger(getContext().system(), getSelf());
 
-    public StompServer(InetSocketAddress remote, ActorRef listener, ActorRef destinationManager) {
+    public StompServer(InetSocketAddress remote, ActorRef topicDestinationManager, ActorRef queueDestinationManager) {
 
-        this.listener = listener;
-        this.destinationManager = destinationManager;
+
+        this.topicDestinationManager = topicDestinationManager;
+        this.queueDestinationManager = queueDestinationManager;
 
         // bind to a socket, registering ourselves as incoming connection handler
         Tcp.get(getContext().system()).getManager().tell(
@@ -54,7 +49,7 @@ public class StompServer extends UntypedActor {
             getContext().stop(getSelf());
 
         } else if (msg instanceof Tcp.Bound) {
-            listener.tell(msg, getSelf());
+            log.info("Server started and ready to accept connections");
 
         } else if (msg instanceof Connected) {
 
@@ -68,7 +63,7 @@ public class StompServer extends UntypedActor {
             ActorRef connection = getSender();
             //  create session handler which will handle conversation state
             ActorRef sessionHandler = getContext().actorOf(Props.create
-                    (ClientSessionHandler.class, connection, destinationManager, init));
+                    (ClientSessionHandler.class, connection, topicDestinationManager, queueDestinationManager, init));
 
 
             final ActorRef handler = getContext().actorOf(
@@ -78,7 +73,6 @@ public class StompServer extends UntypedActor {
             getSender().tell(TcpMessage.register(handler), getSelf());
 
         }
-
         else{
             unhandled(msg);
         }

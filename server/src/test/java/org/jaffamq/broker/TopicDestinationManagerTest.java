@@ -18,9 +18,9 @@ import org.slf4j.LoggerFactory;
  * Time: 22:16
  * To change this template use File | Settings | File Templates.
  */
-public class DestinationManagerTest {
+public class TopicDestinationManagerTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DestinationManagerTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TopicDestinationManagerTest.class);
 
     private static ActorSystem system;
 
@@ -42,7 +42,7 @@ public class DestinationManagerTest {
     @Test
     public void shouldCorrectlyServeTopics(){
         new JavaTestKit(system) {{
-            final Props props = Props.create(DestinationManager.class);
+            final Props props = Props.create(TopicDestinationManager.class);
             final ActorRef destinationManager = system.actorOf(props);
 
 

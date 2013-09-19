@@ -17,12 +17,13 @@ import java.security.NoSuchAlgorithmException;
 public class ServerApp {
 
     public static void main(String... args) throws NoSuchAlgorithmException {
-        //SSLContext ctx = SSLContext.getDefault();
+
         InetSocketAddress remote = new InetSocketAddress("localhost", 9907);
         ActorSystem system = ActorSystem.create("ServerApp");
-        final ActorRef listener = system.actorOf(Props.create(ServerListener.class), "serverlistener");
-        final ActorRef destinationManager = system.actorOf(Props.create(DestinationManager.class), DestinationManager.NAME);
-        final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, listener, destinationManager));
+
+        final ActorRef topicDestinationManager = system.actorOf(Props.create(TopicDestinationManager.class), TopicDestinationManager.NAME);
+        final ActorRef queueDestinationManager = system.actorOf(Props.create(QueueDestinationManager.class), QueueDestinationManager.NAME);
+        final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, topicDestinationManager, queueDestinationManager));
 
     }
 
