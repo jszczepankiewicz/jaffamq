@@ -1,4 +1,4 @@
-package org.jaffamq.broker;
+package org.jaffamq.broker.destination;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
@@ -6,7 +6,6 @@ import akka.actor.Terminated;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import org.jaffamq.Headers;
 import org.jaffamq.broker.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
 import org.jaffamq.broker.messages.Unsubscribe;
@@ -15,30 +14,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Actor responsible for managing topic destinations. Currently limited to only topics.
+ * Abstract destination manager that manages different types of destinations and routes
+ * messages to and from the to the clients.
  */
-public class TopicDestinationManager extends UntypedActor{
 
-    public static final String NAME="topicDestinationManager";
+public abstract class DestinationManager extends UntypedActor{
+
 
     //  TODO: weak references?
-    private Map<String, ActorRef> topics = new HashMap<String, ActorRef>();
+    private Map<String, ActorRef> destinations = new HashMap<String, ActorRef>();
 
     private final LoggingAdapter log = Logging
             .getLogger(getContext().system(), getSelf());
 
-    private ActorRef getOrCreateTopicForDestination(String destination){
+    protected abstract ActorRef createDestinationForName(String destination);
 
-        ActorRef topic = topics.get(destination);
+    private ActorRef getOrCreateDestinationForName(String destination){
 
-        if(topic == null){
-            log.info("Creating topic for destination: {}", destination);
-            final Props props = Props.create(Topic.class, destination);
-            topic = getContext().system().actorOf(props);
-            topics.put(destination, topic);
+        ActorRef destinationActor = destinations.get(destination);
+
+        if(destinationActor == null){
+            log.info("Creating destinationActor for destination: {}", destination);
+            destinationActor = createDestinationForName(destination);
+            destinations.put(destination, destinationActor);
         }
 
-        return topic;
+        return destinationActor;
     }
 
     @Override
@@ -50,20 +51,18 @@ public class TopicDestinationManager extends UntypedActor{
 
             StompMessage m = (StompMessage)o;
             log.info("Received stomp message wit message-id: {}", m.getMessageId());
-            ActorRef topic = getOrCreateTopicForDestination(m.getDestination());
-            topic.tell(o, getSender());
+            ActorRef destination = getOrCreateDestinationForName(m.getDestination());
+            destination.tell(o, getSender());
             return;
         }
         else if(o instanceof SubscriberRegister){
             String destination =((SubscriberRegister)o).getDestination();
-            ActorRef topic = getOrCreateTopicForDestination(destination);
-            topic.tell(o, getSender());
+            ActorRef destinationActor = getOrCreateDestinationForName(destination);
+            destinationActor.tell(o, getSender());
             return;
         }
         else if(o instanceof Terminated){
-            //  I assume this is from topic
-            //Topic topic = ((Topic)getSender())
-            //  TODO: remove me
+            log.warning("Implement me");
         }
         else if(o instanceof Unsubscribe){
 
@@ -72,14 +71,14 @@ public class TopicDestinationManager extends UntypedActor{
 
             //  may be received only from socket
             //  check if we have topics that can be unsubscribed
-            ActorRef topic = topics.get(message.getDestination());
+            ActorRef destinationActor = destinations.get(message.getDestination());
 
-            if(topic != null){
-                log.info("Found topic for destination {}", message.getDestination());
-                topic.tell(o, getSender());
+            if(destinationActor != null){
+                log.info("Found destination actor for name {}", message.getDestination());
+                destinationActor.tell(o, getSender());
             }
             else{
-                log.info("Can not found topic for destination {}", message.getDestination());
+                log.info("Can not found destination actor for name {}", message.getDestination());
             }
 
             return;

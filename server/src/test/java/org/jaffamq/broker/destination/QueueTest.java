@@ -1,4 +1,4 @@
-package org.jaffamq.broker;
+package org.jaffamq.broker.destination;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -15,16 +15,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Integration test for Topic
+ * Integration tests for Queue.
  */
-public class TopicTest {
+public class QueueTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(TopicTest.class);
 
     private static ActorSystem system;
 
     @Rule
-    public ExternalResource systemResouce = new ExternalResource() {
+    public ExternalResource systemResource = new ExternalResource() {
 
         @Override
         protected void before() throws Throwable {
@@ -38,18 +38,14 @@ public class TopicTest {
         }
     };
 
-
-    /*
-        TODO:   add multiple subscribers
-     */
     @Test
-    public void shouldCorrectlyCommunicateWithTopic() {
+    public void shouldCorrectlyCommunicateWithQueueWithOneSubscriber() {
 
         new JavaTestKit(system) {{
 
             //  given
-            final Props props = Props.create(Topic.class, "destination1");
-            final ActorRef topic = system.actorOf(props);
+            final Props props = Props.create(Queue.class, "destination1");
+            final ActorRef queue = system.actorOf(props);
 
             //final JavaTestKit probe = new JavaTestKit(system);
 
@@ -59,17 +55,18 @@ public class TopicTest {
 
             //  warning: this only registers one subscriber
             LOG.debug("Subscribing to topic");
-            topic.tell(new SubscriberRegister("destination1", "1"), getRef());
+            queue.tell(new SubscriberRegister("destination1", "1"), getRef());
 
             StompMessage t1 = new StompMessage("destination1", null, null, "3");
 
             LOG.debug("Sending message to subscribed topic");
-            topic.tell(t1, getRef());
+            queue.tell(t1, getRef());
             SubscribedStompMessage expected = new SubscribedStompMessage(t1, "1");
             expectMsgEquals(expected);
 
-            topic.tell(new Terminated(null, false, false), getRef());
+            queue.tell(new Terminated(null, false, false), getRef());
             expectNoMsg();
         }};
     }
+
 }

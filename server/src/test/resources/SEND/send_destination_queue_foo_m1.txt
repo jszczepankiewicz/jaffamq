@@ -1,0 +1,9 @@
+SEND
+destination:/queue/foo
+content-type:text/plain
+set-message-id:8
+
+hello queue a
+some line two
+message1
+

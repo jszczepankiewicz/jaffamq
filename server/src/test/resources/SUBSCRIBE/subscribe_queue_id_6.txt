@@ -1,0 +1,5 @@
+SUBSCRIBE
+id:6
+destination:/queue/foo
+ack:auto
+

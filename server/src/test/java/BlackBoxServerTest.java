@@ -4,8 +4,8 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
 import org.apache.commons.io.IOUtils;
-import org.jaffamq.broker.QueueDestinationManager;
-import org.jaffamq.broker.TopicDestinationManager;
+import org.jaffamq.broker.destination.QueueDestinationManager;
+import org.jaffamq.broker.destination.TopicDestinationManager;
 
 import org.jaffamq.broker.StompServer;
 import org.jaffamq.org.jaffamq.test.StompTestBlockingClient;
@@ -31,7 +31,8 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.fail;
 
 /**
- * Group of tests that are using full TCP/IP stack to communicate between client (test) and server. Client is simple blocking test sending class.
+ * Group of tests that are using full TCP/IP stack to communicate between client (test) and server.
+ * Client is simple blocking test sending class.
  */
 public class BlackBoxServerTest {
 
@@ -106,7 +107,7 @@ public class BlackBoxServerTest {
 
             final ActorRef topicDestinationManager = system.actorOf(Props.create(TopicDestinationManager.class), TopicDestinationManager.NAME);
             final ActorRef queueDestinationManager = system.actorOf(Props.create(QueueDestinationManager.class), QueueDestinationManager.NAME);
-            final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, topicDestinationManager, queueDestinationManager));
+            system.actorOf(Props.create(StompServer.class, remote, topicDestinationManager, queueDestinationManager));
 
         }
 
@@ -340,6 +341,93 @@ public class BlackBoxServerTest {
         //   when
         client.sendFrame("/UNSUBSCRIBE/invalid_frame_unsubscribe_headers_missing_id.txt");
         expectResponse(client, "/ERROR/error_headers_missing_id.txt");
+
+    }
+
+    @Test
+    public void shouldRecycleQueueSubscribersOnUnsubscribe() throws Exception{
+
+        StompTestClient[] clients = createClients(3);
+        connectClients(clients);
+
+        //  when
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_queue_id_3.txt");
+        waitToPropagateTCP();
+        clients[2].sendFrame("/SUBSCRIBE/subscribe_queue_id_6.txt");
+
+        waitToPropagateTCP();
+        clients[0].sendFrame("/SEND/send_destination_queue_foo_m1.txt");
+
+        //  then
+        expectNoResponse(clients[0]);
+        expectResponse(clients[1], "/MESSAGE/message_queue_subscription_3_m1.txt");
+        expectNoResponse(clients[2]);
+
+        //  unsubscribe
+        clients[2].sendFrame("/UNSUBSCRIBE/unsubscribe_id_6.txt");
+        waitToPropagateTCP();
+
+        //  when
+        clients[0].sendFrame("/SEND/send_destination_queue_foo_m2.txt");
+
+        //  then
+        expectNoResponse(clients[0]);
+        expectResponse(clients[1], "/MESSAGE/message_queue_subscription_6_m2.txt");
+        expectNoResponse(clients[2]);   //  clients[2] unsubscribed from this id
+
+    }
+
+
+    @Test
+    public void shouldRecycleQueueSubscribersOnMoreMessages() throws Exception{
+
+        StompTestClient[] clients = createClients(3);
+        connectClients(clients);
+
+        //  when
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_queue_id_3.txt");
+        waitToPropagateTCP();
+        clients[2].sendFrame("/SUBSCRIBE/subscribe_queue_id_6.txt");
+
+        waitToPropagateTCP();
+        clients[0].sendFrame("/SEND/send_destination_queue_foo_m1.txt");
+
+        //  then
+        expectNoResponse(clients[0]);
+        expectResponse(clients[1], "/MESSAGE/message_queue_subscription_3_m1.txt");
+        expectNoResponse(clients[2]);
+
+        //  when
+        clients[0].sendFrame("/SEND/send_destination_queue_foo_m2.txt");
+
+        //  then
+        expectNoResponse(clients[0]);
+        expectResponse(clients[2], "/MESSAGE/message_queue_subscription_6_m2.txt");
+        expectNoResponse(clients[1]);
+
+        //  when
+        clients[0].sendFrame("/SEND/send_destination_queue_foo_m3.txt");
+
+        //  then
+        expectNoResponse(clients[0]);
+        expectResponse(clients[1], "/MESSAGE/message_queue_subscription_3_m3.txt");
+        expectNoResponse(clients[2]);
+
+        //  when
+        clients[0].sendFrame("/SEND/send_destination_queue_foo_m4.txt");
+
+        //  then
+        expectNoResponse(clients[0]);
+        expectResponse(clients[2], "/MESSAGE/message_queue_subscription_6_m4.txt");
+        expectNoResponse(clients[1]);
+
+        //  when
+        clients[0].sendFrame("/SEND/send_destination_queue_foo_m5.txt");
+
+        //  then
+        expectNoResponse(clients[0]);
+        expectResponse(clients[1], "/MESSAGE/message_queue_subscription_3_m5.txt");
+        expectNoResponse(clients[2]);
 
     }
 

@@ -3,6 +3,8 @@ package org.jaffamq.broker;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import org.jaffamq.broker.destination.QueueDestinationManager;
+import org.jaffamq.broker.destination.TopicDestinationManager;
 
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;

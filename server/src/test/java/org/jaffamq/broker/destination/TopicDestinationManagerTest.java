@@ -1,4 +1,4 @@
-package org.jaffamq.broker;
+package org.jaffamq.broker.destination;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;

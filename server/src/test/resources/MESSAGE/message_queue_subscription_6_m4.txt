@@ -1,0 +1,11 @@
+MESSAGE
+subscription:6
+message-id:11
+destination:/queue/foo
+content-type:text/plain
+
+hello queue a
+some line two
+message4
+
+

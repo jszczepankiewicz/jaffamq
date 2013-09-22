@@ -54,7 +54,8 @@ public class ClientSessionHandler extends ParserFrameState {
     @Override
     public void onReceive(Object msg) throws Exception {
 
-        log.info("ClientSessionHandler.onReceive: {}", msg);
+        //  uncomment below to grab low level tcp events
+        //log.info("ClientSessionHandler.onReceive: {}", msg);
 
         if (msg instanceof Tcp.CommandFailed) {
             getContext().stop(getSelf());
@@ -125,10 +126,12 @@ public class ClientSessionHandler extends ParserFrameState {
 
         //  need to find out the destination by subscriptionId
         String destination = destinationBySubscriptionId.get(subscriptionId);
+
         if (destination == null) {
             log.error("Can not found destination for subscriptionId: {}, unsubscription can not proceed!", subscriptionId);
         } else {
-            topicDestinationManager.tell(new Unsubscribe(destination, subscriptionId), getSelf());
+
+            getDestinationManager(destination).tell(new Unsubscribe(destination, subscriptionId), getSelf());
         }
 
     }
@@ -143,7 +146,8 @@ public class ClientSessionHandler extends ParserFrameState {
         log.info("Received SUBSCRIBE to destination: {} with id: {}", destination, subscriptionId);
 
         //  passing self as the subscriber
-        topicDestinationManager.tell(new SubscriberRegister(destination, subscriptionId), getSelf());
+
+        getDestinationManager(destination).tell(new SubscriberRegister(destination, subscriptionId), getSelf());
     }
 
     private String getNextMessageId() {
