@@ -14,13 +14,12 @@
 
     <artifactId>server</artifactId>
     <dependencies>
+
+
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_2.10</artifactId>
         </dependency>
-
-
-
 
         <dependency>
             <groupId>ch.qos.logback</groupId>

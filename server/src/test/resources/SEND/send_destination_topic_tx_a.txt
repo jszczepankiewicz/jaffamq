@@ -1,0 +1,9 @@
+SEND
+destination:/topic/foo
+content-type:text/plain
+set-message-id:007
+transaction:a
+
+hello queue a
+some line two
+

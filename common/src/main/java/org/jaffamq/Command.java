@@ -23,7 +23,9 @@ public enum Command {
     MESSAGE("MESSAGE"),
     RECEIPT("RECEIPT"),
     CONNECTED("CONNECTED"),
-    ERROR("ERROR"),;
+    ERROR("ERROR"),
+    _EMPTY("_EMPTY"),
+    _UNKNOWN("_UNKNOWN");
     private String text;
 
     Command(String text) {
@@ -44,7 +46,8 @@ public enum Command {
         else if (value.equals("CONNECTED")) return CONNECTED;
         else if (value.equals("DISCONNECT")) return DISCONNECT;
         else if (value.equals("ERROR")) return ERROR;
-        throw new IllegalArgumentException("Unrecognised command " + value);
+        else if (value.equals("")) return _EMPTY;
+        else return _UNKNOWN;
     }
 
 }

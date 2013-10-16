@@ -10,6 +10,7 @@ import org.jaffamq.broker.destination.TopicDestinationManager;
 import org.jaffamq.broker.StompServer;
 import org.jaffamq.org.jaffamq.test.StompTestBlockingClient;
 import org.jaffamq.org.jaffamq.test.StompTestClient;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
@@ -310,6 +311,41 @@ public class BlackBoxServerTest {
     }
 
     @Test
+    public void shouldRespondToBeginWithErrorForMissingTransaction() throws Exception{
+
+        //  given
+        StompTestClient client = createConnectedClient();
+
+        //   when
+        client.sendFrame("/BEGIN/invalid_frame_begin_headers_missing_transaction.txt");
+        expectResponse(client, "/ERROR/error_headers_missing_transaction.txt");
+    }
+
+    @Test
+    public void shouldRespondToCommitWithErrorForMissingTransaction() throws Exception{
+
+        //  given
+        StompTestClient client = createConnectedClient();
+
+        //   when
+        client.sendFrame("/COMMIT/invalid_frame_commit_headers_missing_transaction.txt");
+        expectResponse(client, "/ERROR/error_headers_missing_transaction.txt");
+
+    }
+
+    @Test
+    public void shouldRespondToAbortWithErrorForMissingTransaction() throws Exception{
+
+        //  given
+        StompTestClient client = createConnectedClient();
+
+        //   when
+        client.sendFrame("/ABORT/invalid_frame_abort_headers_missing_transaction.txt");
+        expectResponse(client, "/ERROR/error_headers_missing_transaction.txt");
+
+    }
+
+    @Test
     public void shouldRespondToInvalidTopicDestinationNameWithError() throws Exception{
 
         //  given
@@ -372,7 +408,7 @@ public class BlackBoxServerTest {
 
         //  then
         expectNoResponse(clients[0]);
-        expectResponse(clients[1], "/MESSAGE/message_queue_subscription_6_m2.txt");
+        expectResponse(clients[1], "/MESSAGE/message_queue_subscription_3_m2.txt");
         expectNoResponse(clients[2]);   //  clients[2] unsubscribed from this id
 
     }
@@ -430,6 +466,342 @@ public class BlackBoxServerTest {
         expectNoResponse(clients[2]);
 
     }
+
+    @Test
+    public void shouldReturnErrorOnBeginTwiceSameTx() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(1);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        waitToPropagateTCP();
+
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        expectResponse(clients[0], "/ERROR/error_tx_already_begun.txt");
+
+
+    }
+
+    @Test
+    public void shouldReturnErrorOnAbortNotKnownTx() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(1);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        waitToPropagateTCP();
+
+        //  then
+        clients[0].sendFrame("/SEND/send_destination_topic_tx_a.txt");
+        waitToPropagateTCP();
+        clients[0].sendFrame("/ABORT/abort_tx_y.txt");
+        expectResponse(clients[0], "/ERROR/error_unknown_tx_to_abort.txt");
+    }
+
+    @Test
+    public void shouldReturnErrorOnCommitNotKnownTx() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(1);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        waitToPropagateTCP();
+
+        //  then
+        clients[0].sendFrame("/SEND/send_destination_topic_tx_a.txt");
+        waitToPropagateTCP();
+        clients[0].sendFrame("/COMMIT/commit_tx_y.txt");
+        expectResponse(clients[0], "/ERROR/error_unknown_tx_to_commit.txt");
+    }
+
+    @Test
+    public void shouldReturnErrorOnCommitTwiceSameTx() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(1);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        waitToPropagateTCP();
+
+        //  then
+        clients[0].sendFrame("/SEND/send_destination_topic_tx_a.txt");
+        waitToPropagateTCP();
+        clients[0].sendFrame("/COMMIT/commit_tx_a.txt");
+        expectNoResponse(clients[0]);
+        clients[0].sendFrame("/COMMIT/commit_tx_a.txt");
+        expectResponse(clients[0], "/ERROR/error_tx_already_commited.txt");
+    }
+
+    @Test
+    public void shouldReturnErrorOnAbortTwiceSameTx() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(1);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        waitToPropagateTCP();
+
+        //  then
+        clients[0].sendFrame("/SEND/send_destination_topic_tx_a.txt");
+        waitToPropagateTCP();
+        clients[0].sendFrame("/ABORT/abort_tx_a.txt");
+        expectNoResponse(clients[0]);
+        clients[0].sendFrame("/ABORT/abort_tx_a.txt");
+        expectResponse(clients[0], "/ERROR/error_tx_already_aborted.txt");
+    }
+
+    @Test
+    public void shouldSendCommitedMessagesFromOneTransactionToMultipleDestinations() throws Exception{
+
+        // given
+        StompTestClient[] clients = createClients(3);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_topic_id_0.txt");
+        clients[2].sendFrame("/SUBSCRIBE/subscribe_queue_id_3.txt");
+        waitToPropagateTCP();
+
+        //  then
+        clients[0].sendFrame("/SEND/send_destination_topic_tx_a.txt");
+        clients[0].sendFrame("/SEND/send_destination_queue_tx_a.txt");
+        expectNoResponse(clients[1]);
+        expectNoResponse(clients[2]);
+
+        clients[0].sendFrame("/COMMIT/commit_tx_a.txt");
+        expectResponse(clients[1],"/MESSAGE/message_topic_subscription_0_response.txt");
+        expectResponse(clients[2],"/MESSAGE/message_queue_subscription_3_m1.txt");
+
+    }
+
+    @Test
+    public void shouldNotSendRollbackedMessagesToTopic() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(2);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_topic_id_0.txt");
+        waitToPropagateTCP();
+
+        //  then
+        clients[0].sendFrame("/SEND/send_destination_topic_tx_a.txt");
+        waitToPropagateTCP();
+        clients[0].sendFrame("/ABORT/abort_tx_a.txt");
+        expectNoResponse(clients[1]);
+
+    }
+
+    @Test
+    public void shouldNotSendRollbackedMessagesToQueue() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(2);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_queue_id_3.txt");     //  subscribe to /topic/foo
+        waitToPropagateTCP();
+
+        //  then
+        clients[0].sendFrame("/SEND/send_destination_queue_tx_a.txt");
+        waitToPropagateTCP();
+        clients[0].sendFrame("/ABORT/abort_tx_a.txt");
+        expectNoResponse(clients[1]);
+    }
+
+    @Test
+    public void shouldNotSendRollbackedMessagesFromOneTransactionToMulitpleDestinations() throws Exception{
+
+        // given
+        StompTestClient[] clients = createClients(3);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_topic_id_0.txt");
+        clients[2].sendFrame("/SUBSCRIBE/subscribe_queue_id_3.txt");
+        waitToPropagateTCP();
+
+        //  then
+        clients[0].sendFrame("/SEND/send_destination_topic_tx_a.txt");
+        clients[0].sendFrame("/SEND/send_destination_queue_tx_a.txt");
+        expectNoResponse(clients[1]);
+        expectNoResponse(clients[2]);
+
+        clients[0].sendFrame("/ABORT/abort_tx_a.txt");
+        expectNoResponse(clients[1]);
+        expectNoResponse(clients[2]);
+    }
+
+    @Test
+    public void shouldSendOnlyMessagesFromCommitedTxWithSecondTxFromSameClientUncommited() throws Exception{
+
+        // given
+        StompTestClient[] clients = createClients(4);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        clients[0].sendFrame("/BEGIN/begin_tx_b.txt");
+
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_topic_id_0.txt");    //  subscription id: 0, /topic/foo
+        clients[2].sendFrame("/SUBSCRIBE/subscribe_queue_id_3.txt");    //  subscription id: 3, /queue/foo
+        clients[3].sendFrame("/SUBSCRIBE/subscribe_queue_id_6.txt");    //  subscription id: 6, /queue/foo
+
+        waitToPropagateTCP();
+
+        //  then
+        clients[0].sendFrame("/SEND/send_destination_topic_tx_a.txt");  //  /topic/foo
+        expectNoResponse(clients[0]);
+        clients[0].sendFrame("/SEND/send_destination_queue_tx_a.txt");  //  /queue/foo
+        expectNoResponse(clients[0]);
+        clients[0].sendFrame("/SEND/send_destination_queue_tx_b.txt");  //  /queue/foo
+        expectNoResponse(clients[0]);
+
+        expectNoResponse(clients[1]);
+        expectNoResponse(clients[2]);
+        expectNoResponse(clients[3]);
+
+        clients[0].sendFrame("/ABORT/abort_tx_a.txt");
+        clients[0].sendFrame("/COMMIT/commit_tx_b.txt");
+        expectNoResponse(clients[1]);
+        expectResponse(clients[2], "/MESSAGE/message_queue_subscription_6_m6.txt");
+        expectNoResponse(clients[3]);
+
+
+
+    }
+
+
+    @Test
+    public void shouldNotSendUncommitedMessagesToQueue() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(2);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_queue_id_3.txt");     //  subscribe to /topic/foo
+        waitToPropagateTCP();
+
+        //  then
+        clients[0].sendFrame("/SEND/send_destination_queue_tx_a.txt");
+        waitToPropagateTCP();
+        clients[0].close();
+        expectNoResponse(clients[1]);
+    }
+
+    @Test
+    public void shouldSendCommitedMessagesToQueue() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(2);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_queue_id_3.txt");     //  subscribe to /topic/foo
+        waitToPropagateTCP();
+        clients[0].sendFrame("/SEND/send_destination_queue_tx_a.txt");
+
+        //  then
+        expectNoResponse(clients[1]);
+        clients[0].sendFrame("/COMMIT/commit_tx_a.txt");
+        expectNoResponse(clients[0]);
+        expectResponse(clients[1], "/MESSAGE/message_queue_subscription_3_m1.txt");
+
+    }
+
+    @Test
+    public void shouldSendCommitedMessagesToTopic() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(3);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_topic_id_0.txt");
+        clients[2].sendFrame("/SUBSCRIBE/subscribe_topic_id_100.txt");
+        waitToPropagateTCP();
+        clients[0].sendFrame("/SEND/send_destination_topic_tx_a.txt");
+
+        //  then
+        expectNoResponse(clients[1]);
+        expectNoResponse(clients[2]);
+
+        clients[0].sendFrame("/COMMIT/commit_tx_a.txt");
+
+        expectNoResponse(clients[0]);
+
+        expectResponse(clients[1], "/MESSAGE/message_topic_subscription_0_response.txt");
+        expectResponse(clients[2], "/MESSAGE/message_topic_subscription_100_response.txt");
+    }
+
+    @Ignore
+    @Test
+    public void shouldReturnErrorOnEmptyFrame() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(1);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/OTHER/invalid_frame_empty.txt");
+
+        //  then
+        expectResponse(clients[0], "/ERROR/error_empty_frame.txt");
+    }
+
+    @Test
+    public void shouldReturnErrorOnEmptyTransactionNameWithSend() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(1);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/SEND/invalid_frame_send_empty_tx.txt");
+
+        //  then
+        expectResponse(clients[0], "/ERROR/error_tx_empty_name.txt");
+    }
+
+    @Test
+    public void shouldNotSendUncommitedMessagesToTopic() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(2);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_topic_id_0.txt");     //  subscribe to /topic/foo
+        waitToPropagateTCP();
+
+        //  then
+        clients[0].sendFrame("/SEND/send_destination_topic_tx_a.txt");
+        waitToPropagateTCP();
+        clients[0].close();
+        expectNoResponse(clients[1]);
+    }
+
 
     @Test
     public void shouldUnsubscribeFromTopic() throws Exception{

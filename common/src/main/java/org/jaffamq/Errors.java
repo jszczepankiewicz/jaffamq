@@ -33,13 +33,34 @@ public class Errors {
         public String getAction() {
             return action;
         }
+
+        @Override
+        public String toString(){
+            return "[Error : " + id + "]";
+        }
     }
+
+
 
     //  client frame validation related error codes
     public static final Code HEADERS_MISSING_DESTINATION = new Code("STM-10001", "Missing [destination] header", "SEND / SUBSCRIBE / MESSAGE requires destination header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
     public static final Code HEADERS_MISSING_SUBSCRIPTION_ID = new Code("STM-10002", "Missing [id] header", "SUBSCRIBE / UNSUBSCRIBE frame requires id header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
     public static final Code HEADERS_MISSING_ACCEPT_VERSION = new Code("STM-10003", "Missing [accept-version] header", "CONNECT / STOMP frame requires accept-version header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
     public static final Code HEADERS_MISSING_HOST = new Code("STM-10004", "Missing [host] header", "CONNECT / STOMP frame requires host header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
-    public static final Code UNSUPPORTED_DESTINATION_TYPE = new Code("STM-20001", "Unsupported destination type", "Supported destination types are /queue/... and /topic/...", "Request to server was invalid due to invalid header. Please check if you are using proper STOMP client.");
-    public static final Code INVALID_DESTINATION_NAME = new Code("STM-20002", "Invalid destination name", "Valid destination names should have at least one character after destination type", "Request to server was invalid due to invalid header. Please check if you are using proper STOMP client.");
+    public static final Code HEADERS_MISSING_TRANSACTION = new Code("STM-1005", "Missing [transaction] header", "BEGIN / COMMIT / ABORT frames require transaction header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
+    public static final Code EMPTY_FRAME = new Code("STM-1006", "Empty frame not allowed", "Every frame should contain at least command and body", "Empty frame provided. Please check if you are using proper STOMP client.");
+    public static final Code UNSUPPORTED_FRAME = new Code("STM-1007", "Unsupported command", "Unrecognized command provided", "Transaction to send message with has empty name. Please check if you are using proper STOMP client.");
+    public static final Code UNSUPPORTED_DESTINATION_TYPE = new Code("STM-2001", "Unsupported destination type", "Supported destination types are /queue/... and /topic/...", "Request to server was invalid due to invalid header. Please check if you are using proper STOMP client.");
+    public static final Code INVALID_DESTINATION_NAME = new Code("STM-2002", "Invalid destination name", "Valid destination names should have at least one character after destination type", "Request to server was invalid due to invalid header. Please check if you are using proper STOMP client.");
+    public static final Code TRANSACTION_ALREADY_BEGUN = new Code("STM-2003", "Transaction already begun", "Transaction with specified name already begun in this session", "Transaction can only be started once per session. Please check if you are using proper STOMP client.");
+    public static final Code UNKNOWN_TRANSACTION_TO_COMMIT = new Code("STM-2004", "Unknown transaction to commit", "Transaction with specified name to commit not known in this session", "Transaction to commit with specified name not known to this session. Please check if it was started.");
+    public static final Code UNKNOWN_TRANSACTION_TO_ABORT = new Code("STM-2005", "Unknown transaction to abort", "Transaction with specified name to abort not known in this session", "Transaction to abort with specified name not known to this session. Please check if it was started.");
+    public static final Code TRANSACTION_ALREADY_ABORTED = new Code("STM-2006", "Transaction already aborted", "Transaction with specified name was already aborted in this session", "Transaction to abort with specified name was already aborted in this session.");
+    public static final Code TRANSACTION_ALREADY_COMMITED = new Code("STM-2007", "Transaction already commited", "Transaction with specified name was already commited in this session", "Transaction to commit with specified name was already commited in this session.");
+    public static final Code TRANSACTION_TO_COMMIT_ALREADY_ABORTED = new Code("STM-2008", "Attempt to commit aborted transaction", "Transaction to commit with specified name was already aborted in this session", "Transaction to commit with specified name was already aborted in this session. Please check if you are using proper STOMP client.");
+    public static final Code TRANSACTION_TO_ROLLBACK_ALREADY_COMMITED = new Code("STM-2009", "Attempt to rollback commited transaction", "Transaction to abort with specified name was already commited in this session", "Transaction to abort with specified name was already commited in this session. Please check if you are using proper STOMP client.");
+    public static final Code TRANSACTION_PROVIDED_WITH_EMPTY_NAME = new Code("STM-2010", "Transaction can not have empty name", "Transaction provided with empty name", "Transaction to send message with has empty name. Please check if you are using proper STOMP client.");
+
+
+
 }

@@ -1,0 +1,6 @@
+ERROR
+message:STM-2004 Unknown transaction to commit
+
+Transaction with specified name to commit not known in this session
+
+

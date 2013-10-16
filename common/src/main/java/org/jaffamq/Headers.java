@@ -8,11 +8,12 @@ package org.jaffamq;
  * To change this template use File | Settings | File Templates.
  */
 public interface Headers {
-    static final String ACCEPT_VERSION="accept-version";
+    static final String ACCEPT_VERSION = "accept-version";
     static final String HOST = "host";
-    static final String DESTINATION="destination";
-    static final String SUBSCRIPTION_ID="id";
-    static final String ACK="ack";
-    static final String SET_MESSAGE_ID="set-message-id";
-    static final String CONTENT_TYPE="content-type";
+    static final String DESTINATION = "destination";
+    static final String SUBSCRIPTION_ID = "id";
+    static final String ACK = "ack";
+    static final String SET_MESSAGE_ID = "set-message-id";
+    static final String CONTENT_TYPE = "content-type";
+    static final String TRANSACTION = "transaction";
 }

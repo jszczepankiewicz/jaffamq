@@ -12,8 +12,8 @@
     <modules>
         <module>java-parent</module>
         <module>client</module>
-        <module>server</module>
         <module>common</module>
+        <module>server</module>
         <module>qa-perfomance</module>
     </modules>
 

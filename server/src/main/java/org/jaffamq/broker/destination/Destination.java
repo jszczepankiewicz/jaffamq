@@ -32,6 +32,13 @@ public abstract class Destination extends UntypedActor {
 
     protected abstract void onStompMessage(StompMessage message);
 
+    /**
+     * Called when unsubscription message was successfully finished.
+     *
+     * @param unsubscribe
+     */
+    protected abstract void onSubscriptionRemoved(Unsubscribe unsubscribe);
+
     @Override
     public void onReceive(Object o) throws Exception {
 
@@ -52,23 +59,27 @@ public abstract class Destination extends UntypedActor {
 
             if (o instanceof Unsubscribe) {
                 Unsubscribe unsubscribe = (Unsubscribe) o;
-                Iterator<Subscription> iterator = subscriptions.iterator();
+                //Iterator<Subscription> iterator = subscriptions.iterator();
 
                 log.info("Received Unsubscribe from {} to subscription {}", getSender(), unsubscribe.getSubscriptionId());
 
-                while (iterator.hasNext()) {
+                Subscription toRemove = new Subscription(unsubscribe.getSubscriptionId(), getSender());
+                boolean removalConfirmed = subscriptions.remove(toRemove);
 
-                    Subscription subscription = iterator.next();
+                if(removalConfirmed){
+                    log.info("Unsubscription complete for sender: {} and subscriptionId: {}", toRemove.getSubscriber(), toRemove.getSubscriptionId());
+                    onSubscriptionRemoved(unsubscribe);
+                    getSender().tell(new UnsubscriptionConfirmed(unsubscribe.getSubscriptionId(), unsubscribe.getDestination()), getSelf());
 
-                    if (subscription.getSubscriptionId().equals(unsubscribe.getSubscriptionId()) && subscription.getSubscriber().equals(getSender())) {
-                        log.info("Found subscription to unsubscribe");
-                        iterator.remove();
 
-                        //  we need to inform back the session that the unsubscription was successfull
-                        getSender().tell(new UnsubscriptionConfirmed(unsubscribe.getSubscriptionId(), unsubscribe.getDestination()), getSelf());
-                        break;
-                    }
                 }
+                else{
+                    /*
+                        This can occur if the hashCode or equals do not work as expected.
+                     */
+                    log.error("Can not remove subscription because not found entry for sender: {} and subscriptionId: {}", toRemove.getSubscriber(), unsubscribe.getSubscriptionId());
+                }
+
             } else {
                 throw new IllegalStateException("Unimplemented");
             }
@@ -78,7 +89,7 @@ public abstract class Destination extends UntypedActor {
             subscriptions.add(subscription);
             log.info("Received SubscriberRegister from {} to destination: {}, number of subscribers: {}", getSender(), destination, subscriptions.size());
         } else {
-            log.warning("Received unknow message: {}", o);
+            log.warning("Received unknown message: {}", o);
             unhandled(o);
         }
     }

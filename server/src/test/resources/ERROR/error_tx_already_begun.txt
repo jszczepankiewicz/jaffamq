@@ -1,0 +1,5 @@
+ERROR
+message:STM-2003 Transaction already begun
+
+Transaction with specified name already begun in this session
+

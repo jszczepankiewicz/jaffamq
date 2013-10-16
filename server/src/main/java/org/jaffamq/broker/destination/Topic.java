@@ -6,6 +6,7 @@ import org.jaffamq.broker.Subscription;
 import org.jaffamq.broker.destination.Destination;
 import org.jaffamq.broker.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscribedStompMessage;
+import org.jaffamq.broker.messages.Unsubscribe;
 
 /**
  * Destination that represents Topic. All topic subscribers receive same message.
@@ -17,6 +18,11 @@ public class Topic extends Destination {
 
     public Topic(String destination) {
         super(destination);
+    }
+
+    @Override
+    protected void onSubscriptionRemoved(Unsubscribe unsubscribe) {
+        //  doing nothing
     }
 
     @Override

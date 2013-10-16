@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.Charset;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,7 +44,7 @@ public class StompTestBlockingClient implements StompTestClient {
         }
         try {
             //  we want to make sure that the SERVER closes the connection
-            Thread.sleep(ClientSessionHandler.MILISECONDS_BEFORE_CLOSE *2);
+            Thread.sleep(ClientSessionHandler.MILLISECONDS_BEFORE_CLOSE *2);
         } catch (InterruptedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

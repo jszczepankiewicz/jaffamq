@@ -1,0 +1,5 @@
+ERROR
+message:STM-2007 Transaction already commited
+
+Transaction with specified name was already commited in this session
+

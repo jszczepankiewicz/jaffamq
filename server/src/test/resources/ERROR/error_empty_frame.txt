@@ -1,0 +1,5 @@
+ERROR
+message:STM-1006 Empty frame not allowed
+
+Every frame should contain at least command and body
+

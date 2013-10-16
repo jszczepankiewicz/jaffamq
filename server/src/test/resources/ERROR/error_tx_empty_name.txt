@@ -1,0 +1,5 @@
+ERROR
+message:STM-2010 Transaction can not have empty name
+
+Transaction provided with empty name
+

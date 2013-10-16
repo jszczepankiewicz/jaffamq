@@ -1,0 +1,5 @@
+ERROR
+message:STM-2006 Transaction already aborted
+
+Transaction with specified name was already aborted in this session
+

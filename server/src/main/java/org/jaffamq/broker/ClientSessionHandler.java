@@ -9,6 +9,8 @@ import akka.io.TcpPipelineHandler;
 import akka.util.ByteString;
 import org.jaffamq.*;
 import org.jaffamq.broker.messages.*;
+import org.jaffamq.broker.transaction.Transaction;
+import org.jaffamq.broker.transaction.TransactionFactory;
 import scala.concurrent.duration.Duration;
 
 import java.util.HashMap;
@@ -19,9 +21,13 @@ import java.util.concurrent.TimeUnit;
  * Actor that represents conversation state
  * between client and server. It has mutable state.
  */
-public class ClientSessionHandler extends ParserFrameState {
+public class ClientSessionHandler extends ParserFrameState implements StompMessageSender{
 
-    public static final int MILISECONDS_BEFORE_CLOSE = 100;
+    private Map<String, Transaction> transactionMap = new HashMap<>();
+    /**
+     * Milliseconds from making the decision about closing the TCP connection and effectively closing it.
+     */
+    public static final int MILLISECONDS_BEFORE_CLOSE = 200;
 
     private long nextMessageIdPart;
 
@@ -76,9 +82,6 @@ public class ClientSessionHandler extends ParserFrameState {
             // unwrap TcpPipelineHandler’s event to get a Tcp.Event
             final String recv = init.event(msg);
 
-            // inform someone of the received message
-            //listener.tell(recv, getSelf());
-
             parseLine(recv);
         } else {
             log.warning("unhandled message: {}", msg);
@@ -130,7 +133,7 @@ public class ClientSessionHandler extends ParserFrameState {
         if (destination == null) {
             log.error("Can not found destination for subscriptionId: {}, unsubscription can not proceed!", subscriptionId);
         } else {
-
+            assertDestination(destination);
             getDestinationManager(destination).tell(new Unsubscribe(destination, subscriptionId), getSelf());
         }
 
@@ -146,7 +149,7 @@ public class ClientSessionHandler extends ParserFrameState {
         log.info("Received SUBSCRIBE to destination: {} with id: {}", destination, subscriptionId);
 
         //  passing self as the subscriber
-
+        assertDestination(destination);
         getDestinationManager(destination).tell(new SubscriberRegister(destination, subscriptionId), getSelf());
     }
 
@@ -160,23 +163,30 @@ public class ClientSessionHandler extends ParserFrameState {
             TODO: we should probably change the state of the session to something WAIRING_FOR_CLOSE.
             so no other frames are consumed from client.
          */
-        getContext().system().scheduler().scheduleOnce(Duration.create(MILISECONDS_BEFORE_CLOSE, TimeUnit.MILLISECONDS),
+        getContext().system().scheduler().scheduleOnce(Duration.create(MILLISECONDS_BEFORE_CLOSE, TimeUnit.MILLISECONDS),
                 connection, TcpMessage.close(), getContext().system().dispatcher(), null);
 
+    }
+
+    private void handleErrorFrame(Errors.Code code){
+        log.info("handleErrorFrame: {}", code.getId());
+        ByteString response = ByteString.fromString(String.format("ERROR\nmessage:%s %s\n\n%s\n\000\n", code.getId(), code.getDescription(), code.getCause()));
+        connection.tell(TcpMessage.write(response), getSelf());
+        scheduleClosingConnection();
     }
 
     private void handleErrorFrame(RequestValidationFailedException ex) {
 
         Errors.Code e = ex.getErrorCode();
-        ByteString response = ByteString.fromString(String.format("ERROR\nmessage:%s %s\n\n%s\n\000\n", e.getId(), e.getDescription(), e.getCause()));
-        connection.tell(TcpMessage.write(response), getSender());
-
-        scheduleClosingConnection();
+        handleErrorFrame(e);
     }
+
 
     private void handleSendFrame() throws RequestValidationFailedException {
 
         String destination = getRequiredHeaderValue(Headers.DESTINATION, Errors.HEADERS_MISSING_DESTINATION);
+        assertDestination(destination);
+        String transactionName = headers.get(Headers.TRANSACTION);
 
         String messageId = headers.get(Headers.SET_MESSAGE_ID);
 
@@ -184,11 +194,25 @@ public class ClientSessionHandler extends ParserFrameState {
             messageId = getNextMessageId();
         }
 
-        getDestinationManager(destination).tell(new StompMessage(destination, getCurrentFrameBody(), headers, messageId), getSender());
+        StompMessage stompMessage = new StompMessage(destination, getCurrentFrameBody(), headers, messageId);
+
+        if(transactionName == null){
+            //  messages outside of transaction should be processed immediatelly
+            sendStompMessage(stompMessage);
+        }
+        else if("".equals(transactionName.trim())){
+            throw new RequestValidationFailedException(Errors.TRANSACTION_PROVIDED_WITH_EMPTY_NAME);
+        }
+        else{
+            //  add message to transaction
+            Transaction tx = getOrCreateTransaction(transactionName);
+            tx.addStompMessage(stompMessage);
+        }
+
     }
 
     private void reactToCommandParsed() {
-        log.debug("Finished parsing client frame: {}", currentFrameCommand);
+        log.info("Finished parsing client frame: {}", currentFrameCommand);
         try {
             switch (currentFrameCommand) {
 
@@ -207,14 +231,89 @@ public class ClientSessionHandler extends ParserFrameState {
                 case UNSUBSCRIBE:
                     handleUnsubscribeFrame();
                     break;
+                case BEGIN:
+                    handleBeginFrame();
+                    break;
+                case COMMIT:
+                    handleCommitFrame();
+                    break;
+                case ABORT:
+                    handleAbortFrame();
+                    break;
+                case _UNKNOWN:
+                    log.warning("Validation exception: {} for client: {}", Errors.UNSUPPORTED_FRAME);
+                    handleErrorFrame(Errors.UNSUPPORTED_FRAME);
+                    break;
+                case _EMPTY:
+                    log.warning("Validation exception: {} for client: {}", Errors.EMPTY_FRAME);
+                    handleErrorFrame(Errors.EMPTY_FRAME);
+                    break;
                 default:
                     handleUnimplementedFrame();
                     break;
+
             }
         } catch (RequestValidationFailedException ex) {
             log.warning("Validation exception: {} for client: {}", ex.getErrorCode());
             handleErrorFrame(ex);
         }
+    }
+
+    private Transaction getOrCreateTransaction(String transactionName){
+        Transaction tx = transactionMap.get(transactionName);
+        if(tx == null){
+            tx = TransactionFactory.createTransaction(transactionName, this);
+            transactionMap.put(transactionName, tx);
+        }
+
+        return tx;
+    }
+
+    private void handleCommitFrame() throws RequestValidationFailedException {
+
+        String transactionName = getRequiredHeaderValue(Headers.TRANSACTION, Errors.HEADERS_MISSING_TRANSACTION);
+
+        log.info("Commiting transaction: {}", transactionName);
+
+        Transaction tx = transactionMap.get(transactionName);
+
+        if(tx == null){
+            throw new RequestValidationFailedException(Errors.UNKNOWN_TRANSACTION_TO_COMMIT);
+        }
+
+        tx.commit();
+        //transactionMap.remove(tx);
+        log.info("After Commiting transaction: {}", transactionName);
+    }
+
+
+    private void handleAbortFrame() throws RequestValidationFailedException {
+
+        String transactionName = getRequiredHeaderValue(Headers.TRANSACTION, Errors.HEADERS_MISSING_TRANSACTION);
+
+        log.debug("Aborting transaction: {}", transactionName);
+
+        Transaction tx = transactionMap.get(transactionName);
+
+        if(tx == null){
+            throw new RequestValidationFailedException(Errors.UNKNOWN_TRANSACTION_TO_ABORT);
+        }
+
+        tx.rollback();
+        transactionMap.remove(tx);
+    }
+
+    private void handleBeginFrame()  throws RequestValidationFailedException {
+        String transactionName = getRequiredHeaderValue(Headers.TRANSACTION, Errors.HEADERS_MISSING_TRANSACTION);
+
+        log.debug("Starting transaction: {}", transactionName);
+
+        if(transactionMap.containsKey(transactionName)){
+            throw new RequestValidationFailedException(Errors.TRANSACTION_ALREADY_BEGUN);
+        }
+
+        Transaction tx = TransactionFactory.createTransaction(transactionName, this);
+        transactionMap.put(transactionName, tx);
     }
 
     @Override
@@ -227,12 +326,7 @@ public class ClientSessionHandler extends ParserFrameState {
 
     }
 
-    private ActorRef getDestinationManager(String destination) throws RequestValidationFailedException{
-
-        //  checking if there is at least one character in destination name
-        if(destination.length() == 7){
-            throw new RequestValidationFailedException(Errors.INVALID_DESTINATION_NAME);
-        }
+    private ActorRef getDestinationManager(String destination){
 
         if(destination.startsWith("/topic/")){
             return topicDestinationManager;
@@ -242,7 +336,25 @@ public class ClientSessionHandler extends ParserFrameState {
             return queueDestinationManager;
         }
 
+        //  it should be detected by assertDestination();
+        throw new IllegalStateException("Unsupported destination: " + destination);
+    }
+
+    private void assertDestination(String destination) throws RequestValidationFailedException{
+        //  checking if there is at least one character in destination name
+        if(destination.length() == 7){
+            throw new RequestValidationFailedException(Errors.INVALID_DESTINATION_NAME);
+        }
+
+        if(destination.startsWith("/topic/") || destination.startsWith("/queue/")){
+            return;
+        }
+
         throw new RequestValidationFailedException(Errors.UNSUPPORTED_DESTINATION_TYPE);
     }
 
+    @Override
+    public void sendStompMessage(StompMessage message) {
+        getDestinationManager(message.getDestination()).tell(message, getSender());
+    }
 }

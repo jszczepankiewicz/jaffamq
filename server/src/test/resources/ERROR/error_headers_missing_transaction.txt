@@ -1,0 +1,5 @@
+ERROR
+message:STM-1005 Missing [transaction] header
+
+BEGIN / COMMIT / ABORT frames require transaction header
+

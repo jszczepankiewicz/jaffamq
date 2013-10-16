@@ -1,0 +1,6 @@
+ERROR
+message:STM-2005 Unknown transaction to abort
+
+Transaction with specified name to abort not known in this session
+
+
