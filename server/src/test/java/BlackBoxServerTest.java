@@ -91,7 +91,7 @@ public class BlackBoxServerTest {
         initializedClients = new ArrayList<>(numberOfClients);
 
         for (int i = 0; i < numberOfClients; i++) {
-            initializedClients.add(new StompTestBlockingClient(9999, "localhost", 3000));
+            initializedClients.add(new StompTestBlockingClient(9999, "0.0.0.0", 3000));
         }
 
         return initializedClients.toArray(new StompTestClient[]{});
@@ -103,7 +103,7 @@ public class BlackBoxServerTest {
         @Override
         protected void before() throws Throwable {
 
-            InetSocketAddress remote = new InetSocketAddress("localhost", 9999);
+            InetSocketAddress remote = new InetSocketAddress("0.0.0.0", 9999);
             system = ActorSystem.create("TestServerApp");
 
             final ActorRef topicDestinationManager = system.actorOf(Props.create(TopicDestinationManager.class), TopicDestinationManager.NAME);
