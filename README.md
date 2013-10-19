@@ -6,6 +6,6 @@ Destinations currently supported:
 - non-durable non-persisted topics
 - non-persisted queues
 
-Please note: project is not yet compatible with STOMP 1.2 and should not yet be considered to be used in production.
+Please note: project is not yet compatible with STOMP 1.2 and should not yet be considered ready to used in production.
 
 [STOMP specification static website](http://stomp.github.com/)
