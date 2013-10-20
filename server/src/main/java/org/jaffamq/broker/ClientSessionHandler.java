@@ -40,6 +40,8 @@ public class ClientSessionHandler extends ParserFrameState implements StompMessa
 
     private final ActorRef connection;
 
+    private static final ByteString RESPONSE_CONNECTED = ByteString.fromString("CONNECTED\nversion:1.2\n\000\n");
+
     /*
         Unfortunatelly the unsubscribe client frame contains only subscription id (unique among client session), but no destination.
         In order to correctly unsubscribe we need also destinationId. Best place to store the mapping between destination and subscriptionId (per client)
@@ -99,11 +101,14 @@ public class ClientSessionHandler extends ParserFrameState implements StompMessa
 
     private void handleConnectFrame() throws RequestValidationFailedException {
 
-        getRequiredHeaderValue(Headers.ACCEPT_VERSION, Errors.HEADERS_MISSING_ACCEPT_VERSION);
+        String clientAcceptedVersion = getRequiredHeaderValue(Headers.ACCEPT_VERSION, Errors.HEADERS_MISSING_ACCEPT_VERSION);
         getRequiredHeaderValue(Headers.HOST, Errors.HEADERS_MISSING_HOST);
 
-        final ByteString response = ByteString.fromString("CONNECTED\nversion:1.2\n\000\n");
-        connection.tell(TcpMessage.write(response), getSelf());
+        if(!"1.2".equals(clientAcceptedVersion)){
+            throw new RequestValidationFailedException(Errors.UNSUPPORTED_PROTOCOL_VERSION);
+        }
+
+        connection.tell(TcpMessage.write(RESPONSE_CONNECTED), getSelf());
     }
 
     private void onSubscribedMessage(SubscribedStompMessage msg) {

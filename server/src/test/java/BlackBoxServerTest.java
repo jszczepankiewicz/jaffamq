@@ -784,6 +784,20 @@ public class BlackBoxServerTest {
     }
 
     @Test
+    public void shouldSendErrorOnProtocolNotEqualToStomp12() throws Exception{
+
+        //  given
+        StompTestClient client = createClient();
+
+        //  when
+        String response = client.connectSendAndGrabAnswer("/CONNECT/basic_unsupported_protocol.txt");
+
+        //  then
+        assertThat(response, is(equalTo(readResource("/ERROR/error_unsupported_protocol.txt"))));
+    }
+
+
+    @Test
     public void shouldNotSendUncommitedMessagesToTopic() throws Exception{
 
         //  given

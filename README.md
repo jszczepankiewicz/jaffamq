@@ -21,7 +21,7 @@ Please note: project is not yet compatible with STOMP 1.2 and we do not recommen
 
 ##### Implementation limitations
 - due to lack of any persistence layer current transactions are implemented as in memory transactions thus using very large transactions may lead to JVM heap memory problems
-- whole project is using default type of akka mailboxes which may lead to JVM heap memory problems in some unfriendly conditions
+- whole project is using default type of akka mailboxes (unbounded) which may lead to JVM heap memory problems in some unfriendly conditions
 
 ### Requirements
 - Java 7

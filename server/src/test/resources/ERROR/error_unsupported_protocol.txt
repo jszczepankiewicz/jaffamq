@@ -1,0 +1,4 @@
+ERROR
+message:STM-1008 Unsupported protocol version
+
+This broker supports only Stomp 1.2 clients

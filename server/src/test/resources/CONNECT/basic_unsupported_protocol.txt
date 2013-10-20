@@ -1,0 +1,4 @@
+CONNECT
+accept-version:1.1
+host:localhost
+
