@@ -1,6 +1,6 @@
 ### JaffaMQ Stomp messaging broker
 ---
-build status: [![Build Status](https://travis-ci.org/jszczepankiewicz/jaffamq.png?branch=master)](https://travis-ci.org/jszczepankiewicz/jaffamq)
+##### build status: [![Build Status](https://travis-ci.org/jszczepankiewicz/jaffamq.png?branch=master)](https://travis-ci.org/jszczepankiewicz/jaffamq)
 ---
 
 JaffaMQ is working name for Stomp server messaging implementation written in Akka (Java). It uses new Akka TCP stack (introduced in akka 2.2). It aims to be full Stomp 1.2 complete implementation.
