@@ -109,7 +109,7 @@ public class BlackBoxServerTest {
             final ActorRef topicDestinationManager = system.actorOf(Props.create(TopicDestinationManager.class), TopicDestinationManager.NAME);
             final ActorRef queueDestinationManager = system.actorOf(Props.create(QueueDestinationManager.class), QueueDestinationManager.NAME);
             system.actorOf(Props.create(StompServer.class, remote, topicDestinationManager, queueDestinationManager));
-
+            Thread.sleep(500);
         }
 
         @Override
