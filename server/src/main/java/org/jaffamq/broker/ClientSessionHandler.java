@@ -11,6 +11,7 @@ import org.jaffamq.*;
 import org.jaffamq.broker.messages.*;
 import org.jaffamq.broker.transaction.Transaction;
 import org.jaffamq.broker.transaction.TransactionFactory;
+import org.jaffamq.messages.StompMessage;
 import scala.concurrent.duration.Duration;
 
 import java.util.HashMap;

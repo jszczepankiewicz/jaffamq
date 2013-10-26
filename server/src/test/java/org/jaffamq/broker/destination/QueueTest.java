@@ -5,7 +5,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.testkit.JavaTestKit;
-import org.jaffamq.broker.messages.StompMessage;
+import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscribedStompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
 import org.junit.Rule;

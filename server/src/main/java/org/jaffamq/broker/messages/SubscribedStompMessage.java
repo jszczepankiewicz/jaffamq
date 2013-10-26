@@ -1,7 +1,7 @@
 package org.jaffamq.broker.messages;
 
-import akka.util.ByteString;
 import org.jaffamq.Headers;
+import org.jaffamq.messages.StompMessage;
 
 /**
  * Indicates messages that should be send to specific TCP client. It contains individual subscriptionId specific for client.

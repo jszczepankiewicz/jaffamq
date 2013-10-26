@@ -5,8 +5,7 @@ import java.util.LinkedList;
 
 import org.jaffamq.RequestValidationFailedException;
 import org.jaffamq.broker.StompMessageSender;
-import org.jaffamq.broker.messages.*;
-import org.jaffamq.broker.transaction.Transaction;
+import org.jaffamq.messages.StompMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/aggregator.iml" filepath="$PROJECT_DIR$/aggregator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/client/client.iml" filepath="$PROJECT_DIR$/client/client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/java-parent/java-parent.iml" filepath="$PROJECT_DIR$/java-parent/java-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qa-perfomance/qa-perfomance.iml" filepath="$PROJECT_DIR$/qa-perfomance/qa-perfomance.iml" />
+      <module fileurl="file://$PROJECT_DIR$/server/server.iml" filepath="$PROJECT_DIR$/server/server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spearfish-db/spearfish-db.iml" filepath="$PROJECT_DIR$/spearfish-db/spearfish-db.iml" />
+    </modules>
+  </component>
+</project>
+

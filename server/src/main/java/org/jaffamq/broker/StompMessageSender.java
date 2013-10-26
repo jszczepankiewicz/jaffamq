@@ -1,6 +1,6 @@
 package org.jaffamq.broker;
 
-import org.jaffamq.broker.messages.StompMessage;
+import org.jaffamq.messages.StompMessage;
 
 /**
  * Interface that should be implemented by class that

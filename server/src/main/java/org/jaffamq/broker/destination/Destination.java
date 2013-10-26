@@ -5,12 +5,11 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.jaffamq.broker.Subscription;
-import org.jaffamq.broker.messages.StompMessage;
+import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
 import org.jaffamq.broker.messages.Unsubscribe;
 import org.jaffamq.broker.messages.UnsubscriptionConfirmed;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

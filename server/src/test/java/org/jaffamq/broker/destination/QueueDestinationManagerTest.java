@@ -5,6 +5,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
 import org.jaffamq.broker.messages.*;
+import org.jaffamq.messages.StompMessage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;

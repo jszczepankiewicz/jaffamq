@@ -1,7 +1,7 @@
 package org.jaffamq.broker.transaction;
 
 import org.jaffamq.RequestValidationFailedException;
-import org.jaffamq.broker.messages.StompMessage;
+import org.jaffamq.messages.StompMessage;
 
 import java.util.Iterator;
 

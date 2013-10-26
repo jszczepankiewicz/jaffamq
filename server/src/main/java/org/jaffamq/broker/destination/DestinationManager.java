@@ -1,12 +1,11 @@
 package org.jaffamq.broker.destination;
 
 import akka.actor.ActorRef;
-import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import org.jaffamq.broker.messages.StompMessage;
+import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
 import org.jaffamq.broker.messages.Unsubscribe;
 

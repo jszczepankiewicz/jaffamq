@@ -15,6 +15,7 @@
         <module>common</module>
         <module>server</module>
         <module>qa-perfomance</module>
+        <module>spearfish-db</module>
     </modules>
 
 

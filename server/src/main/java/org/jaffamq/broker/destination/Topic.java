@@ -3,8 +3,7 @@ package org.jaffamq.broker.destination;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.jaffamq.broker.Subscription;
-import org.jaffamq.broker.destination.Destination;
-import org.jaffamq.broker.messages.StompMessage;
+import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscribedStompMessage;
 import org.jaffamq.broker.messages.Unsubscribe;
 
