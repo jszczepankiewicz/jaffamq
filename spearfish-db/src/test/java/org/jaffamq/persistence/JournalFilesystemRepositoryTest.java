@@ -41,9 +41,7 @@ public class JournalFilesystemRepositoryTest {
         @Override
         protected void before() throws IOException {
 
-            String directory = System.getProperty("java.io.tmpdir") + System.currentTimeMillis();
-
-            repo = new JournalFilesystemRepository(directory, Journal.WriteType.SYNC);
+            repo = new JournalFilesystemRepository(getTempDataDir(), Journal.WriteType.SYNC);
             repo.initialize();
         }
 
@@ -52,6 +50,11 @@ public class JournalFilesystemRepositoryTest {
             repo.shutdown();
         }
     };
+
+    private String getTempDataDir(){
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        return tmpDir.endsWith(File.separator)?tmpDir:tmpDir.concat(File.separator) + System.currentTimeMillis();
+    }
 
     @Ignore("This test should be run only in isolated local environment for stress testing because it produces immense amount of messages")
     @Test
@@ -129,7 +132,7 @@ public class JournalFilesystemRepositoryTest {
 
         //  given
         String destination ="/topic/bunny";
-        String directory = System.getProperty("java.io.tmpdir") + System.currentTimeMillis();
+        String directory = getTempDataDir();
 
         JournalFilesystemRepository livingrepo = new JournalFilesystemRepository(directory, Journal.WriteType.SYNC);
         livingrepo.initialize();
