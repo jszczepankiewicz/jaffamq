@@ -43,6 +43,18 @@ public class JournalFilesystemRepository implements Repository {
         serializer = new StandardStompMessageSerializer();
     }
 
+    private void printBanner(){
+        LOG.info("\n==================================================================\n" +
+                 "      Journal.IO db initialized with following configuration:\n" +
+                 "  using archiveFiles: " + journal.isArchiveFiles() + "\n" +
+                 "     using checksums: " + journal.isChecksum() + "\n" +
+                 "  using physicalSync: " + journal.isPhysicalSync() + "\n" +
+                 "  maxFileLength (kB): " + journal.getMaxFileLength()/1024 + "\n" +
+                 "  maxWriteBatchSize (kB): " + journal.getMaxWriteBatchSize() / 1024 + "\n" +
+                "==================================================================");
+    }
+
+
     @Override
     public void initialize() {
 
@@ -67,6 +79,7 @@ public class JournalFilesystemRepository implements Repository {
         }
 
         //  we need to recreate in memory mapping for every destination
+        printBanner();
         recreateDestinationToLocationsMapping();
     }
 

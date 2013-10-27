@@ -166,7 +166,7 @@ public class JournalFilesystemRepositoryTest {
 
         //  given
         String destination ="/queue/bunny";
-        String directory = System.getProperty("java.io.tmpdir") + System.currentTimeMillis();
+        String directory = getTempDataDir();
 
         JournalFilesystemRepository livingrepo = new JournalFilesystemRepository(directory, Journal.WriteType.SYNC);
         livingrepo.initialize();
