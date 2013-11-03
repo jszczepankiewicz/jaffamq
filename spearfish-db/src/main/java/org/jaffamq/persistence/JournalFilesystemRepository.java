@@ -190,5 +190,16 @@ public class JournalFilesystemRepository implements Repository {
         }
     }
 
+    @Override
+    public boolean isNonEmpty(String destination) {
 
+        LinkedList<Location> locations = getLocationsForDestination(destination);
+
+        if(locations.size() == 0){
+            LOG.debug("No messages for location [{}] found", destination);
+            return false;
+        }
+
+        return true;
+    }
 }

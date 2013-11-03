@@ -11,13 +11,9 @@
 
     <modules>
         <module>java-parent</module>
-        <module>client</module>
         <module>common</module>
-        <module>server</module>
-        <module>qa-perfomance</module>
         <module>spearfish-db</module>
+        <module>server</module>
     </modules>
 
-
-    
 </project>

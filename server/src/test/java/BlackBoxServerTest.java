@@ -381,6 +381,33 @@ public class BlackBoxServerTest {
     }
 
     @Test
+    public void shouldKeepMessagesFromQueueForNextSubscriberIfSentWithoutActiveSubscribers() throws Exception{
+
+        //  given
+        StompTestClient[] clients = createClients(2);
+        connectClients(clients);
+
+        //  when
+        clients[0].sendFrame("/BEGIN/begin_tx_a.txt");
+
+        waitToPropagateTCP();
+        clients[0].sendFrame("/SEND/send_destination_queue_tx_a.txt");
+
+        //  then
+        expectNoResponse(clients[1]);
+        clients[0].sendFrame("/COMMIT/commit_tx_a.txt");
+        expectNoResponse(clients[0]);
+
+        waitToPropagateTCP();
+        /*
+            Testing if message will be stored in persisted storage for next subscriber
+         */
+        clients[1].sendFrame("/SUBSCRIBE/subscribe_queue_id_3.txt");     //  subscribe to /topic/foo
+        expectResponse(clients[1], "/MESSAGE/message_queue_subscription_3_m1.txt");
+        expectNoResponse(clients[0]);
+    }
+
+    @Test
     public void shouldRecycleQueueSubscribersOnUnsubscribe() throws Exception{
 
         StompTestClient[] clients = createClients(3);

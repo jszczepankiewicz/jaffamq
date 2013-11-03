@@ -45,4 +45,11 @@ public interface Repository {
      * @return
      */
     StompMessage peek(String destination);
+
+    /**
+     * Checks whether selected destination contains more than 0 messages.
+     * @param destination
+     * @return
+     */
+    boolean isNonEmpty(String destination);
 }

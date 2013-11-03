@@ -162,6 +162,29 @@ public class JournalFilesystemRepositoryTest {
     }
 
     @Test
+    public void shouldReturnNonEmptySize() throws Exception{
+
+        //  given
+        String destination = "omega";
+
+        StompMessage msg = StompMessageFactory.createMessage(destination);
+
+        //  when
+        repo.persist(msg);
+
+        //  then
+        assertThat(repo.isNonEmpty(destination), is(equalTo(true)));
+
+    }
+
+    @Test
+    public void shouldReturnEmptySize() throws Exception{
+
+        //  then
+        assertThat(repo.isNonEmpty("x"), is(equalTo(false)));
+    }
+
+    @Test
     public void shouldPeekMessagesFromPreviousBrokerShutdown() throws Exception{
 
         //  given

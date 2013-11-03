@@ -22,9 +22,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="client" />
         <module name="common" />
-        <module name="qa-perfomance" />
         <module name="server" />
         <module name="spearfish-db" />
       </profile>

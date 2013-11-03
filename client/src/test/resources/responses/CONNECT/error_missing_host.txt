@@ -1,5 +1,0 @@
-CONNECT
-accept-version:1.2
-host:localhost
-
-^@
