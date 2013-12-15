@@ -2,7 +2,8 @@ package org.jaffamq.persistence.journal;
 
 import org.jaffamq.messages.StompMessage;
 import org.jaffamq.persistence.PersistedMessageId;
-import org.jaffamq.persistence.StompMessageFactory;
+
+import org.jaffamq.test.StompMessageFactory;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
