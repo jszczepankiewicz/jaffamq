@@ -3,16 +3,23 @@ package org.jaffamq.persistence;
 import org.jaffamq.messages.StompMessage;
 
 /**
- * Created with IntelliJ IDEA.
- * User: urwisy
- * Date: 24.10.13
- * Time: 20:24
- * To change this template use File | Settings | File Templates.
+ * Represents marshaller / unmarshaller from bytes to StompMessage object and vice versa.
  */
 public interface StompMessageSerializer {
 
+    /**
+     * Marshalling StompMessage object to bytes. Unmarshalling can be only done using the same implementation class.
+     *
+     * @param message to be marshalled
+     * @return value of the message represented by bytes.
+     */
     byte[] toBytes(StompMessage message);
 
+    /**
+     * Unmarshalling from bytes to StompMessage. Supports only unmarshalling from bytes produced by same implementation class.
+     * @param bytes that represents StompMessage
+     * @return unmarshalled StompMessage.
+     */
     StompMessage fromBytes(byte[] bytes);
 
 }
