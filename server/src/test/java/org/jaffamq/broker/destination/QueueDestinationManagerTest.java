@@ -4,18 +4,15 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
-import org.jaffamq.broker.destination.persistence.UnconsumedMessageRepositoryStub;
 import org.jaffamq.broker.messages.*;
 import org.jaffamq.broker.messages.persistence.StoreUnconsumedMessageRequest;
 import org.jaffamq.messages.StompMessage;
-import org.jaffamq.persistence.PersistedMessageId;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -80,7 +77,7 @@ public class QueueDestinationManagerTest {
             expectMsgEquals(expected2);
 
             //  TODO: add more subscribers, test lifecycle
-            destinationManager.tell(new Unsubscribe("destinationb", "2"), getRef());
+            destinationManager.tell(new UnsubscribeRequest("destinationb", "2"), getRef());
             LOG.debug("Unsubscribed from destinationb");
             UnsubscriptionConfirmed expectedC = new UnsubscriptionConfirmed("2", "destinationb");
             expectMsgEquals(expectedC);

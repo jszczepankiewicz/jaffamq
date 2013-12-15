@@ -76,7 +76,7 @@ public class TopicDestinationManagerTest {
             expectMsgEquals(expected2);
 
             //  TODO: add more subscribers, test lifecycle
-            destinationManager.tell(new Unsubscribe("destinationb", "2"), getRef());
+            destinationManager.tell(new UnsubscribeRequest("destinationb", "2"), getRef());
             LOG.debug("Unsubscribed from destinationb");
             UnsubscriptionConfirmed expectedC = new UnsubscriptionConfirmed("2", "destinationb");
             expectMsgEquals(expectedC);

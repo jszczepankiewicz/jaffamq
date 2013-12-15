@@ -11,11 +11,10 @@ import org.jaffamq.broker.messages.persistence.StoreUnconsumedMessageRequest;
 import org.jaffamq.broker.messages.persistence.StoreUnconsumedMessageResponse;
 import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscribedStompMessage;
-import org.jaffamq.broker.messages.Unsubscribe;
+import org.jaffamq.broker.messages.UnsubscribeRequest;
 import org.jaffamq.persistence.PersistedMessageId;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -96,7 +95,7 @@ public class Queue extends Destination {
     }
 
     @Override
-    protected void onSubscriptionRemoved(Unsubscribe unsubscribe) {
+    protected void onSubscriptionRemoved(UnsubscribeRequest unsubscribeRequest) {
         refreshIterator = true;
     }
 

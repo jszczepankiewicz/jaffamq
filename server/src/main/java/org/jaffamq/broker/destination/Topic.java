@@ -5,7 +5,7 @@ import akka.event.LoggingAdapter;
 import org.jaffamq.broker.Subscription;
 import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscribedStompMessage;
-import org.jaffamq.broker.messages.Unsubscribe;
+import org.jaffamq.broker.messages.UnsubscribeRequest;
 
 /**
  * Destination that represents Topic. All topic subscribers receive same message.
@@ -20,7 +20,7 @@ public class Topic extends Destination {
     }
 
     @Override
-    protected void onSubscriptionRemoved(Unsubscribe unsubscribe) {
+    protected void onSubscriptionRemoved(UnsubscribeRequest unsubscribeRequest) {
         //  doing nothing
     }
 

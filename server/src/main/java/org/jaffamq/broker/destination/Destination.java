@@ -5,11 +5,11 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.jaffamq.broker.Subscription;
+import org.jaffamq.broker.messages.UnsubscribeRequest;
 import org.jaffamq.broker.messages.persistence.PollUnconsumedMessageResponse;
 import org.jaffamq.broker.messages.persistence.StoreUnconsumedMessageResponse;
 import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
-import org.jaffamq.broker.messages.Unsubscribe;
 import org.jaffamq.broker.messages.UnsubscriptionConfirmed;
 
 import java.util.LinkedHashSet;
@@ -36,9 +36,9 @@ public abstract class Destination extends UntypedActor {
     /**
      * Called when unsubscription message was successfully finished.
      *
-     * @param unsubscribe
+     * @param unsubscribeRequest
      */
-    protected abstract void onSubscriptionRemoved(Unsubscribe unsubscribe);
+    protected abstract void onSubscriptionRemoved(UnsubscribeRequest unsubscribeRequest);
 
     @Override
     public void onReceive(Object o) throws Exception {
@@ -53,24 +53,24 @@ public abstract class Destination extends UntypedActor {
            log.info("Received StompMessage from {} with message-id: {}, number of current subscriptions: {}", getSender(), m.getMessageId(), subscriptions.size());
             return;
 
-        } else if (o instanceof Terminated || o instanceof Unsubscribe) {
+        } else if (o instanceof Terminated || o instanceof UnsubscribeRequest) {
             log.debug("Received Terminated from {}", getSender());
             //  TODO: optimize that
             //subscribers.remove(getSender());
 
-            if (o instanceof Unsubscribe) {
-                Unsubscribe unsubscribe = (Unsubscribe) o;
+            if (o instanceof UnsubscribeRequest) {
+                UnsubscribeRequest unsubscribeRequest = (UnsubscribeRequest) o;
                 //Iterator<Subscription> iterator = subscriptions.iterator();
 
-                log.info("Received Unsubscribe from {} to subscription {}", getSender(), unsubscribe.getSubscriptionId());
+                log.info("Received UnsubscribeRequest from {} to subscription {}", getSender(), unsubscribeRequest.getSubscriptionId());
 
-                Subscription toRemove = new Subscription(unsubscribe.getSubscriptionId(), getSender());
+                Subscription toRemove = new Subscription(unsubscribeRequest.getSubscriptionId(), getSender());
                 boolean removalConfirmed = subscriptions.remove(toRemove);
 
                 if(removalConfirmed){
                     log.info("Unsubscription complete for sender: {} and subscriptionId: {}", toRemove.getSubscriber(), toRemove.getSubscriptionId());
-                    onSubscriptionRemoved(unsubscribe);
-                    getSender().tell(new UnsubscriptionConfirmed(unsubscribe.getSubscriptionId(), unsubscribe.getDestination()), getSelf());
+                    onSubscriptionRemoved(unsubscribeRequest);
+                    getSender().tell(new UnsubscriptionConfirmed(unsubscribeRequest.getSubscriptionId(), unsubscribeRequest.getDestination()), getSelf());
 
 
                 }
@@ -78,7 +78,7 @@ public abstract class Destination extends UntypedActor {
                     /*
                         This can occur if the hashCode or equals do not work as expected.
                      */
-                    log.error("Can not remove subscription because not found entry for sender: {} and subscriptionId: {}", toRemove.getSubscriber(), unsubscribe.getSubscriptionId());
+                    log.error("Can not remove subscription because not found entry for sender: {} and subscriptionId: {}", toRemove.getSubscriber(), unsubscribeRequest.getSubscriptionId());
                 }
 
             } else {

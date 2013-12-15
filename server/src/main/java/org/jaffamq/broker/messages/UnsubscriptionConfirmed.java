@@ -1,8 +1,8 @@
 package org.jaffamq.broker.messages;
 
 /**
- * Message send by Topic to the ClientSessionHandler (through TopicDestinationManager) when unsubscrption is done.
- * This message is sign to the ClientSessionHandler to remove mapping between destination and subscrptionId.
+ * Message send by Topic to the ClientSessionHandler (through TopicDestinationManager) when unsubscription is done.
+ * This message is sign to the ClientSessionHandler to remove mapping between destination and subscriptionId.
  */
 public class UnsubscriptionConfirmed {
 

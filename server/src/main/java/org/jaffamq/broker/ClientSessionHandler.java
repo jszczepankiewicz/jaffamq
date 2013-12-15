@@ -140,7 +140,7 @@ public class ClientSessionHandler extends ParserFrameState implements StompMessa
             log.error("Can not found destination for subscriptionId: {}, unsubscription can not proceed!", subscriptionId);
         } else {
             assertDestination(destination);
-            getDestinationManager(destination).tell(new Unsubscribe(destination, subscriptionId), getSelf());
+            getDestinationManager(destination).tell(new UnsubscribeRequest(destination, subscriptionId), getSelf());
         }
 
     }

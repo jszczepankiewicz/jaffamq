@@ -5,13 +5,11 @@ import akka.actor.Terminated;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import org.jaffamq.broker.destination.persistence.PollUnconsumedMessageService;
-import org.jaffamq.broker.destination.persistence.StoreUnconsumedMessageService;
+import org.jaffamq.broker.messages.UnsubscribeRequest;
 import org.jaffamq.broker.messages.persistence.PollUnconsumedMessageResponse;
 import org.jaffamq.broker.messages.persistence.StoreUnconsumedMessageResponse;
 import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
-import org.jaffamq.broker.messages.Unsubscribe;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,10 +78,10 @@ public abstract class DestinationManager extends UntypedActor{
             log.warning("Implement me");
             return;
         }
-        else if(o instanceof Unsubscribe){
+        else if(o instanceof UnsubscribeRequest){
 
-            Unsubscribe message = (Unsubscribe)o;
-            log.info("received Unsubscribe to destination {} from {}", message.getDestination(), getSender());
+            UnsubscribeRequest message = (UnsubscribeRequest)o;
+            log.info("received UnsubscribeRequest to destination {} from {}", message.getDestination(), getSender());
 
             //  may be received only from socket
             //  check if we have topics that can be unsubscribed
