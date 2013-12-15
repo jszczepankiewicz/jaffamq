@@ -3,14 +3,14 @@ package org.jaffamq.test;
 import java.io.File;
 
 /**
- * Created with IntelliJ IDEA.
- * User: urwisy
- * Date: 29.11.13
- * Time: 20:43
- * To change this template use File | Settings | File Templates.
+ * Test utilities around IO.
  */
 public class IOTestHelper {
 
+    /**
+     * Returns temp dir name (without creation) inside TEMP dir that can be used for testing.
+     * @return the value of unique temp dir
+     */
     public static String getTempDataDir() {
         String tmpDir = System.getProperty("java.io.tmpdir");
         tmpDir = tmpDir.endsWith(File.separator) ? tmpDir : tmpDir.concat(File.separator);

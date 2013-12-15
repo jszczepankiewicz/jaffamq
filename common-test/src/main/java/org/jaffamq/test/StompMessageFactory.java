@@ -7,18 +7,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created with IntelliJ IDEA.
- * User: urwisy
- * Date: 24.10.13
- * Time: 21:59
- * To change this template use File | Settings | File Templates.
+ * Factory for StompMessage objects used in testing.
  */
 public class StompMessageFactory {
 
+    /**
+     * Create stomp message with random destination.
+     * @return the value with random destination.
+     */
     public static StompMessage createMessage(){
         return createMessage("destinations" + System.currentTimeMillis());
     }
 
+    /**
+     * Create stomp message with hardcoded subscription id, content type of type json and specified destination.
+     * @param destination for message.
+     * @return the value with predefined values
+     */
     public static StompMessage createMessage(String destination){
 
         Map<String, String> headers = new HashMap<String, String>();
