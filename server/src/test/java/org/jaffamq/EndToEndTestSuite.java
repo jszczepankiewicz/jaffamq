@@ -99,7 +99,7 @@ public class EndToEndTestSuite {
             //  sleep a little before shutdowning actors to fill all logs
             Thread.sleep(500);
         } catch (InterruptedException e) {
-            //  do nothing
+            LOG.warn("Unexpected InterrruptedException while waiting");
         }
         JavaTestKit.shutdownActorSystem(system);
         system = null;
@@ -212,37 +212,4 @@ public class EndToEndTestSuite {
         assertThat("Response from server", response, is(equalTo(readResource(expectedFrame))));
     }
 
-    /*protected void expectResponseInOneOfClient(String[] possibleFrames,StompTestClient...clients) throws IOException{
-
-        boolean found = false;
-
-        String[] possibleContent = new String[possibleFrames.length];
-
-        for(int i=0; i<possibleFrames.length; i++){
-            possibleContent[i] = readResource(possibleFrames[i]);
-        }
-
-        for(StompTestClient client:clients){
-            String response = client.getResponseOrTimeout();
-
-            if(response.trim().length()>0){
-
-                if(found){
-                    fail("Messages received by more than one client");
-                }
-
-                boolean localFound = false;
-                for(String content:possibleContent){
-                    if(content.equals(response)){
-                        localFound = true;
-                    }
-                }
-                found = true;
-            }
-        }
-
-        if(!found){
-            fail("Response from server not received by any of clients");
-        }
-    }*/
 }

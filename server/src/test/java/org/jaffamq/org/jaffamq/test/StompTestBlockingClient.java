@@ -10,11 +10,7 @@ import java.io.*;
 import java.net.Socket;
 
 /**
- * Created with IntelliJ IDEA.
- * User: win7
- * Date: 18.08.13
- * Time: 16:07
- * To change this template use File | Settings | File Templates.
+ * Simple blocking socket client used for End-to-end testing.
  */
 public class StompTestBlockingClient implements StompTestClient {
     private static Logger LOG = LoggerFactory.getLogger(StompTestBlockingClient.class);
@@ -46,19 +42,14 @@ public class StompTestBlockingClient implements StompTestClient {
             //  we want to make sure that the SERVER closes the connection
             Thread.sleep(ClientSessionHandler.MILLISECONDS_BEFORE_CLOSE *2);
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            throw new IllegalStateException("Unexpected InterruptedException", e);
         }
-        /*
-            Need to add some timeout, gracefull shutdown
-         */
-        //String responseIgnored = getResponse();
 
-        LOG.debug("Before closing()");
         if(out!=null){
             try {
                 out.close();
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                throw new IllegalStateException("Unexpected IOException", e);
             }
         }
 
@@ -66,12 +57,9 @@ public class StompTestBlockingClient implements StompTestClient {
             try {
                 in.close();
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                throw new IllegalStateException("Unexpected IOException", e);
             }
         }
-
-        LOG.debug("After closing()");
-
     }
 
     /**
