@@ -26,8 +26,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jaffamq</groupId>
+            <artifactId>common-test</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
-            <artifactId>junit-dep</artifactId>
+            <artifactId>junit</artifactId>
         </dependency>
 
         <dependency>
