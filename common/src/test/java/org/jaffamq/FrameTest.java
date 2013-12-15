@@ -8,17 +8,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 
-/**
- * Created with IntelliJ IDEA.
- * User: urwisy
- * Date: 22.08.13
- * Time: 22:46
- * To change this template use File | Settings | File Templates.
- */
+
 public class FrameTest {
 
     @Test
     public void shouldEncodeHeader(){
+
         //  given
         String source = "ęćśżabc\rxyz\nuzy:iz\\";
 
@@ -31,6 +26,7 @@ public class FrameTest {
 
     @Test
     public void shouldDecodeHeader(){
+
         //  given
         String source = "ęćśżabc\\rxyz\\nuzy\\ciz\\\\";
 
