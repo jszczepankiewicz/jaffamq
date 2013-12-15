@@ -1,6 +1,7 @@
 package org.jaffamq.persistence;
 
 import org.jaffamq.messages.StompMessage;
+import org.jaffamq.test.StompMessageFactory;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
