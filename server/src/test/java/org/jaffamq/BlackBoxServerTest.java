@@ -585,9 +585,6 @@ public class BlackBoxServerTest extends EndToEndTestSuite {
             fail("Message was not sent to any client");
         }
 
-        //expectResponseInOneOfClient("/MESSAGE/message_queue_subscription_6_m6.txt", clients[2], clients[3]);
-
-
     }
 
 

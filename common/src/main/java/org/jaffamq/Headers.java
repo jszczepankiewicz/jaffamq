@@ -1,19 +1,15 @@
 package org.jaffamq;
 
 /**
- * Created with IntelliJ IDEA.
- * User: urwisy
- * Date: 31.08.13
- * Time: 20:37
- * To change this template use File | Settings | File Templates.
+ * Common Stomp header constants.
  */
 public interface Headers {
-    static final String ACCEPT_VERSION = "accept-version";
-    static final String HOST = "host";
-    static final String DESTINATION = "destination";
-    static final String SUBSCRIPTION_ID = "id";
-    static final String ACK = "ack";
-    static final String SET_MESSAGE_ID = "set-message-id";
-    static final String CONTENT_TYPE = "content-type";
-    static final String TRANSACTION = "transaction";
+    String ACCEPT_VERSION = "accept-version";
+    String HOST = "host";
+    String DESTINATION = "destination";
+    String SUBSCRIPTION_ID = "id";
+    String ACK = "ack";
+    String SET_MESSAGE_ID = "set-message-id";
+    String CONTENT_TYPE = "content-type";
+    String TRANSACTION = "transaction";
 }

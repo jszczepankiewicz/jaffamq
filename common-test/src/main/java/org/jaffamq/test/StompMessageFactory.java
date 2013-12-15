@@ -11,6 +11,10 @@ import java.util.Map;
  */
 public class StompMessageFactory {
 
+    private StompMessageFactory(){
+
+    }
+
     /**
      * Create stomp message with random destination.
      * @return the value with random destination.
@@ -30,7 +34,6 @@ public class StompMessageFactory {
         headers.put(Headers.CONTENT_TYPE, "application/json");
         headers.put(Headers.SUBSCRIPTION_ID, "345");
 
-        StompMessage message = new StompMessage(destination, "somebody\nsomeline\n", headers, "xyz324");
-        return message;
+        return new StompMessage(destination, "somebody\nsomeline\n", headers, "xyz324");
     }
 }

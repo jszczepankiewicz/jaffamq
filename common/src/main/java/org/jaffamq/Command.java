@@ -31,7 +31,7 @@ public enum Command {
 
         value = value.trim();
 
-        if(value.equals("")){
+        if("".equals(value)){
             return _EMPTY;
         }
 

@@ -74,7 +74,7 @@ public class StompTestBlockingClient implements StompTestClient {
         String line;
 
         try{
-            while ((line = in.readLine()) != null && !line.equals("\000")) {
+            while ((line = in.readLine()) != null && !"\000".equals(line)) {
                 builder.append(line);
                 builder.append("\n");
             }
@@ -83,8 +83,7 @@ public class StompTestBlockingClient implements StompTestClient {
             //  timeout
         }
 
-        String response = builder.toString().trim();
-        return response;
+        return builder.toString().trim();
     }
     /**
      * WARNIG: it trims the values
@@ -96,8 +95,8 @@ public class StompTestBlockingClient implements StompTestClient {
         StringBuilder builder = new StringBuilder();
         String line;
 
-        //  FIXME: dodaje na sztynwo \n powinna być detekcja czy przeszło już na tryb body wtedy treść powinna być bajtowo traktowana
-        while ((line = in.readLine()) != null && !line.equals("\000")) {
+        //  TODO: dodaje na sztynwo \n powinna być detekcja czy przeszło już na tryb body wtedy treść powinna być bajtowo traktowana
+        while ((line = in.readLine()) != null && !"\000".equals(line)) {
             builder.append(line);
             builder.append("\n");
         }

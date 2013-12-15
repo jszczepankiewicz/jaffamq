@@ -1,27 +1,15 @@
 package org.jaffamq;
 
 import org.jaffamq.org.jaffamq.test.StompTestClient;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
  * Integration tests which engage restart of the broker.
  */
 public class WithBrokerRestartsTests extends EndToEndTestSuite {
 
-    private static Logger LOG = LoggerFactory.getLogger(WithBrokerRestartsTests.class);
-
     @Test
-    public void shouldRestoreUnconsumedQueueMessagesFromPreviousServerRun() throws Exception{
+    public void shouldRestoreUnconsumedQueueMessagesFromPreviousServerRun() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(2);

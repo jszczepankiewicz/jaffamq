@@ -49,8 +49,6 @@ public class QueueTest {
             final Props props = Props.create(Queue.class, "destination1", getRef(), getRef(), Collections.emptyList());
             final ActorRef queue = system.actorOf(props);
 
-            //final JavaTestKit probe = new JavaTestKit(system);
-
             LOG.debug("Sending unsubscribed message");
             StompMessage tz = new StompMessage("destinationz", null, null, "3");
             expectNoMsg();

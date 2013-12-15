@@ -7,7 +7,7 @@ import java.util.Map;
  * Message class that contains typical Stomp message:
  * destination, body, headers
  */
-public class StompMessage implements Serializable{
+public class StompMessage implements Serializable {
 
     private final String destination;
     private final String body;

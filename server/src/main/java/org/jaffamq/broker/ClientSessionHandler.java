@@ -61,10 +61,7 @@ public class ClientSessionHandler extends ParserFrameState implements StompMessa
     }
 
     @Override
-    public void onReceive(Object msg) throws Exception {
-
-        //  uncomment below to grab low level tcp events
-        //log.info("ClientSessionHandler.onReceive: {}", msg);
+    public void onReceive(Object msg){
 
         if (msg instanceof Tcp.CommandFailed) {
             getContext().stop(getSelf());
@@ -288,7 +285,6 @@ public class ClientSessionHandler extends ParserFrameState implements StompMessa
         }
 
         tx.commit();
-        //transactionMap.remove(tx);
         log.info("After Commiting transaction: {}", transactionName);
     }
 
@@ -342,11 +338,12 @@ public class ClientSessionHandler extends ParserFrameState implements StompMessa
             return queueDestinationManager;
         }
 
-        //  it should be detected by assertDestination();
+        //  it should be detected by assertDestination() that should be invoked before
         throw new IllegalStateException("Unsupported destination: " + destination);
     }
 
     private void assertDestination(String destination) throws RequestValidationFailedException{
+
         //  checking if there is at least one character in destination name
         if(destination.length() == 7){
             throw new RequestValidationFailedException(Errors.INVALID_DESTINATION_NAME);

@@ -15,12 +15,7 @@ import java.util.Map;
  */
 public abstract class ParserFrameState extends UntypedActor{
 
-    /** this should be the same as StompServer.PAYLOAD_LINE_SEPARATOR */
-    private final int PAYLOAD_LINE_SEPARATOR_LENGTH=1;
-
     protected Frame.FrameParsingState frameParsingState = Frame.FrameParsingState.READING_COMMAND;
-
-    //protected SessionState sessionState = SessionState.WAITING_FOR_CONNECTION;
 
     //  move this to frame
     protected Command currentFrameCommand = null;
@@ -29,7 +24,6 @@ public abstract class ParserFrameState extends UntypedActor{
 
     protected Map<String, String> headers;
 
-    //protected ByteString currentFrameBody;
     //  TODO: change it to ByteString
     protected StringBuilder currentFrameBody;
 
@@ -92,14 +86,12 @@ public abstract class ParserFrameState extends UntypedActor{
                     setState(Frame.FrameParsingState.READING_BODY);
                     return;
                 }
-
                 addHeader(line);
                 break;
 
             case READING_BODY:
-                if(line.equals("\000\n")){
+                if("\000\n".equals(line)){
                     setState(Frame.FrameParsingState.FINISHED_PARSING);
-                    //setState(Frame.FrameParsingState.READING_COMMAND);
                     return;
                 }
                 currentFrameBody.append(line);
@@ -148,8 +140,7 @@ public abstract class ParserFrameState extends UntypedActor{
     }
 
 
-    abstract protected void transition(Frame.FrameParsingState old, Frame.FrameParsingState next);
-
+    protected abstract void transition(Frame.FrameParsingState old, Frame.FrameParsingState next);
 
     protected enum SessionState{
         WAITING_FOR_CONNECTION,
@@ -157,7 +148,5 @@ public abstract class ParserFrameState extends UntypedActor{
         SLEEPING_BEFORE_DISCONNECT
 
     }
-
-
 
 }

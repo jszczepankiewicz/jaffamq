@@ -51,8 +51,6 @@ public class TopicTest {
             final Props props = Props.create(Topic.class, "destination1");
             final ActorRef topic = system.actorOf(props);
 
-            //final JavaTestKit probe = new JavaTestKit(system);
-
             LOG.debug("Sending unsubscribed message");
             StompMessage tz = new StompMessage("destinationz", null, null, "3");
             expectNoMsg();

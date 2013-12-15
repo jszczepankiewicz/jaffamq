@@ -13,7 +13,7 @@ public interface UnconsumedMessageRepository {
     int MAXIMUM_POLL_DURATION_MS = 2000;
     int MAXIMUM_PERSIST_DURATION_MS = 2000;
 
-    public Map<String, List<PersistedMessageId>> getPersistedMessagesByLocation();
+    Map<String, List<PersistedMessageId>> getPersistedMessagesByLocation();
 
     /**
      * Initialize repository. After returning from this method repository is ready to serve operations.

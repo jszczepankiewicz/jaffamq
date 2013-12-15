@@ -16,4 +16,8 @@ public class IOTestHelper {
         tmpDir = tmpDir.endsWith(File.separator) ? tmpDir : tmpDir.concat(File.separator);
         return tmpDir + "torpidomq.tst" + File.separator + System.currentTimeMillis();
     }
+
+    private IOTestHelper(){
+
+    }
 }

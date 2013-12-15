@@ -1,6 +1,5 @@
 package org.jaffamq.broker.messages.persistence;
 
-import org.jaffamq.messages.StompMessage;
 import org.jaffamq.persistence.PersistedMessageId;
 
 /**

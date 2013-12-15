@@ -10,11 +10,12 @@ public class InternalException extends RuntimeException{
 
     protected final String contextMessage;
 
-    protected Throwable cause;
+    protected final Throwable cause;
 
     public InternalException(Errors.Code code, String contextMessage){
         this.errorCode = code;
         this.contextMessage = contextMessage;
+        this.cause = null;
     }
 
     public InternalException(Errors.Code code, Throwable cause, String contextMessage){

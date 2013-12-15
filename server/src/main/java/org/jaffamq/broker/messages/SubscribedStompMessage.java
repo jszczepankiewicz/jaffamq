@@ -43,23 +43,23 @@ public class SubscribedStompMessage extends StompMessage {
      * @return
      */
     public String toTransmit(){
-        final String NL="\r\n";
+        final String newline="\r\n";
         StringBuilder builder = new StringBuilder();
         builder.append("MESSAGE");
-        builder.append(NL);
+        builder.append(newline);
         builder.append("subscription:");
         builder.append(subscriptionId);
-        builder.append(NL);
+        builder.append(newline);
         builder.append("message-id:");
         builder.append(this.getMessageId());
-        builder.append(NL);
+        builder.append(newline);
         builder.append("destination:");
         builder.append(getDestination());
-        builder.append(NL);
+        builder.append(newline);
         builder.append("content-type:");
         builder.append(getHeaders().get(Headers.CONTENT_TYPE));
-        builder.append(NL);
-        builder.append(NL);
+        builder.append(newline);
+        builder.append(newline);
         builder.append(getBody());
         builder.append("\000\n");
 

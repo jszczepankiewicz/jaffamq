@@ -26,9 +26,8 @@ public class StoreUnconsumedMessageHandler extends UntypedActor{
     private final UnconsumedMessageRepository repo;
     private ActorRef destinationManager;
 
-    public StoreUnconsumedMessageHandler(/*ActorRef destinationManager, */UnconsumedMessageRepository repo) {
+    public StoreUnconsumedMessageHandler(UnconsumedMessageRepository repo) {
         this.repo = repo;
-        //this.destinationManager = destinationManager;
     }
 
     private PersistedMessageId storeUnconsumedMessage(StompMessage message){
@@ -57,13 +56,13 @@ public class StoreUnconsumedMessageHandler extends UntypedActor{
      * @throws Exception
      */
     @Override
-    public void preStart() throws Exception {
+    public void preStart() {
         ActorSelection queueDestinationManager = getContext().actorSelection(QueueDestinationManager.LOCAL_PATH);
         queueDestinationManager.tell(new Identify(null), getSelf());
     }
 
     @Override
-    public void onReceive(Object o) throws Exception {
+    public void onReceive(Object o) {
 
         if(o instanceof StoreUnconsumedMessageRequest){
             StoreUnconsumedMessageRequest request = (StoreUnconsumedMessageRequest)o;

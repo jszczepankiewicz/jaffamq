@@ -63,8 +63,6 @@ public class VolatileMemoryTransactionTest {
         //  when
         tx.commit();
         exception.expect(RequestValidationFailedException.class);
-        //TODO: add validation code
-        //exception.expectMessage("Transaction to commit should be in STARTED state but is in COMMITED");
 
         tx.commit();
     }
@@ -79,10 +77,6 @@ public class VolatileMemoryTransactionTest {
         //  when
         tx.rollback();
         exception.expect(RequestValidationFailedException.class);
-        //TODO: add validation code
-        //exception.expectMessage("Transaction to commit should be in STARTED state but is in ROLLBACKED");
-
-
         tx.rollback();
 
     }

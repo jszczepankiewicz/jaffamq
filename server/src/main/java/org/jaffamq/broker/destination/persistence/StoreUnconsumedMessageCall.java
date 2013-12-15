@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 
 public class StoreUnconsumedMessageCall implements Callable<PersistedMessageId> {
 
-    private Logger LOG = LoggerFactory.getLogger(StoreUnconsumedMessageCall.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StoreUnconsumedMessageCall.class);
 
     private StompMessage messageToStore;
     private UnconsumedMessageRepository repo;
@@ -22,7 +22,7 @@ public class StoreUnconsumedMessageCall implements Callable<PersistedMessageId> 
     }
 
     @Override
-    public PersistedMessageId call() throws Exception {
+    public PersistedMessageId call() {
         LOG.info("Before persisting message in repository");
         return repo.persistMessage(messageToStore);
     }

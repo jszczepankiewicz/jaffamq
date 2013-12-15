@@ -8,6 +8,10 @@ import org.jaffamq.broker.StompMessageSender;
  */
 public class TransactionFactory {
 
+    private TransactionFactory(){
+
+    }
+
     public static Transaction createTransaction(String clientTransactionName, StompMessageSender sender){
         return new VolatileMemoryTransaction(clientTransactionName, sender);
     }

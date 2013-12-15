@@ -26,9 +26,8 @@ public class PollUnconsumedMessageHandler extends UntypedActor {
     private final UnconsumedMessageRepository repo;
     private ActorRef destinationManager;
 
-    public PollUnconsumedMessageHandler(/*ActorRef destinationManager, */UnconsumedMessageRepository repo) {
+    public PollUnconsumedMessageHandler(UnconsumedMessageRepository repo) {
         this.repo = repo;
-        /*this.destinationManager = destinationManager;*/
     }
 
     private StompMessage pollMessageFromUnconsumedMessageRepository(PersistedMessageId pid) {
@@ -62,7 +61,7 @@ public class PollUnconsumedMessageHandler extends UntypedActor {
     }
 
     @Override
-    public void onReceive(Object o) throws Exception {
+    public void onReceive(Object o) {
 
         if (o instanceof PollUnconsumedMessageRequest) {
             PollUnconsumedMessageRequest request = (PollUnconsumedMessageRequest) o;
@@ -70,7 +69,7 @@ public class PollUnconsumedMessageHandler extends UntypedActor {
             //  WARNING: blocking operation
             StompMessage message = pollMessageFromUnconsumedMessageRepository(request.getPid());
 
-            //  FIXME: 2, in order to increase perfomance we should in the future send directly to certain destination
+            //  TODO: in order to increase perfomance we should in the future send directly to certain destination
             PollUnconsumedMessageResponse response = new PollUnconsumedMessageResponse(message, request.getPid());
 
             destinationManager.tell(response, getSelf());

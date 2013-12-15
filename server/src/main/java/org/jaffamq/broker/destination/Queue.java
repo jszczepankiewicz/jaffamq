@@ -59,7 +59,7 @@ public class Queue extends Destination {
 
     private void firePollUnconsumedRequestIfAvailable(){
 
-        if(unconsumedMessages.size() > 0){
+        if(!unconsumedMessages.isEmpty()){
             log.info("Detected {} unconsumed messages for destination: {}", unconsumedMessages.size(), destination);
             pollUnconsumedMessageService.tell(new PollUnconsumedMessageRequest(unconsumedMessages.peek()), getSelf());
         }else{
@@ -125,7 +125,7 @@ public class Queue extends Destination {
     @Override
     protected void onStompMessage(StompMessage message) {
 
-        if(subscriptions.size() == 0){
+        if(subscriptions.isEmpty()){
             log.info("No active subscribers to: {} storing message with id: {} for future consumption", destination, message.getMessageId());
             //  no active subscriptions, we should store it
             storeUnconsumedMessageService.tell(new StoreUnconsumedMessageRequest(message), getSelf());

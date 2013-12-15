@@ -8,6 +8,8 @@ import org.jaffamq.RequestValidationFailedException;
  */
 public class TransactionStatusVerifier {
 
+    private TransactionStatusVerifier(){}
+
     public static void assertTransactionStatus(Transaction.Status target, Transaction.Status current) throws RequestValidationFailedException {
         if(target == Transaction.Status.ROLLBACKED){
             if(current == Transaction.Status.ROLLBACKED){

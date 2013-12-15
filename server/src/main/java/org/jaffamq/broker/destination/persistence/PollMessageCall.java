@@ -18,7 +18,7 @@ public class PollMessageCall implements Callable<StompMessage> {
     }
 
     @Override
-    public StompMessage call() throws Exception {
+    public StompMessage call() {
         return repo.pollMessage(requestedPid);
     }
 }

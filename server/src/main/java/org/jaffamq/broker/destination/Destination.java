@@ -41,7 +41,7 @@ public abstract class Destination extends UntypedActor {
     protected abstract void onSubscriptionRemoved(UnsubscribeRequest unsubscribeRequest);
 
     @Override
-    public void onReceive(Object o) throws Exception {
+    public void onReceive(Object o){
 
         log.info("Destination actor: [{}] onReceive: {}", destination, o);
 
@@ -55,12 +55,9 @@ public abstract class Destination extends UntypedActor {
 
         } else if (o instanceof Terminated || o instanceof UnsubscribeRequest) {
             log.debug("Received Terminated from {}", getSender());
-            //  TODO: optimize that
-            //subscribers.remove(getSender());
 
             if (o instanceof UnsubscribeRequest) {
                 UnsubscribeRequest unsubscribeRequest = (UnsubscribeRequest) o;
-                //Iterator<Subscription> iterator = subscriptions.iterator();
 
                 log.info("Received UnsubscribeRequest from {} to subscription {}", getSender(), unsubscribeRequest.getSubscriptionId());
 

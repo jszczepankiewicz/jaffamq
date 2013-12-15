@@ -5,6 +5,10 @@ package org.jaffamq;
  */
 public class Errors {
 
+    private Errors(){
+
+    }
+
     public static class Code {
         private final String id;
         private final String description;

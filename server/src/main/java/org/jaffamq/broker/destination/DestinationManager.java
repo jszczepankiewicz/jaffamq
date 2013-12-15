@@ -44,7 +44,7 @@ public abstract class DestinationManager extends UntypedActor{
     }
 
     @Override
-    public void onReceive(Object o) throws Exception {
+    public void onReceive(Object o){
 
         log.info("DestinationManager.onReceive: {}", o);
 
