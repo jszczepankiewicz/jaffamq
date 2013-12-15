@@ -3,11 +3,7 @@ package org.jaffamq.persistence;
 import org.jaffamq.messages.StompMessage;
 
 /**
- * Created with IntelliJ IDEA.
- * User: urwisy
- * Date: 23.10.13
- * Time: 20:23
- * To change this template use File | Settings | File Templates.
+ * Deprecated?
  */
 public interface Repository {
 

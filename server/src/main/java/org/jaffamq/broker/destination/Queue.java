@@ -1,28 +1,98 @@
 package org.jaffamq.broker.destination;
 
+import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.jaffamq.broker.Subscription;
+import org.jaffamq.broker.messages.SubscriberRegister;
+import org.jaffamq.broker.messages.persistence.PollUnconsumedMessageRequest;
+import org.jaffamq.broker.messages.persistence.PollUnconsumedMessageResponse;
+import org.jaffamq.broker.messages.persistence.StoreUnconsumedMessageRequest;
+import org.jaffamq.broker.messages.persistence.StoreUnconsumedMessageResponse;
 import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscribedStompMessage;
 import org.jaffamq.broker.messages.Unsubscribe;
+import org.jaffamq.persistence.PersistedMessageId;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Destination of type Queue.
  */
 public class Queue extends Destination {
+
+    /*
+        It would be more clever to store not all of them in memory ;)
+        Queue is faster than LinkedList.
+     */
+    private java.util.Queue<PersistedMessageId> unconsumedMessages = new ArrayDeque();
+
     private boolean refreshIterator;
 
     private final LoggingAdapter log = Logging
             .getLogger(getContext().system(), getSelf());
 
+
     private Iterator iterator;
 
-    public Queue(String destination) {
+    private ActorRef storeUnconsumedMessageService;
+    private ActorRef pollUnconsumedMessageService;
+
+    public Queue(String destination, ActorRef storeUnconsumedMessageService, ActorRef pollUnconsumedMessageService, List<PersistedMessageId> unconsumedMessagesOnStartup) {
+
         super(destination);
+        log.info("Creation of queue for destination: {}", destination);
+
+        this.storeUnconsumedMessageService = storeUnconsumedMessageService;
+        this.pollUnconsumedMessageService = pollUnconsumedMessageService;
+
         iterator = subscriptions.iterator();
+
+        //  TODO: convert to Queue
+        if(unconsumedMessagesOnStartup != null){
+            unconsumedMessages = new ArrayDeque<>(unconsumedMessagesOnStartup);
+        }
+
+    }
+
+    private void firePollUnconsumedRequestIfAvailable(){
+
+        if(unconsumedMessages.size() > 0){
+            log.info("Detected {} unconsumed messages for destination: {}", unconsumedMessages.size(), destination);
+            pollUnconsumedMessageService.tell(new PollUnconsumedMessageRequest(unconsumedMessages.peek()), getSelf());
+        }else{
+            log.info("Not detected unconsumed messages for destination: {}", destination);
+        }
+    }
+
+    @Override
+    protected void onSubscriberRegister(SubscriberRegister register){
+
+        super.onSubscriberRegister(register);
+        firePollUnconsumedRequestIfAvailable();
+    }
+
+    @Override
+    protected void onPollUnconsumedMessageResponse(PollUnconsumedMessageResponse response){
+
+        log.debug("Received PollUnconsumedMessageResponse");
+        onStompMessage(response.getMessage());
+        boolean removed = unconsumedMessages.remove(response.getPersistedMessageId());
+
+        if(!removed){
+            log.warning("Tried to removed nonexistent persistedMessageId equalTo: {} on collection with size: {}", response.getPersistedMessageId(), unconsumedMessages.size());
+        }
+
+        firePollUnconsumedRequestIfAvailable();
+    }
+
+    @Override
+    protected void onStoreUnconsumedMessageResponse(StoreUnconsumedMessageResponse response){
+        log.debug("Received StoreUnconsumedMessageResponse");
+        unconsumedMessages.add(response.getMid());
     }
 
     @Override
@@ -57,8 +127,14 @@ public class Queue extends Destination {
     protected void onStompMessage(StompMessage message) {
 
         if(subscriptions.size() == 0){
-            //  no subscribers available nothing to do
+            log.info("No active subscribers to: {} storing message with id: {} for future consumption", destination, message.getMessageId());
+            //  no active subscriptions, we should store it
+            storeUnconsumedMessageService.tell(new StoreUnconsumedMessageRequest(message), getSelf());
+
             return;
+        }
+        else{
+            log.info("Active subscribers to: {} are present, will not store message with id: {} for future consumption", destination, message.getMessageId());
         }
 
         Subscription subscription = getSubscriptionToSendMessage();

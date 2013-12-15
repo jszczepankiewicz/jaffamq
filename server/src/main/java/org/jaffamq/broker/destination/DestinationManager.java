@@ -5,6 +5,10 @@ import akka.actor.Terminated;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import org.jaffamq.broker.destination.persistence.PollUnconsumedMessageService;
+import org.jaffamq.broker.destination.persistence.StoreUnconsumedMessageService;
+import org.jaffamq.broker.messages.persistence.PollUnconsumedMessageResponse;
+import org.jaffamq.broker.messages.persistence.StoreUnconsumedMessageResponse;
 import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
 import org.jaffamq.broker.messages.Unsubscribe;
@@ -44,7 +48,7 @@ public abstract class DestinationManager extends UntypedActor{
     @Override
     public void onReceive(Object o) throws Exception {
 
-        log.info("DestinationHandler.onReceive: {}", o);
+        log.info("DestinationManager.onReceive: {}", o);
 
         if(o instanceof StompMessage){
 
@@ -60,8 +64,21 @@ public abstract class DestinationManager extends UntypedActor{
             destinationActor.tell(o, getSender());
             return;
         }
+        else if(o instanceof StoreUnconsumedMessageResponse){
+            String destination = ((StoreUnconsumedMessageResponse)o).getDestination();
+            ActorRef destinationActor = getOrCreateDestinationForName(destination);
+            destinationActor.tell(o, getSender());
+            return;
+        }
+        else if(o instanceof PollUnconsumedMessageResponse){
+            String destination = ((PollUnconsumedMessageResponse)o).getMessage().getDestination();
+            ActorRef destinationActor = getOrCreateDestinationForName(destination);
+            destinationActor.tell(o, getSender());
+            return;
+        }
         else if(o instanceof Terminated){
             log.warning("Implement me");
+            return;
         }
         else if(o instanceof Unsubscribe){
 

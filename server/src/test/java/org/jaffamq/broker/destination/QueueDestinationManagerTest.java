@@ -4,13 +4,19 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
+import org.jaffamq.broker.destination.persistence.UnconsumedMessageRepositoryStub;
 import org.jaffamq.broker.messages.*;
+import org.jaffamq.broker.messages.persistence.StoreUnconsumedMessageRequest;
 import org.jaffamq.messages.StompMessage;
+import org.jaffamq.persistence.PersistedMessageId;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Queue destination manager integration testing.
@@ -40,7 +46,10 @@ public class QueueDestinationManagerTest {
     @Test
     public void shouldCorrectlyServeQueues(){
         new JavaTestKit(system) {{
-            final Props props = Props.create(QueueDestinationManager.class);
+            /*
+                ActorRef storeUnconsumedMessageService, ActorRef pollUnconsumedMessageService, Map<String, List<PersistedMessageId>> unconsumedMessages
+             */
+            final Props props = Props.create(QueueDestinationManager.class, getRef(), getRef(), Collections.emptyMap());
             final ActorRef destinationManager = system.actorOf(props);
 
             StompMessage tz = new StompMessage("destinationz", null, null, "1");
@@ -48,7 +57,7 @@ public class QueueDestinationManagerTest {
             destinationManager.tell(tz, getRef());
             LOG.debug("Message to destinationz sent");
             //  we were no subscribing, nothing should be retrieved
-            expectNoMsg();
+            expectMsgAnyClassOf(StoreUnconsumedMessageRequest.class);
 
             StompMessage ta = new StompMessage("destinationa", null, null, "2");
             StompMessage tb = new StompMessage("destinationb", null, null, "3");
@@ -83,7 +92,7 @@ public class QueueDestinationManagerTest {
 
             destinationManager.tell(tb, getRef());
             LOG.debug("Message to destinationb sent");
-            expectNoMsg();
+            expectMsgAnyClassOf(StoreUnconsumedMessageRequest.class);
 
 
 

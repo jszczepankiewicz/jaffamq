@@ -49,8 +49,6 @@ public class SubscribedStompMessage extends StompMessage {
         builder.append(NL);
         builder.append("subscription:");
         builder.append(subscriptionId);
-        System.out.println("XXXXXXXXXXXX: " + subscriptionId);
-        System.out.println("XXXXXXXXXXXX: " + subscriptionId.length());
         builder.append(NL);
         builder.append("message-id:");
         builder.append(this.getMessageId());

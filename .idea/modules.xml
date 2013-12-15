@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/aggregator.iml" filepath="$PROJECT_DIR$/aggregator.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common-test/common-test.iml" filepath="$PROJECT_DIR$/common-test/common-test.iml" />
       <module fileurl="file://$PROJECT_DIR$/java-parent/java-parent.iml" filepath="$PROJECT_DIR$/java-parent/java-parent.iml" />
       <module fileurl="file://$PROJECT_DIR$/server/server.iml" filepath="$PROJECT_DIR$/server/server.iml" />
       <module fileurl="file://$PROJECT_DIR$/spearfish-db/spearfish-db.iml" filepath="$PROJECT_DIR$/spearfish-db/spearfish-db.iml" />

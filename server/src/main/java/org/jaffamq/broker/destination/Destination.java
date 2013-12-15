@@ -5,6 +5,8 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.jaffamq.broker.Subscription;
+import org.jaffamq.broker.messages.persistence.PollUnconsumedMessageResponse;
+import org.jaffamq.broker.messages.persistence.StoreUnconsumedMessageResponse;
 import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
 import org.jaffamq.broker.messages.Unsubscribe;
@@ -82,14 +84,35 @@ public abstract class Destination extends UntypedActor {
             } else {
                 throw new IllegalStateException("Unimplemented");
             }
-        } else if (o instanceof SubscriberRegister) {
-            SubscriberRegister register = (SubscriberRegister) o;
-            Subscription subscription = new Subscription(register.getSubscriptionId(), getSender());
-            subscriptions.add(subscription);
-            log.info("Received SubscriberRegister from {} to destination: {}, number of subscribers: {}", getSender(), destination, subscriptions.size());
+        }
+        else if(o instanceof PollUnconsumedMessageResponse){
+            onPollUnconsumedMessageResponse((PollUnconsumedMessageResponse)o);
+        }
+        else if(o instanceof StoreUnconsumedMessageResponse){
+            onStoreUnconsumedMessageResponse((StoreUnconsumedMessageResponse)o);
+            return;
+        }
+        else if (o instanceof SubscriberRegister) {
+            onSubscriberRegister((SubscriberRegister) o);
+            return;
         } else {
             log.warning("Received unknown message: {}", o);
             unhandled(o);
         }
+    }
+
+    protected void onPollUnconsumedMessageResponse(PollUnconsumedMessageResponse response){
+        //  do nothing
+    }
+
+    protected void onSubscriberRegister(SubscriberRegister register){
+
+        Subscription subscription = new Subscription(register.getSubscriptionId(), getSender());
+        subscriptions.add(subscription);
+        log.info("Received SubscriberRegister from {} to destination: {}, number of subscribers: {}", getSender(), destination, subscriptions.size());
+    }
+
+    protected void onStoreUnconsumedMessageResponse(StoreUnconsumedMessageResponse response){
+        //  do nothing by default
     }
 }

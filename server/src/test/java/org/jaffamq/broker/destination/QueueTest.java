@@ -14,6 +14,8 @@ import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
+
 /**
  * Integration tests for Queue.
  */
@@ -44,7 +46,7 @@ public class QueueTest {
         new JavaTestKit(system) {{
 
             //  given
-            final Props props = Props.create(Queue.class, "destination1");
+            final Props props = Props.create(Queue.class, "destination1", getRef(), getRef(), Collections.emptyList());
             final ActorRef queue = system.actorOf(props);
 
             //final JavaTestKit probe = new JavaTestKit(system);

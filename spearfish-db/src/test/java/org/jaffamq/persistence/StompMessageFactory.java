@@ -7,16 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created with IntelliJ IDEA.
- * User: urwisy
- * Date: 24.10.13
- * Time: 21:59
- * To change this template use File | Settings | File Templates.
+ * FIXME: remove me (reploace with common-test)
  */
 public class StompMessageFactory {
 
     public static StompMessage createMessage(){
-        return createMessage("destination" + System.currentTimeMillis());
+        return createMessage("destinations" + System.currentTimeMillis());
     }
 
     public static StompMessage createMessage(String destination){

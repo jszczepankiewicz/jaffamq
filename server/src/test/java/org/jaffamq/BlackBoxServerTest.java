@@ -1,181 +1,23 @@
+package org.jaffamq;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
-import akka.testkit.JavaTestKit;
-import org.apache.commons.io.IOUtils;
-import org.jaffamq.broker.destination.QueueDestinationManager;
-import org.jaffamq.broker.destination.TopicDestinationManager;
-
-import org.jaffamq.broker.StompServer;
-import org.jaffamq.org.jaffamq.test.StompTestBlockingClient;
 import org.jaffamq.org.jaffamq.test.StompTestClient;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.fail;
 
 /**
  * Group of tests that are using full TCP/IP stack to communicate between client (test) and server.
  * Client is simple blocking test sending class.
  */
-public class BlackBoxServerTest {
+public class BlackBoxServerTest extends EndToEndTestSuite {
 
     private static Logger LOG = LoggerFactory.getLogger(BlackBoxServerTest.class);
-
-    private ActorSystem system;
-    private static final Charset UTF8 = Charset.forName("UTF-8");
-
-    private List<StompTestClient> initializedClients;
-
-    @Rule
-    public ExternalResource clientsResource = new ExternalResource() {
-
-        @Override
-        protected void after() {
-
-            if (initializedClients != null) {
-                for (int i = 0; i < initializedClients.size(); i++) {
-
-                    StompTestClient testClient = initializedClients.get(i);
-
-                    try {
-                        testClient.close();
-                    } catch (IOException e) {
-                        LOG.warn("Exception while disposing StompTestClient", e);
-                    }
-                }
-            }
-
-            initializedClients = null;
-        }
-    };
-
-    /**
-     * Creates exactly one client.
-     *
-     * @return
-     */
-    private StompTestClient createClient() {
-        return createClients(1)[0];
-    }
-
-    private StompTestClient createConnectedClient() throws IOException{
-        StompTestClient client = createClient();
-        connectClient(client);
-        return client;
-    }
-
-    private StompTestClient[] createClients(int numberOfClients) {
-
-        if (initializedClients != null) {
-            throw new IllegalStateException("Clients from previous test not disposed properly. Please make sure you have disposed them before initalizing initializedClients for new test.");
-        }
-
-        initializedClients = new ArrayList<>(numberOfClients);
-
-        for (int i = 0; i < numberOfClients; i++) {
-            initializedClients.add(new StompTestBlockingClient(9999, "127.0.0.1", 3000));
-        }
-
-        return initializedClients.toArray(new StompTestClient[]{});
-    }
-
-    @Rule
-    public ExternalResource serverResource = new ExternalResource() {
-
-        @Override
-        protected void before() throws Throwable {
-
-            InetSocketAddress remote = new InetSocketAddress("127.0.0.1", 9999);
-            system = ActorSystem.create("TestServerApp");
-
-            final ActorRef topicDestinationManager = system.actorOf(Props.create(TopicDestinationManager.class), TopicDestinationManager.NAME);
-            final ActorRef queueDestinationManager = system.actorOf(Props.create(QueueDestinationManager.class), QueueDestinationManager.NAME);
-            system.actorOf(Props.create(StompServer.class, remote, topicDestinationManager, queueDestinationManager));
-            Thread.sleep(500);
-        }
-
-        @Override
-        protected void after() {
-            try {
-                //  sleep a little before shutdowning actors to fill all logs
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                //  do nothing
-            }
-            JavaTestKit.shutdownActorSystem(system);
-            system = null;
-        }
-    };
-
-    private static void waitToPropagateTCP() throws InterruptedException {
-        Thread.sleep(1000);
-    }
-
-    private String readResource(String classpathResource) throws IOException {
-
-        StringWriter writer = new StringWriter();
-        InputStream is = this.getClass().getResourceAsStream(classpathResource);
-
-        if (is == null) {
-            throw new IllegalArgumentException("Classpath resource: " + classpathResource + " not found");
-        }
-
-        IOUtils.copy(is, writer, UTF8);
-        return writer.getBuffer().toString().trim();
-    }
-
-    private void expectNoResponse(StompTestClient client) throws IOException {
-
-        String response = client.getResponseOrTimeout();
-
-        if (response.length() > 0) {
-            fail(String.format("Expected no response from server but got: %s", response));
-        }
-    }
-
-    private void expectResponse(StompTestClient client, String expectedFrame) throws IOException {
-
-        String response = client.getResponseOrTimeout();
-        assertThat("Response from server", response, is(equalTo(readResource(expectedFrame))));
-    }
-
-    private void connectClient(StompTestClient client) throws IOException {
-        connectClients(new StompTestClient[]{client});
-    }
-
-    private void connectClients(StompTestClient[] clients) throws IOException {
-
-        for (int i = 0; i < clients.length; i++) {
-
-            //  given
-            assertThat(clients[i], is(notNullValue()));
-
-            //  when
-            String response = clients[i].connectSendAndGrabAnswer("/CONNECT/basic.txt");
-
-            //  then
-            assertThat(response, is(equalTo(readResource("/CONNECT/basic_response.txt"))));
-        }
-
-    }
 
     @Test
     public void shouldChangeStateToConnectedAfterSuccessfulConnect() throws Exception {
@@ -243,7 +85,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToConnectWithErrorForMissingHost() throws Exception{
+    public void shouldRespondToConnectWithErrorForMissingHost() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -254,7 +96,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToConnectWithErrorForMissingAcceptVersion() throws Exception{
+    public void shouldRespondToConnectWithErrorForMissingAcceptVersion() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -265,7 +107,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToSendToTopicWithErrorForMissingDestination() throws Exception{
+    public void shouldRespondToSendToTopicWithErrorForMissingDestination() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -277,7 +119,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToSubscribeToTopicWithErrorForMissingId() throws Exception{
+    public void shouldRespondToSubscribeToTopicWithErrorForMissingId() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -289,7 +131,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToUnknownDestinationTypeWithError() throws Exception{
+    public void shouldRespondToUnknownDestinationTypeWithError() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -300,7 +142,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToInvalidQueueDestinationNameWithError() throws Exception{
+    public void shouldRespondToInvalidQueueDestinationNameWithError() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -311,7 +153,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToBeginWithErrorForMissingTransaction() throws Exception{
+    public void shouldRespondToBeginWithErrorForMissingTransaction() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -322,7 +164,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToCommitWithErrorForMissingTransaction() throws Exception{
+    public void shouldRespondToCommitWithErrorForMissingTransaction() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -334,7 +176,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToAbortWithErrorForMissingTransaction() throws Exception{
+    public void shouldRespondToAbortWithErrorForMissingTransaction() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -346,7 +188,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToInvalidTopicDestinationNameWithError() throws Exception{
+    public void shouldRespondToInvalidTopicDestinationNameWithError() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -357,7 +199,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToSubscribeToTopicWithErrorForMissingDestination() throws Exception{
+    public void shouldRespondToSubscribeToTopicWithErrorForMissingDestination() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -369,7 +211,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRespondToUnsubscribeToTopicWithErrorForMissingId() throws Exception{
+    public void shouldRespondToUnsubscribeToTopicWithErrorForMissingId() throws Exception {
 
         //  given
         StompTestClient client = createConnectedClient();
@@ -380,8 +222,9 @@ public class BlackBoxServerTest {
 
     }
 
+    //  is using persistence
     @Test
-    public void shouldKeepMessagesFromQueueForNextSubscriberIfSentWithoutActiveSubscribers() throws Exception{
+    public void shouldKeepMessagesFromQueueForNextSubscriberIfSentWithoutActiveSubscribers() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(2);
@@ -408,7 +251,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldRecycleQueueSubscribersOnUnsubscribe() throws Exception{
+    public void shouldRecycleQueueSubscribersOnUnsubscribe() throws Exception {
 
         StompTestClient[] clients = createClients(3);
         connectClients(clients);
@@ -442,7 +285,7 @@ public class BlackBoxServerTest {
 
 
     @Test
-    public void shouldRecycleQueueSubscribersOnMoreMessages() throws Exception{
+    public void shouldRecycleQueueSubscribersOnMoreMessages() throws Exception {
 
         StompTestClient[] clients = createClients(3);
         connectClients(clients);
@@ -495,7 +338,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldReturnErrorOnBeginTwiceSameTx() throws Exception{
+    public void shouldReturnErrorOnBeginTwiceSameTx() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(1);
@@ -512,7 +355,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldReturnErrorOnAbortNotKnownTx() throws Exception{
+    public void shouldReturnErrorOnAbortNotKnownTx() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(1);
@@ -530,7 +373,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldReturnErrorOnCommitNotKnownTx() throws Exception{
+    public void shouldReturnErrorOnCommitNotKnownTx() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(1);
@@ -548,7 +391,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldReturnErrorOnCommitTwiceSameTx() throws Exception{
+    public void shouldReturnErrorOnCommitTwiceSameTx() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(1);
@@ -568,7 +411,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldReturnErrorOnAbortTwiceSameTx() throws Exception{
+    public void shouldReturnErrorOnAbortTwiceSameTx() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(1);
@@ -588,7 +431,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldSendCommitedMessagesFromOneTransactionToMultipleDestinations() throws Exception{
+    public void shouldSendCommitedMessagesFromOneTransactionToMultipleDestinations() throws Exception {
 
         // given
         StompTestClient[] clients = createClients(3);
@@ -607,13 +450,13 @@ public class BlackBoxServerTest {
         expectNoResponse(clients[2]);
 
         clients[0].sendFrame("/COMMIT/commit_tx_a.txt");
-        expectResponse(clients[1],"/MESSAGE/message_topic_subscription_0_response.txt");
-        expectResponse(clients[2],"/MESSAGE/message_queue_subscription_3_m1.txt");
+        expectResponse(clients[1], "/MESSAGE/message_topic_subscription_0_response.txt");
+        expectResponse(clients[2], "/MESSAGE/message_queue_subscription_3_m1.txt");
 
     }
 
     @Test
-    public void shouldNotSendRollbackedMessagesToTopic() throws Exception{
+    public void shouldNotSendRollbackedMessagesToTopic() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(2);
@@ -633,7 +476,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldNotSendRollbackedMessagesToQueue() throws Exception{
+    public void shouldNotSendRollbackedMessagesToQueue() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(2);
@@ -652,7 +495,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldNotSendRollbackedMessagesFromOneTransactionToMulitpleDestinations() throws Exception{
+    public void shouldNotSendRollbackedMessagesFromOneTransactionToMulitpleDestinations() throws Exception {
 
         // given
         StompTestClient[] clients = createClients(3);
@@ -676,7 +519,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldSendOnlyMessagesFromCommitedTxWithSecondTxFromSameClientUncommited() throws Exception{
+    public void shouldSendOnlyMessagesFromCommitedTxWithSecondTxFromSameClientUncommited() throws Exception {
 
         // given
         StompTestClient[] clients = createClients(4);
@@ -707,16 +550,49 @@ public class BlackBoxServerTest {
         clients[0].sendFrame("/ABORT/abort_tx_a.txt");
         clients[0].sendFrame("/COMMIT/commit_tx_b.txt");
         expectNoResponse(clients[1]);
-        expectResponse(clients[2], "/MESSAGE/message_queue_subscription_6_m6.txt");
-        expectNoResponse(clients[3]);
 
+        String client1response = clients[2].getResponseOrTimeout();
+        String client2response = clients[3].getResponseOrTimeout();
+        String possibleAnswer1 = readResource("/MESSAGE/message_queue_subscription_6_m6.txt");
+        String possibleAnswer2 = readResource("/MESSAGE/message_queue_subscription_3_m6.txt");
+
+        boolean found = false;
+
+        if(client1response.trim().length()>0){
+
+            if(client1response.equals(possibleAnswer1)){
+                found = true;
+            }
+            else{
+                fail("Expected message different than received");
+            }
+        }
+
+        if(client2response.trim().length()>0){
+            if(found){
+                fail("Message received by more than one client");
+            }
+
+            if(client2response.equals(possibleAnswer2)){
+                found = true;
+            }
+            else{
+                fail("Expected message different than received");
+            }
+        }
+
+        if(!found){
+            fail("Message was not sent to any client");
+        }
+
+        //expectResponseInOneOfClient("/MESSAGE/message_queue_subscription_6_m6.txt", clients[2], clients[3]);
 
 
     }
 
 
     @Test
-    public void shouldNotSendUncommitedMessagesToQueue() throws Exception{
+    public void shouldNotSendUncommitedMessagesToQueue() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(2);
@@ -735,7 +611,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldSendCommitedMessagesToQueue() throws Exception{
+    public void shouldSendCommitedMessagesToQueue() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(2);
@@ -756,7 +632,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldSendCommitedMessagesToTopic() throws Exception{
+    public void shouldSendCommitedMessagesToTopic() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(3);
@@ -781,9 +657,9 @@ public class BlackBoxServerTest {
         expectResponse(clients[2], "/MESSAGE/message_topic_subscription_100_response.txt");
     }
 
-    @Ignore
+    @Ignore("Should be investigated in the future")
     @Test
-    public void shouldReturnErrorOnEmptyFrame() throws Exception{
+    public void shouldReturnErrorOnEmptyFrame() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(1);
@@ -797,7 +673,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldReturnErrorOnEmptyTransactionNameWithSend() throws Exception{
+    public void shouldReturnErrorOnEmptyTransactionNameWithSend() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(1);
@@ -811,7 +687,7 @@ public class BlackBoxServerTest {
     }
 
     @Test
-    public void shouldSendErrorOnProtocolNotEqualToStomp12() throws Exception{
+    public void shouldSendErrorOnProtocolNotEqualToStomp12() throws Exception {
 
         //  given
         StompTestClient client = createClient();
@@ -825,7 +701,7 @@ public class BlackBoxServerTest {
 
 
     @Test
-    public void shouldNotSendUncommitedMessagesToTopic() throws Exception{
+    public void shouldNotSendUncommitedMessagesToTopic() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(2);
@@ -845,7 +721,7 @@ public class BlackBoxServerTest {
 
 
     @Test
-    public void shouldUnsubscribeFromTopic() throws Exception{
+    public void shouldUnsubscribeFromTopic() throws Exception {
 
         //  given
         StompTestClient[] clients = createClients(3);

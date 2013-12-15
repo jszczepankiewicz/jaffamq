@@ -49,7 +49,7 @@ public class FastStompMessageSerializer implements StompMessageSerializer{
             return result;
 
         } catch (Exception e) {
-            throw new IllegalStateException("Unknow exception", e);
+            throw new IllegalStateException("Unknown exception", e);
         }
     }
 }

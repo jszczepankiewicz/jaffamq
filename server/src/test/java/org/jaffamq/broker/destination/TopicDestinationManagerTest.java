@@ -26,7 +26,7 @@ public class TopicDestinationManagerTest {
     private static ActorSystem system;
 
     @Rule
-    public ExternalResource systemResouce = new ExternalResource() {
+    public ExternalResource systemResource = new ExternalResource() {
 
         @Override
         protected void before() throws Throwable {

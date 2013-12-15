@@ -10,8 +10,9 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>java-parent</module>
         <module>common</module>
+        <module>common-test</module>
+        <module>java-parent</module>
         <module>spearfish-db</module>
         <module>server</module>
     </modules>
