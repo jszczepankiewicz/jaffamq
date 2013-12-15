@@ -7,7 +7,7 @@ JaffaMQ is working name for Stomp server messaging implementation written in Akk
 
 Destinations currently supported:
 - non-durable non-persisted topics
-- queues (with non-persisted message if subsc, but unconsumed messages are stored in persisted (in filesyste) journal for future consumption)
+- queues (with non-persisted message if subscribers already connected, but unconsumed messages are stored in persisted filesystem journal for future consumption)
 
 Please note: project is not yet compatible with STOMP 1.2 and we do not recommend using it in production.
 
