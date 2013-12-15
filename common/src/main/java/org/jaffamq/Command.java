@@ -1,15 +1,10 @@
 package org.jaffamq;
 
 /**
- * Created with IntelliJ IDEA.
- * User: win7
- * Date: 17.08.13
- * Time: 12:16
- * To change this template use File | Settings | File Templates.
+ * Stomp protocol command representation.
  */
 public enum Command {
 
-    //  to-broker
     NONE("NONE"),
     SEND("SEND"),
     SUBSCRIBE("SUBSCRIBE"),
@@ -19,13 +14,13 @@ public enum Command {
     ABORT("ABORT"),
     DISCONNECT("DISCONNECT"),
     CONNECT("CONNECT"),
-    //  to-client
     MESSAGE("MESSAGE"),
     RECEIPT("RECEIPT"),
     CONNECTED("CONNECTED"),
     ERROR("ERROR"),
     _EMPTY("_EMPTY"),
     _UNKNOWN("_UNKNOWN");
+
     private String text;
 
     Command(String text) {
@@ -33,21 +28,18 @@ public enum Command {
     }
 
     public static Command forName(String value) {
+
         value = value.trim();
-        if (value.equals("SEND")) return SEND;
-        else if (value.equals("SUBSCRIBE")) return SUBSCRIBE;
-        else if (value.equals("UNSUBSCRIBE")) return UNSUBSCRIBE;
-        else if (value.equals("BEGIN")) return BEGIN;
-        else if (value.equals("COMMIT")) return COMMIT;
-        else if (value.equals("ABORT")) return ABORT;
-        else if (value.equals("CONNECT")) return CONNECT;
-        else if (value.equals("MESSAGE")) return MESSAGE;
-        else if (value.equals("RECEIPT")) return RECEIPT;
-        else if (value.equals("CONNECTED")) return CONNECTED;
-        else if (value.equals("DISCONNECT")) return DISCONNECT;
-        else if (value.equals("ERROR")) return ERROR;
-        else if (value.equals("")) return _EMPTY;
-        else return _UNKNOWN;
+
+        if(value.equals("")){
+            return _EMPTY;
+        }
+
+        try{
+            return Command.valueOf(value);
+        }catch(IllegalArgumentException e){
+            return _UNKNOWN;
+        }
     }
 
 }
