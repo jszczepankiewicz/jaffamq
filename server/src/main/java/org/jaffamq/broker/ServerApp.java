@@ -3,6 +3,8 @@ package org.jaffamq.broker;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.jaffamq.broker.destination.QueueDestinationManager;
 import org.jaffamq.broker.destination.TopicDestinationManager;
 
@@ -10,22 +12,23 @@ import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created with IntelliJ IDEA.
- * User: win7
- * Date: 16.08.13
- * Time: 16:29
- * To change this template use File | Settings | File Templates.
+ * Main class for broker.
  */
 public class ServerApp {
 
-    public static void main(String... args) throws NoSuchAlgorithmException {
+    private static BrokerInstance instance;
 
-        InetSocketAddress remote = new InetSocketAddress("localhost", 9907);
-        ActorSystem system = ActorSystem.create("ServerApp");
+    public static void main(String... args){
 
-        final ActorRef topicDestinationManager = system.actorOf(Props.create(TopicDestinationManager.class), TopicDestinationManager.NAME);
-        final ActorRef queueDestinationManager = system.actorOf(Props.create(QueueDestinationManager.class), QueueDestinationManager.NAME);
-        final ActorRef server = system.actorOf(Props.create(StompServer.class, remote, topicDestinationManager, queueDestinationManager));
+        Config conf = ConfigFactory.load();
+
+        instance = new BrokerInstance(conf.getString("torpedo.net.host"), conf.getInt("torpedo.net.port"), conf.getString("torpedo.repo.datadir"));
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                instance.shutdown();
+            }
+        });
 
     }
 

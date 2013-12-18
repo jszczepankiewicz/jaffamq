@@ -16,6 +16,9 @@ import java.net.InetSocketAddress;
 
 import static akka.io.PipelineStage.sequence;
 
+/**
+ * Class responsible for starting listening and dispatching session handlers for new incoming connections.
+ */
 public class StompServer extends UntypedActor {
     /**
      * If you change this change also ParserFrameState.PAYLOAD_LINE_SEPARATOR_LENGTH

@@ -5,6 +5,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
 import org.apache.commons.io.IOUtils;
+import org.jaffamq.broker.BrokerInstance;
 import org.jaffamq.broker.StompServer;
 import org.jaffamq.broker.destination.QueueDestinationManager;
 import org.jaffamq.broker.destination.TopicDestinationManager;
@@ -42,9 +43,13 @@ public class EndToEndTestSuite {
 
     private static Logger LOG = LoggerFactory.getLogger(EndToEndTestSuite.class);
 
-    protected ActorSystem system;
-
     private String unconsumedRepositoryDataDir;
+
+    private static final Charset UTF8 = Charset.forName("UTF-8");
+
+    protected List<StompTestClient> initializedClients;
+
+    private BrokerInstance brokerInstance;
 
     protected void disconnectAllClients() {
 
@@ -67,22 +72,7 @@ public class EndToEndTestSuite {
     protected void createBroker(String unconsumedRepositoryDataDir) throws InterruptedException {
 
         this.unconsumedRepositoryDataDir = unconsumedRepositoryDataDir;
-
-        InetSocketAddress remote = new InetSocketAddress("127.0.0.1", 9999);
-        system = ActorSystem.create("TestServerApp");
-
-        repo = new UnconsumedMessageJournalRepository(unconsumedRepositoryDataDir);
-        repo.init();
-
-        Map<String, Queue<PersistedMessageId>> persistedMessages = repo.getPersistedMessagesByLocation();
-
-        final ActorRef pollUnconsumedMessageService = system.actorOf(Props.create(PollUnconsumedMessageService.class, repo));
-        final ActorRef storeUnconsumedMessageService = system.actorOf(Props.create(StoreUnconsumedMessageService.class, repo));
-
-        final ActorRef topicDestinationManager = system.actorOf(Props.create(TopicDestinationManager.class), TopicDestinationManager.NAME);
-        final ActorRef queueDestinationManager = system.actorOf(Props.create(QueueDestinationManager.class, storeUnconsumedMessageService, pollUnconsumedMessageService, persistedMessages), QueueDestinationManager.NAME);
-
-        system.actorOf(Props.create(StompServer.class, remote, topicDestinationManager, queueDestinationManager));
+        brokerInstance = new BrokerInstance("localhost", 9999, unconsumedRepositoryDataDir);
         Thread.sleep(500);
     }
 
@@ -101,9 +91,10 @@ public class EndToEndTestSuite {
         } catch (InterruptedException e) {
             LOG.warn("Unexpected InterrruptedException while waiting");
         }
-        JavaTestKit.shutdownActorSystem(system);
-        system = null;
-        repo.shutdown();
+
+        JavaTestKit.shutdownActorSystem(brokerInstance.getSystem());
+        brokerInstance.shutdown();
+
     }
 
     @Rule
@@ -129,11 +120,7 @@ public class EndToEndTestSuite {
         }
     };
 
-    private static final Charset UTF8 = Charset.forName("UTF-8");
 
-    protected List<StompTestClient> initializedClients;
-
-    protected UnconsumedMessageJournalRepository repo;
 
     protected StompTestClient createClient() {
         return createClients(1)[0];
