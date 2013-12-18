@@ -43,9 +43,7 @@ public class QueueDestinationManagerTest {
     @Test
     public void shouldCorrectlyServeQueues(){
         new JavaTestKit(system) {{
-            /*
-                ActorRef storeUnconsumedMessageService, ActorRef pollUnconsumedMessageService, Map<String, List<PersistedMessageId>> unconsumedMessages
-             */
+
             final Props props = Props.create(QueueDestinationManager.class, getRef(), getRef(), Collections.emptyMap());
             final ActorRef destinationManager = system.actorOf(props);
 

@@ -14,6 +14,7 @@ import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
 
 /**
@@ -46,7 +47,7 @@ public class QueueTest {
         new JavaTestKit(system) {{
 
             //  given
-            final Props props = Props.create(Queue.class, "destination1", getRef(), getRef(), Collections.emptyList());
+            final Props props = Props.create(Queue.class, "destination1", getRef(), getRef(), new ArrayDeque<>());
             final ActorRef queue = system.actorOf(props);
 
             LOG.debug("Sending unsubscribed message");

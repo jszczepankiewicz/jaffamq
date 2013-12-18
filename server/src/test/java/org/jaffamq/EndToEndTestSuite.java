@@ -27,9 +27,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.AnyOf.anyOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -46,7 +46,7 @@ public class EndToEndTestSuite {
 
     private String unconsumedRepositoryDataDir;
 
-    protected void disconnectAllClients(){
+    protected void disconnectAllClients() {
 
         if (initializedClients != null) {
             for (int i = 0; i < initializedClients.size(); i++) {
@@ -74,7 +74,7 @@ public class EndToEndTestSuite {
         repo = new UnconsumedMessageJournalRepository(unconsumedRepositoryDataDir);
         repo.init();
 
-        Map<String, List<PersistedMessageId>> persistedMessages = repo.getPersistedMessagesByLocation();
+        Map<String, Queue<PersistedMessageId>> persistedMessages = repo.getPersistedMessagesByLocation();
 
         final ActorRef pollUnconsumedMessageService = system.actorOf(Props.create(PollUnconsumedMessageService.class, repo));
         final ActorRef storeUnconsumedMessageService = system.actorOf(Props.create(StoreUnconsumedMessageService.class, repo));
@@ -86,7 +86,7 @@ public class EndToEndTestSuite {
         Thread.sleep(500);
     }
 
-    protected String getUnconsumedRepositoryDataDir(){
+    protected String getUnconsumedRepositoryDataDir() {
         return unconsumedRepositoryDataDir;
     }
 
@@ -94,7 +94,7 @@ public class EndToEndTestSuite {
         createBroker(org.jaffamq.test.IOTestHelper.getTempDataDir());
     }
 
-    protected void closeBroker(){
+    protected void closeBroker() {
         try {
             //  sleep a little before shutdowning actors to fill all logs
             Thread.sleep(500);

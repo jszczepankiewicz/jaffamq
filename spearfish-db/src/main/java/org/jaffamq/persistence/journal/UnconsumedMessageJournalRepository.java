@@ -13,10 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -29,7 +27,7 @@ public class UnconsumedMessageJournalRepository implements UnconsumedMessageRepo
     private final StompMessageSerializer serializer;
     private final String rootDir;
     private Journal journal;
-    private Map<String, List<PersistedMessageId>> destinationsByName = new ConcurrentHashMap<>();
+    private Map<String, Queue<PersistedMessageId>> destinationsByName = new ConcurrentHashMap<>();
 
     public UnconsumedMessageJournalRepository(String rootDir) {
         this.serializer = new FastStompMessageSerializer();
@@ -71,7 +69,7 @@ public class UnconsumedMessageJournalRepository implements UnconsumedMessageRepo
         recreateDestinationToLocationsMapping();
     }
 
-    public Map<String, List<PersistedMessageId>> getPersistedMessagesByLocation(){
+    public Map<String, Queue<PersistedMessageId>> getPersistedMessagesByLocation(){
         return destinationsByName;
     }
 
@@ -91,18 +89,18 @@ public class UnconsumedMessageJournalRepository implements UnconsumedMessageRepo
      * @param destination
      * @return
      */
-    private List<PersistedMessageId> getLocationsForDestination(String destination, boolean createIfNoPresent){
-        List<PersistedMessageId> locations = destinationsByName.get(destination);
+    private Queue<PersistedMessageId> getLocationsForDestination(String destination, boolean createIfNoPresent){
+        Queue<PersistedMessageId> locations = destinationsByName.get(destination);
 
         if(locations == null && createIfNoPresent){
-            locations = Collections.synchronizedList(new LinkedList<PersistedMessageId>());
+            locations = new ArrayDeque<PersistedMessageId>();
             destinationsByName.put(destination, locations);
         }
 
         return locations;
     }
 
-    private List<PersistedMessageId> getLocationsForDestination(String destination){
+    private Queue<PersistedMessageId> getLocationsForDestination(String destination){
         return getLocationsForDestination(destination, true);
     }
 

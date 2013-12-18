@@ -4,7 +4,6 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import org.jaffamq.persistence.PersistedMessageId;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,10 +20,10 @@ public class QueueDestinationManager extends DestinationManager {
 
     private ActorRef storeUnconsumedMessageService;
     private ActorRef pollUnconsumedMessageService;
-    private Map<String, List<PersistedMessageId>> unconsumedMessagesByDestinationFromPreviousSession;
+    private Map<String, java.util.Queue<PersistedMessageId>> unconsumedMessagesByDestinationFromPreviousSession;
 
 
-    public QueueDestinationManager(ActorRef storeUnconsumedMessageService, ActorRef pollUnconsumedMessageService, Map<String, List<PersistedMessageId>> unconsumedMessages) {
+    public QueueDestinationManager(ActorRef storeUnconsumedMessageService, ActorRef pollUnconsumedMessageService, Map<String, java.util.Queue<PersistedMessageId>> unconsumedMessages) {
         this.storeUnconsumedMessageService = storeUnconsumedMessageService;
         this.pollUnconsumedMessageService = pollUnconsumedMessageService;
         this.unconsumedMessagesByDestinationFromPreviousSession = unconsumedMessages;
@@ -33,7 +32,7 @@ public class QueueDestinationManager extends DestinationManager {
     @Override
     protected ActorRef createDestinationForName(String destination) {
 
-        List<PersistedMessageId> unconsumedMessages = unconsumedMessagesByDestinationFromPreviousSession.get(destination);
+        java.util.Queue<PersistedMessageId> unconsumedMessages = unconsumedMessagesByDestinationFromPreviousSession.get(destination);
         final Props props = Props.create(Queue.class, destination, storeUnconsumedMessageService, pollUnconsumedMessageService, unconsumedMessages);
         ActorRef queue = getContext().system().actorOf(props);
         unconsumedMessagesByDestinationFromPreviousSession.remove(destination);

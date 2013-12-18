@@ -1,18 +1,18 @@
 package org.jaffamq.broker.transaction;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import org.jaffamq.RequestValidationFailedException;
 import org.jaffamq.broker.StompMessageSender;
 import org.jaffamq.messages.StompMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayDeque;
+import java.util.Iterator;
+
 /**
  * In memory transaction. It is used as in-memory buffer. Please note that currently number of messages is not limited thus
  * it may lead to out of memory error.
- *
+ * <p/>
  * Since: 28.09.13
  */
 public class VolatileMemoryTransaction implements Transaction {
@@ -25,9 +25,9 @@ public class VolatileMemoryTransaction implements Transaction {
 
     private final String clientTransactionName;
 
-    private LinkedList<StompMessage> uncommitedMessages = new LinkedList<>();
+    private java.util.Queue<StompMessage> uncommitedMessages = new ArrayDeque<>();
 
-    public VolatileMemoryTransaction(String clientTransactionName, StompMessageSender sender){
+    public VolatileMemoryTransaction(String clientTransactionName, StompMessageSender sender) {
         this.clientTransactionName = clientTransactionName;
         this.sender = sender;
 
@@ -51,7 +51,7 @@ public class VolatileMemoryTransaction implements Transaction {
         TransactionStatusVerifier.assertTransactionStatus(Status.COMMITED, status);
 
         Iterator<StompMessage> messagesIterator = getMessagesInTransaction();
-        while(messagesIterator.hasNext()){
+        while (messagesIterator.hasNext()) {
             sender.sendStompMessage(messagesIterator.next());
         }
 
@@ -64,7 +64,7 @@ public class VolatileMemoryTransaction implements Transaction {
 
         TransactionStatusVerifier.assertTransactionStatus(Status.ROLLBACKED, status);
 
-        uncommitedMessages = new LinkedList<>();
+        uncommitedMessages = new ArrayDeque<>();
 
         status = Status.ROLLBACKED;
     }
