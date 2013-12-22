@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
+ * Unconsumed messages repository from queues. Implementation is using journal storage (journal.io) in filesystem.
  */
 public class UnconsumedMessageJournalRepository implements UnconsumedMessageRepository{
 
@@ -84,7 +84,7 @@ public class UnconsumedMessageJournalRepository implements UnconsumedMessageRepo
 
 
     /**
-     * Retrieve of create & retrieve list of locations for given destionations.
+     * Retrieve of create & retrieve list of locations for given destinations.
      * WARNING: this method is not internally thread safe and should be run in synchronized context (to locations & destinationsByName) if createIfNoPresent = true.
      * @param destination
      * @return
