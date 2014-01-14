@@ -44,8 +44,6 @@ public class Errors {
         }
     }
 
-
-
     //  client frame validation related error codes
     public static final Code HEADERS_MISSING_DESTINATION = new Code("STM-10001", "Missing [destination] header", "SEND / SUBSCRIBE / MESSAGE requires destination header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
     public static final Code HEADERS_MISSING_SUBSCRIPTION_ID = new Code("STM-10002", "Missing [id] header", "SUBSCRIBE / UNSUBSCRIBE frame requires id header", "Request to server was invalid due to missing header. Please check if you are using proper STOMP client.");
@@ -66,12 +64,19 @@ public class Errors {
     public static final Code TRANSACTION_TO_ROLLBACK_ALREADY_COMMITED = new Code("STM-2009", "Attempt to rollback commited transaction", "Transaction to abort with specified name was already commited in this session", "Transaction to abort with specified name was already commited in this session. Please check if you are using proper STOMP client.");
     public static final Code TRANSACTION_PROVIDED_WITH_EMPTY_NAME = new Code("STM-2010", "Transaction can not have empty name", "Transaction provided with empty name", "Transaction to send message with has empty name. Please check if you are using proper STOMP client.");
 
-    //  persistence related problems
+    //  unconsumed messages related problems
     public static final Code UNCONSUMED_MESSAGE_PERSIST_TIMEOUT = new Code("STM-3001", "Persist unconsumed operation timeout", "Timeout occurred for persist unconsumed message operation", "Timeout occurred for persisting unconsumed message operation. For stability reasons operation was aborted. Please check log files for details. It might be necessarily to tune configuration to level appropriate for available hardware");
     public static final Code UNCOSUMEND_MESSAGE_PERSIST_UNEXPECTED_ERROR = new Code("STM-3002", "Error persisting unconsumed message", "Unexpected exception occurred while persisting unconsumed message", "Please check log for details.");
     public static final Code UNCONSUMED_MESSAGE_POLL_TIMEOUT = new Code("STM-3003", "Poll unconsumed operation timeout", "Timeout occurred for poll unconsumed message operation", "Timeout occurred for polling unconsumed message operation. For stability reasons operation was aborted. Please check log files for details. It might be necessarily to tune configuration to level appropriate for available hardware");
     public static final Code UNCONSUMED_MESSAGE_POLL_UNEXPECTED_ERROR = new Code("STM-3002", "Error polling unconsumed message", "Unexpected exception occured while polling unconsumed message", "Please check log for details.");
 
+    //  sql persistence layer messages
+    public static final Code PREPARED_STATEMENT_CREATION_EXCEPTION = new Code ("STM-4001", "SQLException while creating PreparedStatement", "", "");
+    public static final Code PREPARED_STATEMENT_EXECUTE_WITHOUT_PARAMETERS_PASSED = new Code("STM-4002", "SQL Statement requires some parameters but none given to execute method", "", "");
+    public static final Code SQL_EXECUTE_QUERY_FAILED = new Code("STM-4003", "General SQLException while executing sql", "", "");
+    public static final Code PREPARED_STATEMENT_PARAMETERS_LENGTH_NOT_EQUAL = new Code("STM-4004", "Passed different number of parameters than declared in sql query for prepared statement", "", "");
+    public static final Code SQL_EXCEPTION_ON_LOOPING_RESULT_SET = new Code("STM-4005", "SQLException during resultSet.next()", "", "");
+    public static final Code SQL_EXCEPTION_WHILE_SET_VALUE_ON_STATEMENT = new Code("STM-4006", "SQLException on set value on statement", "", "");
 
 
 }

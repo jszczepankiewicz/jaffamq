@@ -1,0 +1,89 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="1" author="jszczepankiewicz">
+
+        <!--    DDL =============================================================================================== -->
+        <createTable tableName="security_group">
+            <column name="id" type="long">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="varchar(1024)"/>
+        </createTable>
+
+        <createTable tableName="security_user">
+            <column name="id" type="long">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="login" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="passhash" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="creationtime" type="long">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+        <createTable tableName="security_user_and_group">
+
+            <column name="id_user" type="long">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="id_group" type="long">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="id_user"
+                                 baseTableName="security_user_and_group"
+                                 constraintName="fk_security_user_and_group_id_user"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="security_user"/>
+
+        <addForeignKeyConstraint baseColumnNames="id_group"
+                                 baseTableName="security_user_and_group"
+                                 constraintName="fk_security_user_and_group_id_group"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="security_group"/>
+
+        <!--    INSERTIONS ======================================================================================= -->
+
+        <insert tableName="security_group">
+            <column name="id" value="1000"/>
+            <column name="name" value="admins"/>
+        </insert>
+
+        <insert tableName="security_user">
+            <column name="id" value="1000"/>
+            <column name="login" value="admin"/>
+            <column name="passhash" value="8be94e85158147d335c31e7401565942785e79d7d446cc41f6427422d6755371"/>
+            <column name="creationtime" value="1"/>
+        </insert>
+
+        <insert tableName="security_user_and_group">
+            <column name="id_user" value="1000"/>
+            <column name="id_group" value="1000"/>
+        </insert>
+
+    </changeSet>
+
+
+</databaseChangeLog>

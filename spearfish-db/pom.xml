@@ -9,15 +9,30 @@
         <relativePath>../java-parent</relativePath>
     </parent>
 
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>spearfish-db</artifactId>
+
+    <properties>
+        <liquibase.version>3.0.8</liquibase.version>
+    </properties>
 
     <dependencies>
 
         <dependency>
             <groupId>com.github.sbtourist</groupId>
             <artifactId>journalio</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
         </dependency>
 
         <dependency>
@@ -45,6 +60,27 @@
             <artifactId>hamcrest-library</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>${liquibase.version}</version>
+                <configuration>
+                    <driver>org.h2.Driver</driver>
+                    <url>jdbc:h2:mem:</url>
+                    <changeLogFile>${basedir}/src/main/resources/org/torpidomq/db/changelog/db.changelog-master.xml</changeLogFile>
+                    <migrationSqlOutputFile>${basedir}/src/main/resources/sql/torpidomq.init.sql</migrationSqlOutputFile>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
