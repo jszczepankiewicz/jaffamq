@@ -2,6 +2,7 @@ package org.jaffamq.persistence.database.sql;
 
 import org.jaffamq.Errors;
 import org.jaffamq.InternalException;
+import scala.annotation.meta.param;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,42 +21,12 @@ public abstract class SelectOperation<T> extends SQLOperation {
     }
 
     public SelectOperation(String preparedStatementName, String sql, Integer...parameters) {
-
-        super(preparedStatementName, sql);
-
-        for(Integer type:parameters){
-            addParameter(type);
-        }
+        super(preparedStatementName, sql, parameters);
     }
 
     protected abstract T mapResult(ResultSet rs, int rowNumber) throws SQLException;
 
-    protected void setParameterValues(PreparedStatement statement, Object...args) throws SQLException {
 
-        for(int columnCounter=0; columnCounter<getParameters().size(); columnCounter++) {
-
-            int type = getParameters().get(columnCounter).intValue();
-
-            int parameterIndex = columnCounter+1;
-
-            switch(type){
-                case Types.LONGNVARCHAR:
-                case Types.LONGVARCHAR:
-                case Types.VARCHAR:
-                case Types.NVARCHAR:
-                case Types.NCHAR:
-                    String strval = (String)args[columnCounter];
-                    statement.setString(parameterIndex, strval);
-                    break;
-                case Types.INTEGER:
-                    Integer intval = (Integer)args[columnCounter];
-                    statement.setInt(parameterIndex, intval);
-                    break;
-                default:
-                    throw new IllegalStateException("Type: " + type + " is not implemented yet, you can add mapping here");
-            }
-        }
-    }
 
     public T executeEntity(JDBCSession session, Object...args){
 
@@ -74,17 +45,8 @@ public abstract class SelectOperation<T> extends SQLOperation {
 
     public List<T> execute(JDBCSession session, Object...args){
 
-        PreparedStatement statement = session.getCompiledStatement(this);
-
-        if(getParameters().size()!=args.length){
-            throw new InternalException(Errors.PREPARED_STATEMENT_PARAMETERS_LENGTH_NOT_EQUAL, "for query: " + this.getPreparedStatementName() + ", expected: " + getParameters().size() + ", given: " + args.length);
-        }
-
-        try {
-            setParameterValues(statement, args);
-        } catch (SQLException e) {
-            throw new InternalException(Errors.SQL_EXCEPTION_WHILE_SET_VALUE_ON_STATEMENT, e, "for query: " + this.getPreparedStatementName());
-        }
+        // here
+        PreparedStatement statement = getStatement(session, args);
 
         ResultSet rs;
 
@@ -110,4 +72,6 @@ public abstract class SelectOperation<T> extends SQLOperation {
 
         return results;
     }
+
+
 }

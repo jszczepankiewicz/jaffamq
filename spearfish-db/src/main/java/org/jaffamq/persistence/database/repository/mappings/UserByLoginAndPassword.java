@@ -11,21 +11,9 @@ import static java.sql.Types.VARCHAR;
 /**
  * Created by urwisy on 07.01.14.
  */
-public class UserByLoginAndPassword extends SelectOperation<User>{
+public class UserByLoginAndPassword extends SelectUserOperation{
 
     public UserByLoginAndPassword() {
         super("UserByloginAndPassword", "SELECT * FROM security_user WHERE login=? AND passhash=?", VARCHAR, VARCHAR);
-    }
-
-    @Override
-    protected User mapResult(ResultSet rs, int rowNumber) throws SQLException {
-
-        User user = new User(
-                rs.getInt("id"),
-                rs.getString("login"),
-                rs.getString("passhash"),
-                DateTimeZone.forOffsetMillis(rs.getInt("creationtime")));
-
-        return user;
     }
 }

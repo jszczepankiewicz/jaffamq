@@ -64,8 +64,19 @@ public class RepositoryTest {
 
     }
 
-    private void initializeTestData() {
+    private void initializeTestData()  throws SQLException{
 
+        LOG.debug("Initializing test data...");
+
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute("RUNSCRIPT FROM 'classpath:sql/db-test.init.sql'");
+            connection.commit();
+
+        } catch (SQLException e) {
+            LOG.error("Error initializing test db with data", e);
+            throw e;
+        }
     }
 
 

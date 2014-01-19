@@ -77,6 +77,7 @@ public class Errors {
     public static final Code PREPARED_STATEMENT_PARAMETERS_LENGTH_NOT_EQUAL = new Code("STM-4004", "Passed different number of parameters than declared in sql query for prepared statement", "", "");
     public static final Code SQL_EXCEPTION_ON_LOOPING_RESULT_SET = new Code("STM-4005", "SQLException during resultSet.next()", "", "");
     public static final Code SQL_EXCEPTION_WHILE_SET_VALUE_ON_STATEMENT = new Code("STM-4006", "SQLException on set value on statement", "", "");
+    public static final Code SQL_EXCEPTION_ON_EXECUTE_UPDATE = new Code("STM-4007", "SQLException on executeUpdate", "", "");
 
 
 }

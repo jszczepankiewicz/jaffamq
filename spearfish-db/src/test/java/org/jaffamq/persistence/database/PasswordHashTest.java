@@ -1,5 +1,6 @@
 package org.jaffamq.persistence.database;
 
+import org.jaffamq.persistence.database.repository.UserRepository;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -33,13 +34,13 @@ public class PasswordHashTest {
     public void shouldReturnHashForNonEmptyString() {
 
         //  given
-        String password = "xyz321";
+        String password = UserRepository.SUPERADMIN_PASSWORD_DEFAULT;
 
         //  when
         String hash = PasswordHash.hash(password);
 
         //  then
-        assertThat(hash, is(equalTo("8be94e85158147d335c31e7401565942785e79d7d446cc41f6427422d6755371")));
+        assertThat(hash, is(equalTo(UserRepository.SUPERADMIN_PASSWORD_HASH)));
 
     }
 

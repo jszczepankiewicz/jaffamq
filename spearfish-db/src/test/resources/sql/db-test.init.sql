@@ -6,6 +6,14 @@
 
 
 --  move this to init db.
---INSERT INTO security_user(id, login, passhash, creationtime) VALUES
---    (1, 'admin', 'xyz321', 1);
+INSERT INTO security_user(id, login, passhash, creationtime) VALUES
+    (1000, 'someuser1', 'notimportant', 1);
+INSERT INTO security_user(id, login, passhash, creationtime) VALUES
+    (1001, 'someuser2', 'notimportant', 1);
+INSERT INTO security_user(id, login, passhash, creationtime) VALUES
+    (1002, 'someuser3', 'notimportant', 1);
+INSERT INTO security_user(id, login, passhash, creationtime) VALUES
+    (1003, 'someuser4', 'notimportant', 1);
+INSERT INTO security_user(id, login, passhash, creationtime) VALUES
+    (1004, 'someuser5', 'notimportant', 1);
 

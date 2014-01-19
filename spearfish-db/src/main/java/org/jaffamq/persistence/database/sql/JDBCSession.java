@@ -20,11 +20,14 @@ public class JDBCSession {
 
     private Connection connection;
 
+
     private Map<String, PreparedStatement> compiledStatements = new HashMap<>();
 
     public JDBCSession(Connection connection){
         this.connection = connection;
     }
+
+
 
     PreparedStatement getCompiledStatement(SQLOperation sql){
 
