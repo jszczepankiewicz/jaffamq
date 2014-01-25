@@ -4,6 +4,7 @@ import org.jaffamq.persistence.database.PasswordHash;
 import org.jaffamq.persistence.database.dto.Group;
 import org.jaffamq.persistence.database.dto.User;
 import org.jaffamq.persistence.database.repository.mappings.GroupsByUser;
+import org.jaffamq.persistence.database.repository.mappings.user.InsertGroupAndUser;
 import org.jaffamq.persistence.database.repository.mappings.user.InsertUser;
 import org.jaffamq.persistence.database.repository.mappings.UserByLoginAndPassword;
 import org.jaffamq.persistence.database.repository.mappings.UserList;
@@ -32,6 +33,7 @@ public class UserRepository {
     private GroupsByUser groupsByUser = new GroupsByUser();
     private UserList userList = new UserList();
     private InsertUser insertUser = new InsertUser();
+    private InsertGroupAndUser insertGroupAndUser = new InsertGroupAndUser();
 
     /**
      *
@@ -113,7 +115,11 @@ public class UserRepository {
                 100);
 
         if(groups.size()>0){
+
             //  do something
+            for(Group group:groups){
+                insertGroupAndUser.insert(session,id, group.getId());
+            }
         }
 
         LOG.debug("Created user with id: {}", id);

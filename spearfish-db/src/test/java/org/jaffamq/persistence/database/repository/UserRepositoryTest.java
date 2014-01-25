@@ -1,16 +1,19 @@
 package org.jaffamq.persistence.database.repository;
 
 import org.hamcrest.Matchers;
+import org.jaffamq.persistence.database.dto.Group;
 import org.jaffamq.persistence.database.dto.User;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -91,6 +94,12 @@ public class UserRepositoryTest extends RepositoryTest {
     @Test
     public void shouldReturnNullForGetUserWithNonExistedUser(){
 
+        //  when
+        User admin = repository.getUser(getSession(), 0l);
+
+        //  then
+        assertThat(admin, is(nullValue()));
+
     }
 
     @Test
@@ -123,13 +132,25 @@ public class UserRepositoryTest extends RepositoryTest {
         assertThat(userRetrieved.getId(), is(greaterThan(0l)));
         assertThat(userRetrieved.getLogin(), is(equalTo("somelogin")));
         assertThat(userRetrieved.getPasswordhash(), is(equalTo(UserRepository.SUPERADMIN_PASSWORD_HASH)));
-
-
     }
 
-    @Ignore
     @Test
     public void shouldCreateUserWithGroups(){
+
+        //  given
+        List<Group> groups = new ArrayList<>();
+        groups.add(new Group(1001, "test1"));
+        groups.add(new Group(1002, "test2"));
+
+        //  when
+        Long createdId = repository.createUser(getSession(), "a", UserRepository.SUPERADMIN_PASSWORD_DEFAULT, groups);
+
+        //  then
+        assertThat(createdId, is(notNullValue()));
+        User userRetrieved = repository.getUser(getSession(), createdId);
+        assertThat(userRetrieved.getLogin(), is(equalTo("a")));
+        assertThat(userRetrieved.getPasswordhash(), is(equalTo(UserRepository.SUPERADMIN_PASSWORD_HASH)));
+        assertThat(userRetrieved.getGroups(), containsInAnyOrder(groups.toArray()));
 
     }
 

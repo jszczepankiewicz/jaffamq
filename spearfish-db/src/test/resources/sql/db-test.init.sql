@@ -17,3 +17,13 @@ INSERT INTO security_user(id, login, passhash, creationtime) VALUES
 INSERT INTO security_user(id, login, passhash, creationtime) VALUES
     (1004, 'someuser5', 'notimportant', 1);
 
+-- groups
+INSERT INTO security_group(id, name) VALUES
+    (1000, 'test0');
+
+INSERT INTO security_group(id, name) VALUES
+    (1001, 'test1');
+
+INSERT INTO security_group(id, name) VALUES
+    (1002, 'test2');
+
