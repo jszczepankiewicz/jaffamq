@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Jaffamq by jszczepankiewicz</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Jaffamq</h1>
+        <p></p>
+
+        <p class="view"><a href="https://github.com/jszczepankiewicz/jaffamq">View the Project on GitHub <small>jszczepankiewicz/jaffamq</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/jszczepankiewicz/jaffamq/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/jszczepankiewicz/jaffamq/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/jszczepankiewicz/jaffamq">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h3>
+<a name="jaffamq-stomp-messaging-broker" class="anchor" href="#jaffamq-stomp-messaging-broker"><span class="octicon octicon-link"></span></a>JaffaMQ Stomp messaging broker</h3>
+
+<hr><h5>
+<a name="build-status-" class="anchor" href="#build-status-"><span class="octicon octicon-link"></span></a>build status: <a href="https://travis-ci.org/jszczepankiewicz/jaffamq"><img src="https://travis-ci.org/jszczepankiewicz/jaffamq.png?branch=master" alt="Build Status"></a>
+</h5>
+
+<hr><p>JaffaMQ is working name for Stomp server messaging implementation written in Akka (Java). It uses new Akka TCP stack (introduced in akka 2.2). It aims to be full Stomp 1.2 complete implementation.</p>
+
+<p>Destinations currently supported:</p>
+
+<ul>
+<li>non-durable non-persisted topics</li>
+<li>queues (with non-persisted message if subscribers already connected, but unconsumed messages are stored in persisted filesystem journal for future consumption)</li>
+</ul><p>Please note: project is not yet compatible with STOMP 1.2 and we do not recommend using it in production.</p>
+
+<h3>
+<a name="limitations" class="anchor" href="#limitations"><span class="octicon octicon-link"></span></a>Limitations</h3>
+
+<h5>
+<a name="known-unimplemented-yet-stomp-12-specification-features" class="anchor" href="#known-unimplemented-yet-stomp-12-specification-features"><span class="octicon octicon-link"></span></a>Known unimplemented yet Stomp 1.2 specification features</h5>
+
+<ul>
+<li>Heart-beating</li>
+<li>only acknowledge mode auto is supported</li>
+</ul><p><a href="http://stomp.github.com/">STOMP specification static website</a></p>
+
+<h5>
+<a name="implementation-limitations" class="anchor" href="#implementation-limitations"><span class="octicon octicon-link"></span></a>Implementation limitations</h5>
+
+<ul>
+<li>due to lack of any persistence layer current transactions are implemented as in memory transactions thus using very large transactions may lead to JVM heap memory problems</li>
+<li>whole project is using default type of akka mailboxes (unbounded) which may lead to JVM heap memory problems in some unfriendly conditions</li>
+</ul><h3>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h3>
+
+<ul>
+<li>Java 7 (tested on OpenJDK 7 and Oracle JDK 7).</li>
+<li>Maven 3</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/jszczepankiewicz">jszczepankiewicz</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-47492565-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
