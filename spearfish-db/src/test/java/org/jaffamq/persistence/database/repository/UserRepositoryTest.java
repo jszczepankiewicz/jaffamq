@@ -44,7 +44,7 @@ public class UserRepositoryTest extends RepositoryTest {
         assertThat(users.size(), is(equalTo(6)));
         assertThat(users.get(0).getId(), is(equalTo(1l)));
         assertThat(users.get(0).getLogin(), is(equalTo("admin")));
-        assertThat(users.get(0).getPasswordhash(), is(equalTo(UserRepository.SUPERADMIN_PASSWORD_HASH)));
+        assertThat(users.get(0).getPasswordhash(), is(equalTo(UserDefaults.SUPERADMIN_PASSWORD_HASH)));
         assertThat(users.get(0).getCreationTime(), is(equalTo(DateTimeZone.forOffsetMillis(1))));
         assertThat(users.get(0).getGroups().size(), is(equalTo(1)));
         assertThat(users.get(1).getId(), is(equalTo(1000l)));
@@ -79,16 +79,16 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldHaveAdminUserCreatedAfterStart() throws Exception {
 
         //  when
-        User admin = repository.getUser(getSession(), UserRepository.SUPERADMIN_LOGIN, UserRepository.SUPERADMIN_PASSWORD_DEFAULT);
+        User admin = repository.getUser(getSession(), UserDefaults.SUPERADMIN_LOGIN, UserDefaults.SUPERADMIN_PASSWORD_DEFAULT);
 
         //  then
         assertThat(admin, is(notNullValue()));
         assertThat(admin.getId(), is(greaterThan(0l)));
-        assertThat(admin.getLogin(), is(equalTo(UserRepository.SUPERADMIN_LOGIN)));
-        assertThat(admin.getPasswordhash(), is(equalTo(UserRepository.SUPERADMIN_PASSWORD_HASH)));
+        assertThat(admin.getLogin(), is(equalTo(UserDefaults.SUPERADMIN_LOGIN)));
+        assertThat(admin.getPasswordhash(), is(equalTo(UserDefaults.SUPERADMIN_PASSWORD_HASH)));
         assertThat(admin.getGroups(), is(Matchers.notNullValue()));
         assertThat(admin.getGroups().size(), is(equalTo(1)));
-        assertThat(admin.getGroups().get(0).getName(), is(equalTo(UserRepository.ADMINS_GROUP)));
+        assertThat(admin.getGroups().get(0).getName(), is(equalTo(UserDefaults.ADMINS_GROUP)));
     }
 
     @Test
@@ -106,23 +106,23 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldReturnUserById(){
 
         //  when
-        User admin = repository.getUser(getSession(), UserRepository.SUPERADMIN_ID);
+        User admin = repository.getUser(getSession(), UserDefaults.SUPERADMIN_ID);
 
         //  then
         assertThat(admin, is(notNullValue()));
-        assertThat(admin.getId().intValue(), is(equalTo(UserRepository.SUPERADMIN_ID.intValue())));
-        assertThat(admin.getLogin(), is(equalTo(UserRepository.SUPERADMIN_LOGIN)));
-        assertThat(admin.getPasswordhash(), is(equalTo(UserRepository.SUPERADMIN_PASSWORD_HASH)));
+        assertThat(admin.getId().intValue(), is(equalTo(UserDefaults.SUPERADMIN_ID.intValue())));
+        assertThat(admin.getLogin(), is(equalTo(UserDefaults.SUPERADMIN_LOGIN)));
+        assertThat(admin.getPasswordhash(), is(equalTo(UserDefaults.SUPERADMIN_PASSWORD_HASH)));
         assertThat(admin.getGroups(), is(Matchers.notNullValue()));
         assertThat(admin.getGroups().size(), is(equalTo(1)));
-        assertThat(admin.getGroups().get(0).getName(), is(equalTo(UserRepository.ADMINS_GROUP)));
+        assertThat(admin.getGroups().get(0).getName(), is(equalTo(UserDefaults.ADMINS_GROUP)));
     }
 
     @Test
     public void shouldCreateUserWithoutGroup() throws Exception{
 
         //  when
-        Long afterCreation = repository.createUser(getSession(), "somelogin", UserRepository.SUPERADMIN_PASSWORD_DEFAULT, Collections.EMPTY_LIST);
+        Long afterCreation = repository.createUser(getSession(), "somelogin", UserDefaults.SUPERADMIN_PASSWORD_DEFAULT, Collections.EMPTY_LIST);
 
         //  then
         assertThat(afterCreation, is(notNullValue()));
@@ -131,7 +131,7 @@ public class UserRepositoryTest extends RepositoryTest {
 
         assertThat(userRetrieved.getId(), is(greaterThan(0l)));
         assertThat(userRetrieved.getLogin(), is(equalTo("somelogin")));
-        assertThat(userRetrieved.getPasswordhash(), is(equalTo(UserRepository.SUPERADMIN_PASSWORD_HASH)));
+        assertThat(userRetrieved.getPasswordhash(), is(equalTo(UserDefaults.SUPERADMIN_PASSWORD_HASH)));
     }
 
     @Test
@@ -143,13 +143,13 @@ public class UserRepositoryTest extends RepositoryTest {
         groups.add(new Group(1002, "test2"));
 
         //  when
-        Long createdId = repository.createUser(getSession(), "a", UserRepository.SUPERADMIN_PASSWORD_DEFAULT, groups);
+        Long createdId = repository.createUser(getSession(), "a", UserDefaults.SUPERADMIN_PASSWORD_DEFAULT, groups);
 
         //  then
         assertThat(createdId, is(notNullValue()));
         User userRetrieved = repository.getUser(getSession(), createdId);
         assertThat(userRetrieved.getLogin(), is(equalTo("a")));
-        assertThat(userRetrieved.getPasswordhash(), is(equalTo(UserRepository.SUPERADMIN_PASSWORD_HASH)));
+        assertThat(userRetrieved.getPasswordhash(), is(equalTo(UserDefaults.SUPERADMIN_PASSWORD_HASH)));
         assertThat(userRetrieved.getGroups(), containsInAnyOrder(groups.toArray()));
 
     }
@@ -172,7 +172,7 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldShouldFoundUserByLogin(){
 
         //  when
-        boolean found = repository.userWithLoginExists(getSession(), UserRepository.SUPERADMIN_LOGIN);
+        boolean found = repository.userWithLoginExists(getSession(), UserDefaults.SUPERADMIN_LOGIN);
 
         //  then
         assertThat(found, is(true));

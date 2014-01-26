@@ -24,12 +24,6 @@ public class UserRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserRepository.class);
 
-    public static String SUPERADMIN_LOGIN = "admin";
-    public static Long SUPERADMIN_ID = 1l;
-    public static String SUPERADMIN_PASSWORD_DEFAULT = "xyz321";
-    public static String SUPERADMIN_PASSWORD_HASH = "8be94e85158147d335c31e7401565942785e79d7d446cc41f6427422d6755371";
-    public static String ADMINS_GROUP = "admins";
-
     private UserByLoginAndPassword userByLoginAndPassword = new UserByLoginAndPassword();
     private SelectUserById selectUserById = new SelectUserById();
     private GroupsByUser groupsByUser = new GroupsByUser();
