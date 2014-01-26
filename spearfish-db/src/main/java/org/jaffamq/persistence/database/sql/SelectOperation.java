@@ -26,6 +26,23 @@ public abstract class SelectOperation<T> extends SQLOperation {
 
     protected abstract T mapResult(ResultSet rs, int rowNumber) throws SQLException;
 
+    /**
+     * Execute select and return first row mapped.
+     * @param session
+     * @param args
+     * @throws java.lang.IllegalStateException when number of results different than 1
+     * @return
+     */
+    public T executeSingle(JDBCSession session, Object...args){
+
+        List<T> results = execute(session, args);
+
+        if(results.size()!=1){
+            throw new IllegalStateException("Expected 1 result found " + results.size());
+        }
+
+        return results.get(0);
+    }
 
 
     public T executeEntity(JDBCSession session, Object...args){

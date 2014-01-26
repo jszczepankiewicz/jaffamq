@@ -1,11 +1,31 @@
 package org.jaffamq.persistence.database.sql;
 
-/**
- * Created by urwisy on 02.01.14.
- */
-public class UpdateOperation extends SQLOperation{
+import org.jaffamq.Errors;
+import org.jaffamq.InternalException;
 
-    public UpdateOperation(String preparedStatementName, String sql) {
-        super(preparedStatementName, sql);
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+/**
+ * Threadsafe sql operation object responsible for inserting something new into db.
+ */
+public class UpdateOperation extends  SQLOperation{
+
+    public UpdateOperation(String preparedStatementName, String sql, Integer... args) {
+        super(preparedStatementName, sql, args);
     }
+
+    public int execute(JDBCSession session, Object... args){
+
+        PreparedStatement statement = getStatement(session, args);
+
+        try {
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new InternalException(Errors.SQL_EXCEPTION_ON_EXECUTE_UPDATE, e, "for query: " + this.getPreparedStatementName());
+        }
+
+    }
+
+
 }

@@ -3,7 +3,9 @@ package org.jaffamq.persistence.database.repository;
 import org.jaffamq.persistence.database.PasswordHash;
 import org.jaffamq.persistence.database.dto.Group;
 import org.jaffamq.persistence.database.dto.User;
+import org.jaffamq.persistence.database.repository.mappings.DeleteByIdOperation;
 import org.jaffamq.persistence.database.repository.mappings.GroupsByUser;
+import org.jaffamq.persistence.database.repository.mappings.user.CountUserByLogin;
 import org.jaffamq.persistence.database.repository.mappings.user.InsertGroupAndUser;
 import org.jaffamq.persistence.database.repository.mappings.user.InsertUser;
 import org.jaffamq.persistence.database.repository.mappings.UserByLoginAndPassword;
@@ -34,6 +36,8 @@ public class UserRepository {
     private UserList userList = new UserList();
     private InsertUser insertUser = new InsertUser();
     private InsertGroupAndUser insertGroupAndUser = new InsertGroupAndUser();
+    private DeleteByIdOperation deleteUser = new DeleteByIdOperation("security_user");
+    private CountUserByLogin countUserByLogin = new CountUserByLogin();
 
     /**
      *
@@ -108,7 +112,7 @@ public class UserRepository {
 
         LOG.debug("Creating user with login: {}", login);
         Long id = IdentityProvider.getNextIdFor(session, User.class);
-        insertUser.insert(session,
+        insertUser.execute(session,
                 id,
                 login,
                 PasswordHash.hash(passwordToUse),
@@ -118,7 +122,7 @@ public class UserRepository {
 
             //  do something
             for(Group group:groups){
-                insertGroupAndUser.insert(session,id, group.getId());
+                insertGroupAndUser.execute(session, id, group.getId());
             }
         }
 
@@ -136,5 +140,20 @@ public class UserRepository {
      */
     public boolean updateUser(JDBCSession session, User updatedUser, String newPasswordToSet){
         return false;
+    }
+
+    /**
+     * Delete user by id
+     *
+     * @param session
+     * @param id
+     * @return true if user found and removed
+     */
+    public boolean deleteUser(JDBCSession session, Long id){
+        return deleteUser.execute(session, id) > 0;
+    }
+
+    public boolean userWithLoginExists(JDBCSession session, String login){
+        return countUserByLogin.executeSingle(session, login) == 1;
     }
 }

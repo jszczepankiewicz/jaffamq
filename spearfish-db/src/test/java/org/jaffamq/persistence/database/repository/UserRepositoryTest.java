@@ -158,6 +158,8 @@ public class UserRepositoryTest extends RepositoryTest {
     @Test
     public void shouldUpdateUserWithoutChangingGroups(){
 
+
+
     }
 
     @Ignore
@@ -166,9 +168,37 @@ public class UserRepositoryTest extends RepositoryTest {
 
     }
 
-    @Ignore
+    @Test
+    public void shouldShouldFoundUserByLogin(){
+
+        //  when
+        boolean found = repository.userWithLoginExists(getSession(), UserRepository.SUPERADMIN_LOGIN);
+
+        //  then
+        assertThat(found, is(true));
+
+    }
+
+    @Test
+    public void shouldNotFoundUserByLogin(){
+
+        //  hen
+        boolean found = repository.userWithLoginExists(getSession(), "unknown!@#");
+
+        //  then
+        assertThat(found, is(false));
+    }
+
     @Test
     public void shouldDeleteUser(){
+
+        //  when
+        boolean deleted = repository.deleteUser(getSession(), 1004l);
+        User userAfterUpdate = repository.getUser(getSession(), 1004l);
+
+        //  then
+        assertThat(deleted, is(true));
+        assertThat(userAfterUpdate, is(Matchers.nullValue()));
 
     }
 
