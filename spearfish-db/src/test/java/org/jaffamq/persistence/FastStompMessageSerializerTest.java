@@ -7,6 +7,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * Test for FST serializer.
@@ -29,10 +30,10 @@ public class FastStompMessageSerializerTest {
         assertThat(serialized, is(notNullValue()));
         assertThat(serialized.length, is(greaterThan(10)));
 
-        assertThat(unserialized, is(notNullValue()));
-        assertThat(unserialized, is(not(sameInstance(msg))));
-        assertThat(unserialized, is(equalTo(msg)));
+        assertThat(unserialized,
+                allOf(
+                        notNullValue(),
+                        not(sameInstance(msg)),
+                        equalTo(msg)));
     }
-
-
 }
