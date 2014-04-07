@@ -15,6 +15,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.jaffamq</groupId>
             <artifactId>common</artifactId>
         </dependency>
