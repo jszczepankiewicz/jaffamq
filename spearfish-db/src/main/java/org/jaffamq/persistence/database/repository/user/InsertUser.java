@@ -1,4 +1,4 @@
-package org.jaffamq.persistence.database.repository.mappings.user;
+package org.jaffamq.persistence.database.repository.user;
 
 import org.jaffamq.persistence.database.sql.UpdateOperation;
 
@@ -10,7 +10,7 @@ import static java.sql.Types.*;
 public class InsertUser extends UpdateOperation {
 
     public InsertUser() {
-        super("InsertUser", "INSERT INTO security_user (id, login, passhash, creationtime) values (?,?,?,?)", BIGINT, VARCHAR, VARCHAR, INTEGER);
+        super("InsertUser", "INSERT INTO security_user (id, login, passhash, creationtime) values (?,?,?,?)", BIGINT, VARCHAR, VARCHAR, BIGINT);
     }
 
 }

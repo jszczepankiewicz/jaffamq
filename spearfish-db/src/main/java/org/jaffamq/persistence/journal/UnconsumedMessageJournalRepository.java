@@ -36,8 +36,7 @@ public class UnconsumedMessageJournalRepository implements UnconsumedMessageRepo
 
     @Override
     public void shutdown() {
-        try {
-            journal.close();
+        try { journal.close();
         } catch (IOException e) {
             throw new IllegalStateException("IOException while closing journal", e);
         }

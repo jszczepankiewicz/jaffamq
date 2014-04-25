@@ -1,7 +1,8 @@
 package org.jaffamq.persistence.database.repository;
 
-import org.jaffamq.persistence.database.dto.Group;
-import org.jaffamq.persistence.database.dto.User;
+import org.jaffamq.persistence.database.repository.destination.Destination;
+import org.jaffamq.persistence.database.repository.group.Group;
+import org.jaffamq.persistence.database.repository.user.User;
 import org.jaffamq.persistence.database.repository.mappings.SelectNextId;
 import org.jaffamq.persistence.database.sql.JDBCSession;
 
@@ -31,6 +32,9 @@ public class IdentityProvider {
         }
         else if(Group.class.equals(clazz)){
             seqname = "GROUP_SEQ";
+        }
+        else if(Destination.class.equals(clazz)){
+            seqname = "DESTINATION_SEQ";
         }
         else{
             throw new IllegalArgumentException("Sequence name not found for class: " + clazz);

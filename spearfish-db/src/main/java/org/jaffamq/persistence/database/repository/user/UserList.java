@@ -1,4 +1,4 @@
-package org.jaffamq.persistence.database.repository.mappings;
+package org.jaffamq.persistence.database.repository.user;
 
 import static java.sql.Types.INTEGER;
 

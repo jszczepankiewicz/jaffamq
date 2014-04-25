@@ -1,19 +1,25 @@
-package org.jaffamq.persistence.database.dto;
+package org.jaffamq.persistence.database.repository.group;
+
+import org.jaffamq.persistence.database.repository.Identifiable;
 
 /**
  * Represent security group attached to users.
  */
-public class Group {
+public class Group implements Identifiable {
 
-    private final long id;
+    private Long id;
     private final String name;
 
-    public Group(long id, String name) {
+    public Group(String name){
+        this.name = name;
+    }
+
+    public Group(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -28,7 +34,7 @@ public class Group {
 
         Group group = (Group) o;
 
-        if (id != group.id) return false;
+        if (id != null ? !id.equals(group.id) : group.id != null) return false;
         if (name != null ? !name.equals(group.name) : group.name != null) return false;
 
         return true;
@@ -36,8 +42,16 @@ public class Group {
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

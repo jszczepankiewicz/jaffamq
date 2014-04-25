@@ -1,7 +1,7 @@
 package org.jaffamq.persistence.database.repository;
 
-import org.jaffamq.persistence.database.dto.Group;
-import org.jaffamq.persistence.database.dto.User;
+import org.jaffamq.persistence.database.repository.group.Group;
+import org.jaffamq.persistence.database.repository.user.User;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

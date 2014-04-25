@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by urwisy on 02.01.14.
+ * TODO: check if we can remove completely this object and replace this with SelectOperationWithMapper
  */
 public abstract class SelectOperation<T> extends SQLOperation {
 
@@ -83,6 +83,13 @@ public abstract class SelectOperation<T> extends SQLOperation {
             }
         } catch (SQLException e) {
             throw new InternalException(Errors.SQL_EXCEPTION_ON_LOOPING_RESULT_SET, e, "for query: " + this.getPreparedStatementName());
+        }
+        finally{
+            try {
+                rs.close();
+            } catch (SQLException e) {
+                LOG.warn("SQLException while closing ResultSet", e);
+            }
         }
 
         LOG.debug("Query returned {} tuple(s)", counter);

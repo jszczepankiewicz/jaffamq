@@ -1,5 +1,6 @@
 package org.jaffamq.persistence.database.repository.mappings;
 
+import org.jaffamq.persistence.database.Table;
 import org.jaffamq.persistence.database.sql.UpdateOperation;
 
 import static java.sql.Types.BIGINT;
@@ -8,8 +9,8 @@ import static java.sql.Types.BIGINT;
  */
 public class DeleteByIdOperation extends UpdateOperation{
 
-    public DeleteByIdOperation(String tablename){
-        super("DetelByIdOperationFrom" + tablename, "DELETE FROM " + tablename + " WHERE id = ?", BIGINT);
+    public DeleteByIdOperation(Table table){
+        super("DeleteByIdOperationFrom" + Table.sqlTableNameOf(table), "DELETE FROM " + Table.sqlTableNameOf(table) + " WHERE id = ?", BIGINT);
     }
     /**
      *

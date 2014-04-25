@@ -1,6 +1,4 @@
-package org.jaffamq.persistence.database.repository.mappings.user;
-
-import org.jaffamq.persistence.database.repository.mappings.SelectUserOperation;
+package org.jaffamq.persistence.database.repository.user;
 
 import java.sql.Types;
 

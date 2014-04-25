@@ -1,4 +1,4 @@
-package org.jaffamq.persistence.database.repository.mappings.user;
+package org.jaffamq.persistence.database.repository.user;
 
 import org.jaffamq.persistence.database.repository.mappings.SelectLongOperation;
 

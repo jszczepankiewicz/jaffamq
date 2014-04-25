@@ -4,6 +4,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
 
+    <!-- TODO: make it more granular -->
     <changeSet id="1" author="jszczepankiewicz">
 
         <!--    DDL =============================================================================================== -->
@@ -18,7 +19,7 @@
 
         <!--    TABLES -->
         <createTable tableName="security_group">
-            <column name="id" type="long">
+            <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
@@ -28,7 +29,7 @@
         </createTable>
 
         <createTable tableName="security_user">
-            <column name="id" type="long">
+            <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
@@ -40,7 +41,7 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="creationtime" type="long">
+            <column name="creationtime" type="bigint">
                 <constraints nullable="false"/>
             </column>
 
@@ -48,11 +49,11 @@
 
         <createTable tableName="security_user_and_group">
 
-            <column name="id_user" type="long">
+            <column name="id_user" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-            <column name="id_group" type="long">
+            <column name="id_group" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
@@ -95,5 +96,127 @@
 
     </changeSet>
 
+    <changeSet id="100" author="jszczepankiewicz">
+
+        <comment>destination table and the rest of relations</comment>
+
+        <createTable tableName="destination">
+
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="varchar(4096)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="creationtime" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="101" author="jszczepankiewicz">
+        <comment>destination and groups with read authorities</comment>
+
+        <createTable tableName="destination_and_group_with_read">
+            <column name="id_group" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="id_destination" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="id_group"
+                                 baseTableName="destination_and_group_with_read"
+                                 constraintName="fk_destination_and_group_with_read_id_group"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="security_group"/>
+
+        <addForeignKeyConstraint baseColumnNames="id_destination"
+                                 baseTableName="destination_and_group_with_read"
+                                 constraintName="fk_destination_and_group_with_read_id_destination"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="destination"/>
+
+    </changeSet>
+
+    <changeSet id="102" author="jszczepankiewicz">
+        <comment>destination and groups with write authorities</comment>
+
+        <createTable tableName="destination_and_group_with_write">
+            <column name="id_group" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="id_destination" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="id_group"
+                                 baseTableName="destination_and_group_with_write"
+                                 constraintName="fk_destination_and_group_with_write_id_group"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="security_group"/>
+
+        <addForeignKeyConstraint baseColumnNames="id_destination"
+                                 baseTableName="destination_and_group_with_write"
+                                 constraintName="fk_destination_and_group_with_write_id_destination"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="destination"/>
+
+    </changeSet>
+
+    <changeSet id="103" author="jszczepankiewicz">
+        <comment>destination and groups with admin authorities</comment>
+
+        <createTable tableName="destination_and_group_with_admin">
+            <column name="id_group" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="id_destination" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="id_group"
+                                 baseTableName="destination_and_group_with_admin"
+                                 constraintName="fk_destination_and_group_with_admin_id_group"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="security_group"/>
+
+        <addForeignKeyConstraint baseColumnNames="id_destination"
+                                 baseTableName="destination_and_group_with_admin"
+                                 constraintName="fk_destination_and_group_with_admin_id_destination"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="destination"/>
+
+    </changeSet>
+
+    <changeSet id="104" author="jszczepankiewicz">
+        <comment>Sequence for destination table</comment>
+        <createSequence sequenceName="destination_seq"
+                        incrementBy="1"
+                        startValue="10000"/>
+
+    </changeSet>
 
 </databaseChangeLog>
