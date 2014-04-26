@@ -94,8 +94,7 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldThrowIAEOnInvalidUserToCreate(){
 
         //  given
-        User user = new User(1l, "some", "someother", CalendarUtils.now());
-        user.setPassword("x");
+        User user = new User.Builder("some").id(9999l).password("somex").build();
 
         //  then
         thrown.expect(IllegalArgumentException.class);
@@ -173,12 +172,15 @@ public class UserRepositoryTest extends RepositoryTest {
     @Test
     public void shouldThrowNPEForCreateUserWithNulledPassword() throws Exception{
 
+        //  given
+        User user = new User.Builder("somex").build();
+
         //  then
         thrown.expect(NullPointerException.class);
         thrown.expectMessage("Password can not be left empty for new user");
 
         //  when
-        repository.create(getSession(), new User("somex", null));
+        repository.create(getSession(), user);
 
     }
 
@@ -186,7 +188,8 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldCreateUserWithoutGroup() throws Exception{
 
         //  when
-        User user = new User("somelogin", UserDefaults.SUPERADMIN_PASSWORD_DEFAULT);
+        User user = new User.Builder("somelogin").password(UserDefaults.SUPERADMIN_PASSWORD_DEFAULT).build();
+
         Long createdId = repository.create(getSession(), user);
 
         //  then
@@ -205,12 +208,12 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  given
         Set<Group> groups = Sets.newHashSet(
-            new Group(1001l, "test1"),
-            new Group(1002l, "test2"));
+                new Group.Builder("test1").id(1001l).build(),
+                new Group.Builder("test2").id(1002l).build()
+            );
 
         //  when
-        User toCreate = new User("a", UserDefaults.SUPERADMIN_PASSWORD_DEFAULT);
-        toCreate.setGroups(groups);
+        User toCreate = new User.Builder("a").password(UserDefaults.SUPERADMIN_PASSWORD_DEFAULT).groups(groups).build();
         Long createdId = repository.create(getSession(), toCreate);
 
         //  then
@@ -237,7 +240,7 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldThrowNPEOnLackOfIdentityOfUserToUpdate(){
 
         //  given
-        User user = new User(null, "testX", "some", CalendarUtils.now());
+        User user = new User.Builder("testX").password("some").build();
 
         //  then
         thrown.expect(IllegalArgumentException.class);
@@ -253,7 +256,7 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  given
         User beforeUpdate = repository.get(getSession(), 1004l);
-        User toUpdate = new User(99999l, "newlogin", beforeUpdate.getPasswordhash(), CalendarUtils.now());
+        User toUpdate = new User.Builder("newlogin").id(99999l).passwordhash(beforeUpdate.getPasswordhash()).build();
 
         //  when
         boolean updated = repository.update(getSession(), toUpdate);
@@ -267,8 +270,8 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  given
         User beforeUpdate = repository.get(getSession(), 1004l);
-        User toUpdate = new User(beforeUpdate.getId(), "newlogin", beforeUpdate.getPasswordhash(), CalendarUtils.now());
-        toUpdate.setPassword("newpassword");
+        User toUpdate = new User.Builder("newlogin").id(beforeUpdate.getId())
+                .passwordhash(beforeUpdate.getPasswordhash()).password("newpassword").build();
 
         //  when
         boolean updated = repository.update(getSession(), toUpdate);
@@ -290,7 +293,9 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  given
         User beforeChange = repository.get(getSession(), 1002l);
-        User toChange = new User(1002l, "shouldUpdateUserWithoutGroupsAssignedWithoutPasswordChange", "thisshouldnotbesaved", CalendarUtils.now());
+        User toChange = new User.Builder("shouldUpdateUserWithoutGroupsAssignedWithoutPasswordChange")
+                .id(1002l)
+                .passwordhash("thisshouldnotbesaved").build();
 
         //  when
         boolean updated = repository.update(getSession(), toChange);
@@ -309,8 +314,10 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  given
         User beforeChange = repository.get(getSession(), 1003l);
-        User toChange = new User(1003l, "shouldUpdateUserWithoutChangingGroups", "thisshouldnotbesaved", CalendarUtils.now());
-        toChange.setGroups(beforeChange.getGroups());
+        User toChange = new User.Builder("shouldUpdateUserWithoutChangingGroups")
+                .id(1003l)
+                .passwordhash("thisshouldnotbesaved")
+                .groups(beforeChange.getGroups()).build();
 
         //  when
         boolean updated = repository.update(getSession(), toChange);
@@ -330,12 +337,14 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  given
         User beforeChange = repository.get(getSession(), 1003l);
-        User toChange = new User(1003l, "shouldUpdateUserWithoutChangingGroups", "thisshouldnotbesaved", CalendarUtils.now());
         Set<Group> expectedGroups = Sets.newHashSet(
                 groupRepository.get(getSession(), 1002l),
                 groupRepository.get(getSession(), 1003l),
                 groupRepository.get(getSession(), 1004l));
-        toChange.setGroups(expectedGroups);
+        User toChange = new User.Builder("shouldUpdateUserWithoutChangingGroups")
+                .id(1003l)
+                .passwordhash("thisshouldnotbesaved")
+                .groups(expectedGroups).build();
 
         //  when
         boolean updated = repository.update(getSession(), toChange);
@@ -347,27 +356,6 @@ public class UserRepositoryTest extends RepositoryTest {
         assertThat(afterUpdate.getCreationTime(), is(equalTo(beforeChange.getCreationTime())));
         assertThat(afterUpdate.getPasswordhash(), is(equalTo(beforeChange.getPasswordhash())));
         assertThat(afterUpdate.getGroups(), is(equalTo(expectedGroups)));
-    }
-
-    @Test
-    public void shouldShouldFoundUserByLogin(){
-
-        //  when
-        boolean found = repository.userWithLoginExists(getSession(), UserDefaults.SUPERADMIN_LOGIN);
-
-        //  then
-        assertThat(found, is(true));
-
-    }
-
-    @Test
-    public void shouldNotFoundUserByLogin(){
-
-        //  hen
-        boolean found = repository.userWithLoginExists(getSession(), "unknown!@#");
-
-        //  then
-        assertThat(found, is(false));
     }
 
     @Test
@@ -399,6 +387,17 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  when
         boolean isUnique = repository.isUnique(getSession(), UserDefaults.SUPERADMIN_LOGIN);
+
+        //  then
+        assertThat(isUnique, is(false));
+
+    }
+
+    @Test
+    public void shouldReturnNonUniqueForExistingNameDifferentCase(){
+
+        //  when
+        boolean isUnique = repository.isUnique(getSession(), UserDefaults.SUPERADMIN_LOGIN.toUpperCase());
 
         //  then
         assertThat(isUnique, is(false));

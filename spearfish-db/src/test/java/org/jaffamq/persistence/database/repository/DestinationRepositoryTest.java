@@ -1,7 +1,6 @@
 package org.jaffamq.persistence.database.repository;
 
 import com.google.common.collect.Sets;
-import org.jaffamq.persistence.database.CalendarUtils;
 import org.jaffamq.persistence.database.CalendarUtilsTest;
 import org.jaffamq.persistence.database.repository.destination.Destination;
 import org.jaffamq.persistence.database.repository.destination.DestinationRepository;
@@ -9,6 +8,7 @@ import org.jaffamq.persistence.database.repository.group.Group;
 import org.jaffamq.persistence.database.repository.group.GroupRepository;
 import org.jaffamq.persistence.database.sql.DBConst;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -26,6 +26,8 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
+import static org.jaffamq.persistence.database.repository.destination.Destination.Type.QUEUE;
+import static org.jaffamq.persistence.database.repository.destination.Destination.Type.TOPIC;
 
 /**
  * Created by urwisy on 15.04.14.
@@ -46,22 +48,39 @@ public class DestinationRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldSelectDestinationByIdWithoutRelations() {
+    public void shouldSelectQueueDestinationByIdWithoutRelations() {
 
         //  when
         Destination destination = repository.get(getSession(), 1000l);
-
+        //  FIXME: do date checking
         //  then
         assertThat(destination.getId(), is(equalTo(1000l)));
         assertThat(destination.getName(), is(equalTo("queue/something1")));
         assertThat(destination.getCreationTime(), is(notNullValue()));
+        assertThat(destination.getType(), is(equalTo(QUEUE)));
 
         //  relations
-        assertThat(destination.getAdminAuthorizedGroups().isEmpty(), is(true));
-        assertThat(destination.getReadAuthorizedGroups().isEmpty(), is(true));
-        assertThat(destination.getWriteAuthorizedGroups().isEmpty(), is(true));
+        assertThat(destination.getAdminAuthorizedGroups(), is(empty()));
+        assertThat(destination.getReadAuthorizedGroups(), is(empty()));
+        assertThat(destination.getWriteAuthorizedGroups(), is(empty()));
+    }
 
+    @Test
+    public void shouldSelectTopicDestinationByIdWithoutRelations() {
 
+        //  when
+        Destination destination = repository.get(getSession(), 1001l);
+
+        //  then
+        assertThat(destination.getId(), is(equalTo(1001l)));
+        assertThat(destination.getName(), is(equalTo("topic/something2")));
+        assertThat(destination.getCreationTime(), is(notNullValue()));
+        assertThat(destination.getType(), is(equalTo(TOPIC)));
+
+        //  relations
+        assertThat(destination.getAdminAuthorizedGroups(), is(empty()));
+        assertThat(destination.getReadAuthorizedGroups(), is(empty()));
+        assertThat(destination.getWriteAuthorizedGroups(), is(empty()));
     }
 
     @Test
@@ -122,7 +141,10 @@ public class DestinationRepositoryTest extends RepositoryTest {
     public void shouldReturnFalseForUpdatingNotRecognizedDestination() {
 
         //  given
-        Destination destination = new Destination(999999l, "shouldReturnFalseForUpdatingNotRecognizedDestination", CalendarUtils.now());
+        Destination destination = new Destination.Builder(
+                "shouldReturnFalseForUpdatingNotRecognizedDestination", QUEUE)
+                .id(999999l)
+                .build();
 
         //  when
         boolean updated = repository.update(getSession(), destination);
@@ -137,8 +159,9 @@ public class DestinationRepositoryTest extends RepositoryTest {
         //  given
         List<Destination> expected = Arrays.asList(
                 repository.get(getSession(), 1000l),
-                repository.get(getSession(), 1001l),
-                repository.get(getSession(), 1002l));
+                repository.get(getSession(), 1002l),
+                repository.get(getSession(), 1001l)
+        );
 
         //  when
         List<Destination> destinations = repository.list(getSession(), DBConst.NO_LIMIT, DBConst.NO_OFFSET);
@@ -153,7 +176,7 @@ public class DestinationRepositoryTest extends RepositoryTest {
         //  given
         List<Destination> expected = Arrays.asList(
                 repository.get(getSession(), 1000l),
-                repository.get(getSession(), 1001l));
+                repository.get(getSession(), 1002l));
 
         //  when
         List<Destination> destinations = repository.list(getSession(), 2, 0);
@@ -178,14 +201,14 @@ public class DestinationRepositoryTest extends RepositoryTest {
     public void shouldThrowIAEOnLackOfIdentityOfDestinationToUpdate() {
 
         //  given
-        Destination g = new Destination(null, "testX", CalendarUtils.now());
+        Destination destination = new Destination.Builder("testX", QUEUE).build();
 
         //  then
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Object to update should have identity set");
 
         //  when
-        repository.update(getSession(), g);
+        repository.update(getSession(), destination);
 
     }
 
@@ -204,14 +227,14 @@ public class DestinationRepositoryTest extends RepositoryTest {
     public void shouldThrowIAEOnInvalidCreateDestination() {
 
         //  given
-        Destination d = new Destination(1l, "queue/test2", CalendarUtils.now());
+        Destination destination = new Destination.Builder("queue/test2", QUEUE).id(1l).build();
 
         //  then
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Object to create should not have identity set");
 
         //  when
-        repository.create(getSession(), d);
+        repository.create(getSession(), destination);
 
     }
 
@@ -220,7 +243,7 @@ public class DestinationRepositoryTest extends RepositoryTest {
 
         //  given
         String name = "queue/testcreate";
-        Destination destination = new Destination(name);
+        Destination destination = new Destination.Builder(name, QUEUE).build();
 
         //  when
         Long id = repository.create(getSession(), destination);
@@ -241,7 +264,6 @@ public class DestinationRepositoryTest extends RepositoryTest {
 
         //  given
         String name = "queue/testcreate";
-        Destination destination = new Destination(name);
 
         Group g1000 = groupRepository.get(getSession(), 1000l);
         Group g1001 = groupRepository.get(getSession(), 1001l);
@@ -250,9 +272,11 @@ public class DestinationRepositoryTest extends RepositoryTest {
         Group g1004 = groupRepository.get(getSession(), 1004l);
         Group g1005 = groupRepository.get(getSession(), 1005l);
 
-        destination.setAdminAuthorizedGroups(Sets.newHashSet(g1000, g1001));
-        destination.setReadAuthorizedGroups(Sets.newHashSet(g1002, g1003));
-        destination.setWriteAuthorizedGroups(Sets.newHashSet(g1003, g1004, g1005));
+        Destination destination = new Destination.Builder(name, QUEUE)
+                .groupsAuthorizedToAdmin(Sets.newHashSet(g1000, g1001))
+                .groupsAuthorizedToRead(Sets.newHashSet(g1002, g1003))
+                .groupsAuthorizedToWrite(Sets.newHashSet(g1003, g1004, g1005))
+                .build();
 
 
         //  when
@@ -274,7 +298,7 @@ public class DestinationRepositoryTest extends RepositoryTest {
     public void shouldUpdateDestinationWithoutRelations() {
 
         //  given
-        Destination destination = new Destination(1000l, "shouldUpdateDestinationWithoutRelations", CalendarUtils.now());
+        Destination destination = new Destination.Builder("shouldUpdateDestinationWithoutRelations", QUEUE).id(1000l).build();
         Destination destinationBeforeUpdate = repository.get(getSession(), destination.getId());
 
         //  when
@@ -297,7 +321,6 @@ public class DestinationRepositoryTest extends RepositoryTest {
         //  given
         String name = "queue/testcreate";
         Destination beforeUpdate = repository.get(getSession(), 1002l);
-        Destination toUpdate = new Destination(beforeUpdate.getId(), name, beforeUpdate.getCreationTime());
 
         Group g1000 = groupRepository.get(getSession(), 1000l);
         Group g1001 = groupRepository.get(getSession(), 1001l);
@@ -306,9 +329,13 @@ public class DestinationRepositoryTest extends RepositoryTest {
         Group g1004 = groupRepository.get(getSession(), 1004l);
         Group g1005 = groupRepository.get(getSession(), 1005l);
 
-        toUpdate.setAdminAuthorizedGroups(Sets.newHashSet(g1000, g1001));
-        toUpdate.setReadAuthorizedGroups(Sets.newHashSet(g1002, g1003));
-        toUpdate.setWriteAuthorizedGroups(Sets.newHashSet(g1003, g1004, g1005));
+        Destination toUpdate = new Destination.Builder(name, QUEUE)
+                .creationtime(beforeUpdate.getCreationTime())
+                .id(beforeUpdate.getId())
+                .groupsAuthorizedToAdmin(Sets.newHashSet(g1000, g1001))
+                .groupsAuthorizedToRead(Sets.newHashSet(g1002, g1003))
+                .groupsAuthorizedToWrite(Sets.newHashSet(g1003, g1004, g1005))
+                .build();
 
 
         //  when
@@ -339,6 +366,17 @@ public class DestinationRepositoryTest extends RepositoryTest {
 
         //  when
         boolean isUnique = repository.isUnique(getSession(), "queue/something1");
+
+        //  then
+        assertThat(isUnique, is(false));
+
+    }
+
+    @Test
+    public void shouldReturnNonUniqueForExistingNameDifferentCase() {
+
+        //  when
+        boolean isUnique = repository.isUnique(getSession(), "queue/SOMething1");
 
         //  then
         assertThat(isUnique, is(false));

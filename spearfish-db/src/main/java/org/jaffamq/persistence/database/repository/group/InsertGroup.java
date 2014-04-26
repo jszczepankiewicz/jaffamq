@@ -2,14 +2,15 @@ package org.jaffamq.persistence.database.repository.group;
 
 import org.jaffamq.persistence.database.sql.UpdateOperation;
 
-import java.sql.Types;
+import static java.sql.Types.BIGINT;
+import static java.sql.Types.VARCHAR;
 
 /**
  * Created by urwisy on 13.04.14.
  */
-public class InsertGroup  extends UpdateOperation {
+public class InsertGroup extends UpdateOperation {
 
     public InsertGroup() {
-        super("InsertGroup", "INSERT INTO security_group (id, name) VALUES (?,?)", Types.BIGINT, Types.VARCHAR);
+        super("InsertGroup", "INSERT INTO security_group (id, name, creationtime) VALUES (?,?,?)", BIGINT, VARCHAR, BIGINT);
     }
 }

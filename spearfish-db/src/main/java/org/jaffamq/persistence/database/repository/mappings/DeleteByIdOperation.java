@@ -12,13 +12,5 @@ public class DeleteByIdOperation extends UpdateOperation{
     public DeleteByIdOperation(Table table){
         super("DeleteByIdOperationFrom" + Table.sqlTableNameOf(table), "DELETE FROM " + Table.sqlTableNameOf(table) + " WHERE id = ?", BIGINT);
     }
-    /**
-     *
-     * @param tablename name of the table to remove tuple from
-     * @param idcolumn name of id column
-     */
-    public DeleteByIdOperation(String tablename, String idcolumn) {
-        super("DetelByIdOperationFrom" + tablename, "DELETE FROM " + tablename + " WHERE " + idcolumn + " = ?", BIGINT);
-    }
 
 }

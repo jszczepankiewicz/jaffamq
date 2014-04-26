@@ -18,6 +18,10 @@ public class DestinationMapper extends Mapper<Destination> {
 
     @Override
     public Destination mapResult(ResultSet rs, int rowNumber) throws SQLException {
-        return new Destination(rs.getLong("Id"), rs.getString("name"), CalendarUtils.toDateTime(rs.getLong("creationtime")));
+
+        return new Destination.Builder(
+                rs.getString("name"), Destination.Type.ofValue(rs.getString("nature").charAt(0)))
+                .id(rs.getLong("id")).creationtime(CalendarUtils.toDateTime(rs.getLong("creationtime")))
+                .build();
     }
 }

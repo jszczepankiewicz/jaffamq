@@ -1,12 +1,19 @@
 package org.jaffamq.persistence.database.repository.group;
 
-import com.google.common.base.*;
-import org.jaffamq.persistence.database.*;
-import org.jaffamq.persistence.database.repository.*;
-import org.jaffamq.persistence.database.repository.mappings.*;
-import org.jaffamq.persistence.database.sql.*;
+import com.google.common.base.Preconditions;
+import org.jaffamq.persistence.database.CalendarUtils;
+import org.jaffamq.persistence.database.Table;
+import org.jaffamq.persistence.database.repository.CheckEntityUnique;
+import org.jaffamq.persistence.database.repository.CrudRepository;
+import org.jaffamq.persistence.database.repository.IdentityProvider;
+import org.jaffamq.persistence.database.repository.mappings.DeleteByIdOperation;
+import org.jaffamq.persistence.database.sql.CountEntityByName;
+import org.jaffamq.persistence.database.sql.DBConst;
+import org.jaffamq.persistence.database.sql.JDBCSession;
+import org.jaffamq.persistence.database.sql.ListAllOperation;
+import org.jaffamq.persistence.database.sql.SelectByIdOperation;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Repository for operation on groups
@@ -14,15 +21,10 @@ import java.util.*;
 public class GroupRepository implements CrudRepository<Group>, CheckEntityUnique {
 
     private DeleteByIdOperation deleteById = new DeleteByIdOperation(Table.GROUP);
-
     private SelectByIdOperation<Group> selectById = new SelectByIdOperation<>(DBConst.GROUP_MAPPER);
-
     private InsertGroup insertGroup = new InsertGroup();
-
     private ListAllOperation listAll = new ListAllOperation(DBConst.GROUP_MAPPER, "name");
-
     private UpdateGroup updateGroup = new UpdateGroup();
-
     private CountEntityByName countEntityByName = new CountEntityByName(Table.GROUP);
 
     @Override
@@ -48,7 +50,7 @@ public class GroupRepository implements CrudRepository<Group>, CheckEntityUnique
 
         Long id = IdentityProvider.getNextIdFor(session, Group.class);
 
-        insertGroup.execute(session, id, toCreate.getName());
+        insertGroup.execute(session, id, toCreate.getName(), CalendarUtils.asLong(toCreate.getCreationtime()));
         return id;
     }
 
@@ -58,7 +60,7 @@ public class GroupRepository implements CrudRepository<Group>, CheckEntityUnique
         Preconditions.checkNotNull(toUpdate, "Object to update should not be null");
         Preconditions.checkArgument(toUpdate.getId() != null, "Object to update should have identity set");
 
-        return updateGroup.execute(session, toUpdate.getName(), toUpdate.getId())>0;
+        return updateGroup.execute(session, toUpdate.getName(), toUpdate.getId()) > 0;
     }
 
     @Override

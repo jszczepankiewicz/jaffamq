@@ -11,4 +11,8 @@ public class UserDefaults {
     public static String SUPERADMIN_PASSWORD_HASH = "8be94e85158147d335c31e7401565942785e79d7d446cc41f6427422d6755371";
     public static String ADMINS_GROUP = "admins";
     public static Long ADMINS_GROUP_ID = 1l;
+
+    private UserDefaults(){
+        //  no instantiation allowed
+    }
 }

@@ -19,10 +19,11 @@ public class UserMapper extends Mapper<User> {
     @Override
     public User mapResult(ResultSet rs, int rowNumber) throws SQLException {
 
-        return new User(
-                rs.getLong("id"),
-                rs.getString("login"),
-                rs.getString("passhash"),
-                CalendarUtils.toDateTime(rs.getLong("creationtime")));
+        return new User.Builder(
+                rs.getString("login"))
+                .creationtime(CalendarUtils.toDateTime(rs.getLong("creationtime")))
+                .id(rs.getLong("id"))
+                .passwordhash(rs.getString("passhash"))
+                .build();
     }
 }

@@ -22,7 +22,7 @@ public class CalendarUtils {
         return DateTime.now(DB_TIMEZONE);
     }
 
-    public static Long toLong(DateTime time){
+    public static Long asLong(DateTime time){
 
         if(time == null){
             return null;

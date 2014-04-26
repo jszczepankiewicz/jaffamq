@@ -19,12 +19,19 @@
 
         <!--    TABLES -->
         <createTable tableName="security_group">
+
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+
             <column name="name" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
+
+            <column name="creationtime" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="description" type="varchar(1024)"/>
         </createTable>
 
@@ -80,6 +87,8 @@
         <insert tableName="security_group">
             <column name="id" value="1"/>
             <column name="name" value="admins"/>
+            <column name="creationtime" value="1398008282884"/>
+
         </insert>
 
         <insert tableName="security_user">
@@ -111,6 +120,10 @@
             </column>
 
             <column name="creationtime" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="nature" type="char(1)">
                 <constraints nullable="false"/>
             </column>
 
@@ -218,5 +231,6 @@
                         startValue="10000"/>
 
     </changeSet>
+
 
 </databaseChangeLog>

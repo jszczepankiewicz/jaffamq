@@ -1,22 +1,59 @@
 package org.jaffamq.persistence.database.repository.group;
 
+import org.jaffamq.persistence.database.CalendarUtils;
 import org.jaffamq.persistence.database.repository.Identifiable;
+import org.joda.time.DateTime;
 
 /**
  * Represent security group attached to users.
  */
 public class Group implements Identifiable {
 
-    private Long id;
+    private final Long id;
     private final String name;
+    private final DateTime creationtime;
 
-    public Group(String name){
-        this.name = name;
+    public static class Builder {
+
+        //  required
+        private final String name;
+
+        //  optional
+        private Long id;
+        private DateTime creationtime;
+
+        public Builder(String name) {
+            this.name = name;
+        }
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder creationtime(DateTime creationtime) {
+            this.creationtime = creationtime;
+            return this;
+        }
+
+        public Group build() {
+
+            if (creationtime == null) {
+                creationtime = CalendarUtils.now();
+            }
+
+            return new Group(this);
+        }
     }
 
-    public Group(Long id, String name) {
-        this.id = id;
-        this.name = name;
+    private Group(Builder builder) {
+        id = builder.id;
+        name = builder.name;
+        creationtime = builder.creationtime;
+    }
+
+    public DateTime getCreationtime() {
+        return creationtime;
     }
 
     public Long getId() {

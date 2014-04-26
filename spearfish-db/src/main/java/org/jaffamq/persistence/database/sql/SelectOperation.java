@@ -82,7 +82,8 @@ public abstract class SelectOperation<T> extends SQLOperation {
                 results.add(mapResult(rs, counter++));
             }
         } catch (SQLException e) {
-            throw new InternalException(Errors.SQL_EXCEPTION_ON_LOOPING_RESULT_SET, e, "for query: " + this.getPreparedStatementName());
+            throw new InternalException(Errors.SQL_EXCEPTION_ON_LOOPING_RESULT_SET, e, "for query name: " + this.getPreparedStatementName()
+            + ", sql: [" + this.getSql()+ "]");
         }
         finally{
             try {

@@ -1,5 +1,7 @@
 package org.jaffamq.persistence.database.repository;
 
+import org.jaffamq.persistence.database.CalendarUtils;
+import org.jaffamq.persistence.database.CalendarUtilsTest;
 import org.jaffamq.persistence.database.repository.group.Group;
 import org.jaffamq.persistence.database.repository.user.User;
 import org.jaffamq.persistence.database.repository.group.GroupRepository;
@@ -7,6 +9,7 @@ import org.jaffamq.persistence.database.repository.user.UserDefaults;
 import org.jaffamq.persistence.database.repository.user.UserRepository;
 import org.jaffamq.persistence.database.sql.DBConst;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -59,6 +62,7 @@ public class GroupRepositoryTest extends RepositoryTest{
         //  then
         assertThat(group.getId(), is(equalTo(1000l)));
         assertThat(group.getName(), is(equalTo("test0")));
+        assertThat(group.getCreationtime(), is(equalTo(CalendarUtilsTest.TARGET_DATE)));
 
     }
 
@@ -97,7 +101,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     public void shouldUpdateGroup(){
 
         //  given
-        Group groupToUpdate = new Group(1l, "shouldUpdateGroup");
+        Group groupToUpdate = new Group.Builder("shouldUpdateGroup").id(1l).build();
 
         //  when
         boolean isUpdated = repository.update(getSession(), groupToUpdate);
@@ -114,7 +118,7 @@ public class GroupRepositoryTest extends RepositoryTest{
 
         //  given
         final String EXPECTED_NAME = "shouldCreateGroupWithoutRelations";
-        Group toCreate = new Group(EXPECTED_NAME);
+        Group toCreate = new Group.Builder(EXPECTED_NAME).build();
 
         //  when
         Long id = repository.create(getSession(), toCreate);
@@ -123,6 +127,7 @@ public class GroupRepositoryTest extends RepositoryTest{
         //  then
         assertThat(id, is(greaterThan(0l)));
         assertThat(created.getName(), is(equalTo(EXPECTED_NAME)));
+        assertThat(created.getCreationtime(), is(equalTo(toCreate.getCreationtime())));
 
     }
 
@@ -130,7 +135,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     public void shouldReturnFalseForUpdatingNotRecognizedGroup(){
 
         //  given
-        Group group = new Group(9999l, "999name");
+        Group group = new Group.Builder("999name").id(9999l).build();
 
         //  when
         boolean updated = repository.update(getSession(), group);
@@ -154,7 +159,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     public void shouldThrowIAEOnLackOfIdentityInGroupToUpdate(){
 
         //  given
-        Group g = new Group(null, "testX");
+        Group g = new Group.Builder("testX").build();
 
         //  then
         thrown.expect(IllegalArgumentException.class);
@@ -180,7 +185,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     public void shouldThrowIAEOnInvalidCreateDestination(){
 
         //  given
-        Group g = new Group(1l, "testX");
+        Group g = new Group.Builder("testX").id(1l).build();
 
         //  then
         thrown.expect(IllegalArgumentException.class);
@@ -195,8 +200,14 @@ public class GroupRepositoryTest extends RepositoryTest{
     public void shouldListNonPagedGroups(){
 
         //  given
-        List<Group> expected = Arrays.asList(new Group(1l, "admins"), new Group(1000l, "test0"), new Group(1001l, "test1"),
-                new Group(1002l, "test2"), new Group(1003l, "test3"), new Group(1004l, "test4"), new Group(1005l, "test5"));
+        List<Group> expected = Arrays.asList(
+                new Group.Builder("admins").id(1l).build(),
+                new Group.Builder("test0").id(1000l).build(),
+                new Group.Builder("test1").id(1001l).build(),
+                new Group.Builder("test2").id(1002l).build(),
+                new Group.Builder("test3").id(1003l).build(),
+                new Group.Builder("test4").id(1004l).build(),
+                new Group.Builder("test5").id(1005l).build());
 
         //  when
         List<Group> found = repository.list(getSession(), DBConst.NO_LIMIT, DBConst.NO_OFFSET);
@@ -210,7 +221,10 @@ public class GroupRepositoryTest extends RepositoryTest{
     public void shouldListPagedGroups(){
 
         //  given
-        List<Group> expected = Arrays.asList(new Group(1000l, "test0"), new Group(1001l, "test1"), new Group(1002l, "test2"));
+        List<Group> expected = Arrays.asList(
+                new Group.Builder("test0").id(1000l).build(),
+                new Group.Builder("test1").id(1001l).build(),
+                new Group.Builder("test2").id(1002l).build());
 
         //  when
         List<Group> found = repository.list(getSession(), 3, 1);
@@ -231,10 +245,21 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldReturnNonUniqueForExistingName(){
+     public void shouldReturnNonUniqueForExistingName(){
 
         //  when
         boolean isUnique = repository.isUnique(getSession(), UserDefaults.ADMINS_GROUP);
+
+        //  then
+        assertThat(isUnique, is(false));
+    }
+
+
+    @Test
+    public void shouldReturnNonUniqueForExistingNameDifferentCase(){
+
+        //  when
+        boolean isUnique = repository.isUnique(getSession(), UserDefaults.ADMINS_GROUP.toUpperCase());
 
         //  then
         assertThat(isUnique, is(false));

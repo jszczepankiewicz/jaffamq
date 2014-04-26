@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import static java.sql.Types.BIGINT;
+
 /**
  * Returns entity of type T for provided table name and mapper by querieng by ID of type Long
  */
@@ -16,7 +18,7 @@ public class SelectByIdOperation<T> extends SelectOperation<T>{
 
     public SelectByIdOperation(Mapper<T> mapper) {
 
-        super("SelectByIdOperation" + Table.sqlTableNameOf(mapper.getTable()), String.format("SELECT * FROM %s WHERE id=?", Table.sqlTableNameOf(mapper.getTable())), Types.BIGINT);
+        super("SelectByIdOperation" + Table.sqlTableNameOf(mapper.getTable()), String.format("SELECT * FROM %s WHERE id=?", Table.sqlTableNameOf(mapper.getTable())), BIGINT);
         this.mapper = mapper;
     }
 

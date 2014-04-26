@@ -12,10 +12,9 @@ import org.jaffamq.persistence.database.repository.group.Group;
 import org.jaffamq.persistence.database.repository.mappings.DeleteByIdOperation;
 import org.jaffamq.persistence.database.sql.CountEntityByName;
 import org.jaffamq.persistence.database.sql.DBConst;
-import org.jaffamq.persistence.database.sql.DeleteMN;
-import org.jaffamq.persistence.database.sql.InsertMN;
 import org.jaffamq.persistence.database.sql.JDBCSession;
 import org.jaffamq.persistence.database.sql.ListAllOperation;
+import org.jaffamq.persistence.database.sql.MNRelation;
 import org.jaffamq.persistence.database.sql.SelectByIdOperation;
 
 import java.util.Arrays;
@@ -41,13 +40,9 @@ public class DestinationRepository implements CrudRepository<Destination>, Check
     private ListAllOperation listAll = new ListAllOperation(DBConst.DESTINATION_MAPPER, "name");
     private CountEntityByName countEntityByName = new CountEntityByName(Table.DESTINATION);
 
-    private InsertMN assignGroupReadToDestination = new InsertMN(Table.DESTINATION_AND_GROUP_WITH_READ, "id_destination", "id_group");
-    private InsertMN assignGroupWriteToDestination = new InsertMN(Table.DESTINATION_AND_GROUP_WITH_WRITE, "id_destination", "id_group");
-    private InsertMN assignGroupAdminToDestination = new InsertMN(Table.DESTINATION_AND_GROUP_WITH_ADMIN, "id_destination", "id_group");
-
-    private DeleteMN removeGroupReadFromDestination = new DeleteMN(Table.DESTINATION_AND_GROUP_WITH_READ, "id_destination", "id_group");
-    private DeleteMN removeGroupWriteFromDestination = new DeleteMN(Table.DESTINATION_AND_GROUP_WITH_WRITE, "id_destination", "id_group");
-    private DeleteMN removeGroupAdminFromDestination = new DeleteMN(Table.DESTINATION_AND_GROUP_WITH_ADMIN, "id_destination", "id_group");
+    private MNRelation groupsToReadFromDestination = new MNRelation(Table.DESTINATION_AND_GROUP_WITH_READ, "id_destination", "id_group");
+    private MNRelation groupsWithWriteToDestination = new MNRelation(Table.DESTINATION_AND_GROUP_WITH_WRITE, "id_destination", "id_group");
+    private MNRelation groupsWithAdminToDestination = new MNRelation(Table.DESTINATION_AND_GROUP_WITH_ADMIN, "id_destination", "id_group");
 
     @Override
     public boolean isUnique(JDBCSession session, String name) {
@@ -89,34 +84,34 @@ public class DestinationRepository implements CrudRepository<Destination>, Check
         Preconditions.checkArgument(toCreate.getId() == null, "Object to create should not have identity set");
 
         Long id = IdentityProvider.getNextIdFor(session, Destination.class);
-        insertDestination.execute(session, id, toCreate.getName(), CalendarUtils.nowAsLong());
+        insertDestination.execute(session, id, toCreate.getName(), CalendarUtils.nowAsLong(), String.valueOf(toCreate.getType().toValue()));
 
         for (Group group : toCreate.getReadAuthorizedGroups()) {
-            assignGroupReadToDestination.execute(session, id, group.getId());
+            groupsToReadFromDestination.add(session, id, group.getId());
         }
 
         for (Group group : toCreate.getWriteAuthorizedGroups()) {
-            assignGroupWriteToDestination.execute(session, id, group.getId());
+            groupsWithWriteToDestination.add(session, id, group.getId());
         }
 
         for (Group group : toCreate.getAdminAuthorizedGroups()) {
-            assignGroupAdminToDestination.execute(session, id, group.getId());
+            groupsWithAdminToDestination.add(session, id, group.getId());
         }
 
         return id;
     }
 
-    private void synchronizeRelationsToGroups(JDBCSession session, InsertMN insertMN, DeleteMN deleteMN, Set<Group> persisted, Set<Group> toPersist, Long destinationId) {
+    private void synchronizeRelationsToGroups(JDBCSession session, MNRelation relation, Set<Group> persisted, Set<Group> toPersist, Long destinationId) {
 
         Set<Group> diffToPersist = Sets.filter(toPersist, new NotFoundInSetPredicate(persisted));
         Set<Group> diffToRemove = Sets.filter(persisted, new NotFoundInSetPredicate(toPersist));
 
         for (Group group : diffToPersist) {
-            insertMN.execute(session, destinationId, group.getId());
+            relation.add(session, destinationId, group.getId());
         }
 
         for (Group group : diffToRemove) {
-            deleteMN.execute(session, destinationId, group.getId());
+            relation.remove(session, destinationId, group.getId());
         }
     }
 
@@ -132,11 +127,11 @@ public class DestinationRepository implements CrudRepository<Destination>, Check
             //  change assignments
             Destination updatedDestination = get(session, toUpdate.getId());
 
-            synchronizeRelationsToGroups(session, assignGroupReadToDestination, removeGroupReadFromDestination,
+            synchronizeRelationsToGroups(session, groupsToReadFromDestination,
                     updatedDestination.getReadAuthorizedGroups(), toUpdate.getReadAuthorizedGroups(), toUpdate.getId());
-            synchronizeRelationsToGroups(session, assignGroupWriteToDestination, removeGroupWriteFromDestination,
+            synchronizeRelationsToGroups(session, groupsWithWriteToDestination,
                     updatedDestination.getWriteAuthorizedGroups(), toUpdate.getWriteAuthorizedGroups(), toUpdate.getId());
-            synchronizeRelationsToGroups(session, assignGroupAdminToDestination, removeGroupAdminFromDestination,
+            synchronizeRelationsToGroups(session, groupsWithAdminToDestination,
                     updatedDestination.getAdminAuthorizedGroups(), toUpdate.getAdminAuthorizedGroups(), toUpdate.getId());
 
         }

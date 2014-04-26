@@ -2,7 +2,8 @@ package org.jaffamq.persistence.database.repository.group;
 
 import org.jaffamq.persistence.database.sql.UpdateOperation;
 
-import java.sql.Types;
+import static java.sql.Types.BIGINT;
+import static java.sql.Types.VARCHAR;
 
 /**
  * Created by urwisy on 13.04.14.
@@ -10,6 +11,6 @@ import java.sql.Types;
 public class UpdateGroup extends UpdateOperation {
 
     public UpdateGroup() {
-        super("UpdateGroup", "UPDATE security_group SET name=? WHERE id=?", Types.VARCHAR, Types.BIGINT);
+        super("UpdateGroup", "UPDATE security_group SET name=? WHERE id=?", VARCHAR, BIGINT);
     }
 }
