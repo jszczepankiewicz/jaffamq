@@ -3,10 +3,10 @@ package org.jaffamq.persistence.database.repository;
 import com.google.common.collect.Sets;
 import org.jaffamq.persistence.database.CalendarUtilsTest;
 import org.jaffamq.persistence.database.DBConst;
-import org.jaffamq.persistence.database.repository.destination.Destination;
-import org.jaffamq.persistence.database.repository.destination.DestinationRepository;
-import org.jaffamq.persistence.database.repository.group.Group;
-import org.jaffamq.persistence.database.repository.group.GroupRepository;
+import org.jaffamq.persistence.database.destination.Destination;
+import org.jaffamq.persistence.database.destination.DestinationRepository;
+import org.jaffamq.persistence.database.group.Group;
+import org.jaffamq.persistence.database.group.GroupRepository;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,8 +25,8 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
-import static org.jaffamq.persistence.database.repository.destination.Destination.Type.QUEUE;
-import static org.jaffamq.persistence.database.repository.destination.Destination.Type.TOPIC;
+import static org.jaffamq.persistence.database.destination.Destination.Type.QUEUE;
+import static org.jaffamq.persistence.database.destination.Destination.Type.TOPIC;
 
 /**
  * Created by urwisy on 15.04.14.

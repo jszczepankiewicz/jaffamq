@@ -2,11 +2,11 @@ package org.jaffamq.persistence.database.repository;
 
 import org.jaffamq.persistence.database.CalendarUtilsTest;
 import org.jaffamq.persistence.database.DBConst;
-import org.jaffamq.persistence.database.repository.group.Group;
-import org.jaffamq.persistence.database.repository.group.GroupRepository;
-import org.jaffamq.persistence.database.repository.user.User;
-import org.jaffamq.persistence.database.repository.user.UserDefaults;
-import org.jaffamq.persistence.database.repository.user.UserRepository;
+import org.jaffamq.persistence.database.group.Group;
+import org.jaffamq.persistence.database.group.GroupRepository;
+import org.jaffamq.persistence.database.user.User;
+import org.jaffamq.persistence.database.user.UserDefaults;
+import org.jaffamq.persistence.database.user.UserRepository;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

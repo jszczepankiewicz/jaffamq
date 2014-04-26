@@ -1,7 +1,8 @@
 package org.jaffamq.persistence.database.repository;
 
-import org.jaffamq.persistence.database.repository.group.Group;
-import org.jaffamq.persistence.database.repository.user.User;
+import org.jaffamq.persistence.database.IdentityProvider;
+import org.jaffamq.persistence.database.group.Group;
+import org.jaffamq.persistence.database.user.User;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -15,7 +16,7 @@ public class IdentityProviderTest extends RepositoryTest {
 
 
     @Test
-    public void shouldReturnNextIdentityForUser(){
+    public void shouldReturnNextIdentityForUser() {
 
         //  when
         Long id = IdentityProvider.getNextIdFor(getSession(), User.class);
@@ -28,7 +29,7 @@ public class IdentityProviderTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldReturnNextIDForGroup(){
+    public void shouldReturnNextIDForGroup() {
 
         //  when
         Long id = IdentityProvider.getNextIdFor(getSession(), Group.class);

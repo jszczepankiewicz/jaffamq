@@ -1,7 +1,7 @@
 package org.jaffamq.persistence.database.sql;
 
+import org.jaffamq.persistence.database.Mapper;
 import org.jaffamq.persistence.database.Table;
-import org.jaffamq.persistence.database.repository.Mapper;
 
 import static java.sql.Types.BIGINT;
 

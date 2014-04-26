@@ -1,9 +1,8 @@
 package org.jaffamq.persistence.database;
 
-import org.jaffamq.persistence.database.repository.LongMapper;
-import org.jaffamq.persistence.database.repository.destination.DestinationMapper;
-import org.jaffamq.persistence.database.repository.group.GroupMapper;
-import org.jaffamq.persistence.database.repository.user.UserMapper;
+import org.jaffamq.persistence.database.destination.DestinationMapper;
+import org.jaffamq.persistence.database.group.GroupMapper;
+import org.jaffamq.persistence.database.user.UserMapper;
 
 /**
  * Some common constants used in interaction with persistence layer.

@@ -1,7 +1,8 @@
 package org.jaffamq.persistence.database.repository;
 
 import com.google.common.collect.Sets;
-import org.jaffamq.persistence.database.repository.group.Group;
+import org.jaffamq.persistence.database.NotFoundInSetPredicate;
+import org.jaffamq.persistence.database.group.Group;
 import org.junit.Test;
 
 import java.util.Set;
@@ -13,12 +14,12 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public class NotFoundInSetPredicateTest {
 
-    private Group build(Long id, String name){
+    private Group build(Long id, String name) {
         return new Group.Builder(name).id(id).build();
     }
 
     @Test
-    public void shouldFoundDifference(){
+    public void shouldFoundDifference() {
 
         //  given
         Set<Group> groupsStored = Sets.newHashSet(build(1l, "a"), build(2l, "b"), build(3l, "c"), build(4l, "d"));
@@ -29,8 +30,8 @@ public class NotFoundInSetPredicateTest {
         Set<Group> toRemove = Sets.filter(groupsStored, new NotFoundInSetPredicate(groupsToStore));
 
         //  then
-        assertThat(toPersist, is(equalTo((Set)Sets.newHashSet(build(5l, "f"), build(6l, "g")))));
-        assertThat(toRemove, is(equalTo((Set)Sets.newHashSet(build(2l, "b")))));
+        assertThat(toPersist, is(equalTo((Set) Sets.newHashSet(build(5l, "f"), build(6l, "g")))));
+        assertThat(toRemove, is(equalTo((Set) Sets.newHashSet(build(2l, "b")))));
     }
 
 }

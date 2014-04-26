@@ -2,7 +2,7 @@ package org.jaffamq.persistence.database.sql;
 
 import org.jaffamq.Errors;
 import org.jaffamq.InternalException;
-import org.jaffamq.persistence.database.repository.Mapper;
+import org.jaffamq.persistence.database.Mapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

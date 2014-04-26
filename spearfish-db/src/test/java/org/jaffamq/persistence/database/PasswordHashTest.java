@@ -1,6 +1,6 @@
 package org.jaffamq.persistence.database;
 
-import org.jaffamq.persistence.database.repository.user.UserDefaults;
+import org.jaffamq.persistence.database.user.UserDefaults;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
