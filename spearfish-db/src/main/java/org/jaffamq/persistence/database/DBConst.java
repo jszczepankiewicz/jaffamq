@@ -1,5 +1,6 @@
-package org.jaffamq.persistence.database.sql;
+package org.jaffamq.persistence.database;
 
+import org.jaffamq.persistence.database.repository.LongMapper;
 import org.jaffamq.persistence.database.repository.destination.DestinationMapper;
 import org.jaffamq.persistence.database.repository.group.GroupMapper;
 import org.jaffamq.persistence.database.repository.user.UserMapper;
@@ -15,6 +16,7 @@ public class DBConst {
     public static final GroupMapper GROUP_MAPPER = new GroupMapper();
     public static final UserMapper USER_MAPPER = new UserMapper();
     public static final DestinationMapper DESTINATION_MAPPER = new DestinationMapper();
+    public static final LongMapper LONG_MAPPER = new LongMapper();
 
     private DBConst() {
         //  no instantiation allowed

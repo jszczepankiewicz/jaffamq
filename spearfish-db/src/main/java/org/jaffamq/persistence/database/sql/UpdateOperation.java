@@ -9,13 +9,13 @@ import java.sql.SQLException;
 /**
  * Threadsafe sql operation object responsible for inserting something new into db.
  */
-public class UpdateOperation extends  SQLOperation{
+public class UpdateOperation extends SQLOperation {
 
     public UpdateOperation(String preparedStatementName, String sql, Integer... args) {
         super(preparedStatementName, sql, args);
     }
 
-    public int execute(JDBCSession session, Object... args){
+    public int execute(JDBCSession session, Object... args) {
 
         PreparedStatement statement = getStatement(session, args);
 

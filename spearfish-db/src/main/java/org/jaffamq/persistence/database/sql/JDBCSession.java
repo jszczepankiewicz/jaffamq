@@ -20,21 +20,18 @@ public class JDBCSession {
 
     private Connection connection;
 
-
     private Map<String, PreparedStatement> compiledStatements = new HashMap<>();
 
-    public JDBCSession(Connection connection){
+    public JDBCSession(Connection connection) {
         this.connection = connection;
     }
 
-
-
-    PreparedStatement getCompiledStatement(SQLOperation sql){
+    PreparedStatement getCompiledStatement(SQLOperation sql) {
 
         String name = sql.getPreparedStatementName();
         PreparedStatement statement = compiledStatements.get(name);
 
-        if(statement == null){
+        if (statement == null) {
 
             LOG.debug("PreparedStatement: {} not found in this session, will create one", name);
 
@@ -51,11 +48,11 @@ public class JDBCSession {
         return statement;
     }
 
-    public void dispose(){
+    public void dispose() {
 
         LOG.debug("Disposing JDBCSession with {} prepared statements", compiledStatements.size());
 
-        for(String name:compiledStatements.keySet()){
+        for (String name : compiledStatements.keySet()) {
             PreparedStatement statement = compiledStatements.get(name);
             try {
                 statement.close();

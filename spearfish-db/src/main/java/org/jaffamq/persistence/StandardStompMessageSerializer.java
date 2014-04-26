@@ -2,21 +2,21 @@ package org.jaffamq.persistence;
 
 import org.jaffamq.messages.StompMessage;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
- * Created with IntelliJ IDEA.
- * User: urwisy
- * Date: 25.10.13
- * Time: 22:08
- * To change this template use File | Settings | File Templates.
+ * StompMessage serialized that is using standard(inefficient) java serialization.
  */
 public class StandardStompMessageSerializer implements StompMessageSerializer{
 
     @Override
     public byte[] toBytes(StompMessage message) {
         ByteArrayOutputStream b = new ByteArrayOutputStream();
-        ObjectOutputStream o = null;
+        ObjectOutputStream o;
         try {
             o = new ObjectOutputStream(b);
             o.writeObject(message);

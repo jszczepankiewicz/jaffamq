@@ -2,7 +2,7 @@ package org.jaffamq.persistence.database.repository.group;
 
 import org.jaffamq.persistence.database.CalendarUtils;
 import org.jaffamq.persistence.database.Table;
-import org.jaffamq.persistence.database.repository.mappings.Mapper;
+import org.jaffamq.persistence.database.repository.Mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

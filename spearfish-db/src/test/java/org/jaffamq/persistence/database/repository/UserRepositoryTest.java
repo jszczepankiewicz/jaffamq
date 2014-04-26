@@ -2,25 +2,20 @@ package org.jaffamq.persistence.database.repository;
 
 import com.google.common.collect.Sets;
 import org.hamcrest.Matchers;
-import org.jaffamq.persistence.database.CalendarUtils;
-import org.jaffamq.persistence.database.CalendarUtilsTest;
 import org.jaffamq.persistence.database.repository.group.Group;
 import org.jaffamq.persistence.database.repository.group.GroupRepository;
 import org.jaffamq.persistence.database.repository.user.User;
 import org.jaffamq.persistence.database.repository.user.UserDefaults;
 import org.jaffamq.persistence.database.repository.user.UserRepository;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static junit.framework.Assert.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -30,9 +25,9 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.jaffamq.persistence.database.DBConst.NO_LIMIT;
+import static org.jaffamq.persistence.database.DBConst.NO_OFFSET;
 
-import static org.jaffamq.persistence.database.sql.DBConst.NO_LIMIT;
-import static org.jaffamq.persistence.database.sql.DBConst.NO_OFFSET;
 /**
  * Created by urwisy on 12.01.14.
  */
@@ -51,7 +46,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldReturnPagedListOfUsers(){
+    public void shouldReturnPagedListOfUsers() {
 
         //  given
         List<User> expected = Arrays.asList(
@@ -70,7 +65,7 @@ public class UserRepositoryTest extends RepositoryTest {
 
 
     @Test
-    public void shouldReturnNonPagedListOfSuperadminAndTestUsers(){
+    public void shouldReturnNonPagedListOfSuperadminAndTestUsers() {
 
         //  given
         List<User> expected = Arrays.asList(
@@ -91,7 +86,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldThrowIAEOnInvalidUserToCreate(){
+    public void shouldThrowIAEOnInvalidUserToCreate() {
 
         //  given
         User user = new User.Builder("some").id(9999l).password("somex").build();
@@ -106,7 +101,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldReturnNullForNotFoundUser() throws Exception{
+    public void shouldReturnNullForNotFoundUser() throws Exception {
 
         //  when
         User notFoundUser = repository.getUser(getSession(), "nonexisting", "notimportant");
@@ -132,7 +127,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldReturnNullForGetUserWithNonExistedUser(){
+    public void shouldReturnNullForGetUserWithNonExistedUser() {
 
         //  when
         User admin = repository.get(getSession(), 0l);
@@ -143,7 +138,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldReturnUserById(){
+    public void shouldReturnUserById() {
 
         //  when
         User admin = repository.get(getSession(), UserDefaults.SUPERADMIN_ID);
@@ -159,7 +154,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldThrowNPEforCreateUserWithNull() throws Exception{
+    public void shouldThrowNPEforCreateUserWithNull() throws Exception {
 
         //  then
         thrown.expect(NullPointerException.class);
@@ -170,7 +165,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldThrowNPEForCreateUserWithNulledPassword() throws Exception{
+    public void shouldThrowNPEForCreateUserWithNulledPassword() throws Exception {
 
         //  given
         User user = new User.Builder("somex").build();
@@ -185,7 +180,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldCreateUserWithoutGroup() throws Exception{
+    public void shouldCreateUserWithoutGroup() throws Exception {
 
         //  when
         User user = new User.Builder("somelogin").password(UserDefaults.SUPERADMIN_PASSWORD_DEFAULT).build();
@@ -204,13 +199,13 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldCreateUserWithGroups(){
+    public void shouldCreateUserWithGroups() {
 
         //  given
         Set<Group> groups = Sets.newHashSet(
                 new Group.Builder("test1").id(1001l).build(),
                 new Group.Builder("test2").id(1002l).build()
-            );
+        );
 
         //  when
         User toCreate = new User.Builder("a").password(UserDefaults.SUPERADMIN_PASSWORD_DEFAULT).groups(groups).build();
@@ -226,7 +221,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldThrowNPEOnNullUserToUpdate(){
+    public void shouldThrowNPEOnNullUserToUpdate() {
 
         //  then
         thrown.expect(NullPointerException.class);
@@ -237,7 +232,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldThrowNPEOnLackOfIdentityOfUserToUpdate(){
+    public void shouldThrowNPEOnLackOfIdentityOfUserToUpdate() {
 
         //  given
         User user = new User.Builder("testX").password("some").build();
@@ -252,7 +247,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldReturnFalseForUpdatingNotRecognizedUser(){
+    public void shouldReturnFalseForUpdatingNotRecognizedUser() {
 
         //  given
         User beforeUpdate = repository.get(getSession(), 1004l);
@@ -266,7 +261,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldUpdateUserWithoutGroupsAssignedWithPasswordChange(){
+    public void shouldUpdateUserWithoutGroupsAssignedWithPasswordChange() {
 
         //  given
         User beforeUpdate = repository.get(getSession(), 1004l);
@@ -289,7 +284,7 @@ public class UserRepositoryTest extends RepositoryTest {
 
 
     @Test
-    public void shouldUpdateUserWithoutGroupsAssignedWithoutPasswordChange(){
+    public void shouldUpdateUserWithoutGroupsAssignedWithoutPasswordChange() {
 
         //  given
         User beforeChange = repository.get(getSession(), 1002l);
@@ -310,7 +305,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldUpdateUserWithoutChangingGroups(){
+    public void shouldUpdateUserWithoutChangingGroups() {
 
         //  given
         User beforeChange = repository.get(getSession(), 1003l);
@@ -333,7 +328,7 @@ public class UserRepositoryTest extends RepositoryTest {
 
 
     @Test
-    public void shouldUpdateUserWithChangedGroups(){
+    public void shouldUpdateUserWithChangedGroups() {
 
         //  given
         User beforeChange = repository.get(getSession(), 1003l);
@@ -359,7 +354,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldDeleteUser(){
+    public void shouldDeleteUser() {
 
         //  when
         boolean deleted = repository.delete(getSession(), 1004l);
@@ -372,7 +367,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldReturnUniqueForNonExistingName(){
+    public void shouldReturnUniqueForNonExistingName() {
 
         //  when
         boolean isUnique = repository.isUnique(getSession(), "shouldReturnUniqueForNonExistingName");
@@ -383,7 +378,7 @@ public class UserRepositoryTest extends RepositoryTest {
 
 
     @Test
-    public void shouldReturnNonUniqueForExistingName(){
+    public void shouldReturnNonUniqueForExistingName() {
 
         //  when
         boolean isUnique = repository.isUnique(getSession(), UserDefaults.SUPERADMIN_LOGIN);
@@ -394,7 +389,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldReturnNonUniqueForExistingNameDifferentCase(){
+    public void shouldReturnNonUniqueForExistingNameDifferentCase() {
 
         //  when
         boolean isUnique = repository.isUnique(getSession(), UserDefaults.SUPERADMIN_LOGIN.toUpperCase());
@@ -403,8 +398,6 @@ public class UserRepositoryTest extends RepositoryTest {
         assertThat(isUnique, is(false));
 
     }
-
-
 
 
 }

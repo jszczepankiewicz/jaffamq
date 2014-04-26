@@ -1,16 +1,14 @@
 package org.jaffamq.persistence.database.sql;
 
-import org.jaffamq.persistence.database.*;
-import org.jaffamq.persistence.database.repository.mappings.*;
-
-import java.sql.*;
+import org.jaffamq.persistence.database.Table;
+import org.jaffamq.persistence.database.repository.Mapper;
 
 import static java.sql.Types.INTEGER;
 
 /**
  * Created by urwisy on 2014-04-21.
  */
-public class ListAllOperation<T> extends SelectOperationWithMapper<T> {
+public class ListAllOperation<T> extends SelectOperation<T> {
 
     public ListAllOperation(Mapper<T> mapper, String orderColumn) {
         super("ListAllOperation" + mapper.getTable() + orderColumn, "SELECT * FROM " +

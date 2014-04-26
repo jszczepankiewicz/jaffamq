@@ -1,5 +1,6 @@
 package org.jaffamq.persistence.database.sql;
 
+import org.jaffamq.persistence.database.DBConst;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -7,8 +8,6 @@ import org.mockito.Mockito;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -29,11 +28,7 @@ public class JDBCSessionTest {
         String sql = "Select * from torpidomq";
         String SELECT_NAME = "SELECT_FROM_TORPIDOMQ";
 
-        SelectOperation query = new SelectOperation(SELECT_NAME, sql){
-            @Override
-            protected Object mapResult(ResultSet rs, int rowNumber) throws SQLException {
-                return null;
-            }
+        SelectOperation query = new SelectOperation(SELECT_NAME, sql, DBConst.LONG_MAPPER) {
         };
 
         Connection connection = Mockito.mock(Connection.class);
@@ -56,12 +51,7 @@ public class JDBCSessionTest {
         String sql = "Select * from torpidomq";
         String SELECT_NAME = "SELECT_FROM_TORPIDOMQ";
 
-        SelectOperation query = new SelectOperation(SELECT_NAME, sql){
-
-            @Override
-            protected Object mapResult(ResultSet rs, int rowNumber) throws SQLException {
-                return null;
-            }
+        SelectOperation query = new SelectOperation(SELECT_NAME, sql, DBConst.LONG_MAPPER) {
         };
 
         Connection connection = Mockito.mock(Connection.class);

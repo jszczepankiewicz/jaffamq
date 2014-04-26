@@ -2,13 +2,13 @@ package org.jaffamq.persistence.database.repository.group;
 
 import com.google.common.base.Preconditions;
 import org.jaffamq.persistence.database.CalendarUtils;
+import org.jaffamq.persistence.database.DBConst;
 import org.jaffamq.persistence.database.Table;
 import org.jaffamq.persistence.database.repository.CheckEntityUnique;
 import org.jaffamq.persistence.database.repository.CrudRepository;
 import org.jaffamq.persistence.database.repository.IdentityProvider;
-import org.jaffamq.persistence.database.repository.mappings.DeleteByIdOperation;
 import org.jaffamq.persistence.database.sql.CountEntityByName;
-import org.jaffamq.persistence.database.sql.DBConst;
+import org.jaffamq.persistence.database.sql.DeleteByIdOperation;
 import org.jaffamq.persistence.database.sql.JDBCSession;
 import org.jaffamq.persistence.database.sql.ListAllOperation;
 import org.jaffamq.persistence.database.sql.SelectByIdOperation;

@@ -3,8 +3,8 @@ package org.jaffamq.persistence.database.repository;
 import org.jaffamq.persistence.database.repository.destination.Destination;
 import org.jaffamq.persistence.database.repository.group.Group;
 import org.jaffamq.persistence.database.repository.user.User;
-import org.jaffamq.persistence.database.repository.mappings.SelectNextId;
 import org.jaffamq.persistence.database.sql.JDBCSession;
+import org.jaffamq.persistence.database.sql.SelectNextId;
 
 import java.util.List;
 
@@ -23,26 +23,23 @@ public class IdentityProvider {
      * @param clazz
      * @return
      */
-    public static Long getNextIdFor(JDBCSession session, Class clazz){
+    public static Long getNextIdFor(JDBCSession session, Class clazz) {
 
         String seqname;
 
-        if(User.class.equals(clazz)){
+        if (User.class.equals(clazz)) {
             seqname = "USER_SEQ";
-        }
-        else if(Group.class.equals(clazz)){
+        } else if (Group.class.equals(clazz)) {
             seqname = "GROUP_SEQ";
-        }
-        else if(Destination.class.equals(clazz)){
+        } else if (Destination.class.equals(clazz)) {
             seqname = "DESTINATION_SEQ";
-        }
-        else{
+        } else {
             throw new IllegalArgumentException("Sequence name not found for class: " + clazz);
         }
 
         List<Long> ids = selectNextId.execute(session, seqname);
 
-        if(ids.size() != 1){
+        if (ids.size() != 1) {
             throw new IllegalStateException(String.format("NEXTVAL for sequence: %s returend %d tuples, expected 1", seqname, ids.size()));
         }
 

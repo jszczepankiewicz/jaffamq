@@ -2,8 +2,6 @@ package org.jaffamq.persistence.database.repository.user;
 
 import org.jaffamq.persistence.database.sql.UpdateOperation;
 
-import java.sql.Types;
-
 import static java.sql.Types.BIGINT;
 import static java.sql.Types.VARCHAR;
 

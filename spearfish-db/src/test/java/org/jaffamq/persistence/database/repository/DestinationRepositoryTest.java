@@ -2,13 +2,12 @@ package org.jaffamq.persistence.database.repository;
 
 import com.google.common.collect.Sets;
 import org.jaffamq.persistence.database.CalendarUtilsTest;
+import org.jaffamq.persistence.database.DBConst;
 import org.jaffamq.persistence.database.repository.destination.Destination;
 import org.jaffamq.persistence.database.repository.destination.DestinationRepository;
 import org.jaffamq.persistence.database.repository.group.Group;
 import org.jaffamq.persistence.database.repository.group.GroupRepository;
-import org.jaffamq.persistence.database.sql.DBConst;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

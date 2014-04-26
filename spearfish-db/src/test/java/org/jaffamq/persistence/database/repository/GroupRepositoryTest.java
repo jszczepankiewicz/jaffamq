@@ -1,15 +1,13 @@
 package org.jaffamq.persistence.database.repository;
 
-import org.jaffamq.persistence.database.CalendarUtils;
 import org.jaffamq.persistence.database.CalendarUtilsTest;
+import org.jaffamq.persistence.database.DBConst;
 import org.jaffamq.persistence.database.repository.group.Group;
-import org.jaffamq.persistence.database.repository.user.User;
 import org.jaffamq.persistence.database.repository.group.GroupRepository;
+import org.jaffamq.persistence.database.repository.user.User;
 import org.jaffamq.persistence.database.repository.user.UserDefaults;
 import org.jaffamq.persistence.database.repository.user.UserRepository;
-import org.jaffamq.persistence.database.sql.DBConst;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -23,12 +21,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
-import static org.junit.Assert.fail;
 
 /**
  * Created by urwisy on 19.01.14.
  */
-public class GroupRepositoryTest extends RepositoryTest{
+public class GroupRepositoryTest extends RepositoryTest {
 
     private GroupRepository repository;
     private UserRepository userRepository;
@@ -43,7 +40,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldHaveAdminsGroupAfterStartup(){
+    public void shouldHaveAdminsGroupAfterStartup() {
 
         //  when
         Group group = repository.get(getSession(), UserDefaults.ADMINS_GROUP_ID);
@@ -54,7 +51,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldSelectGroupById(){
+    public void shouldSelectGroupById() {
 
         //  when
         Group group = repository.get(getSession(), 1000l);
@@ -67,7 +64,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldDeleteGroupWithoutRelations(){
+    public void shouldDeleteGroupWithoutRelations() {
 
         //  when
         boolean deleted = repository.delete(getSession(), 1002l);
@@ -85,7 +82,7 @@ public class GroupRepositoryTest extends RepositoryTest{
 
 
     @Test
-    public void shouldDeleteGroupWithRelations(){
+    public void shouldDeleteGroupWithRelations() {
 
         //  when
         boolean deleted = repository.delete(getSession(), 1003l);
@@ -98,7 +95,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldUpdateGroup(){
+    public void shouldUpdateGroup() {
 
         //  given
         Group groupToUpdate = new Group.Builder("shouldUpdateGroup").id(1l).build();
@@ -114,7 +111,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldCreateGroup(){
+    public void shouldCreateGroup() {
 
         //  given
         final String EXPECTED_NAME = "shouldCreateGroupWithoutRelations";
@@ -132,7 +129,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldReturnFalseForUpdatingNotRecognizedGroup(){
+    public void shouldReturnFalseForUpdatingNotRecognizedGroup() {
 
         //  given
         Group group = new Group.Builder("999name").id(9999l).build();
@@ -145,7 +142,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldThrowNPEOnNullDestinationToUpdate(){
+    public void shouldThrowNPEOnNullDestinationToUpdate() {
 
         //  then
         thrown.expect(NullPointerException.class);
@@ -156,7 +153,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldThrowIAEOnLackOfIdentityInGroupToUpdate(){
+    public void shouldThrowIAEOnLackOfIdentityInGroupToUpdate() {
 
         //  given
         Group g = new Group.Builder("testX").build();
@@ -171,7 +168,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldThrowNPEOnNullGroupToCreate(){
+    public void shouldThrowNPEOnNullGroupToCreate() {
 
         //  then
         thrown.expect(NullPointerException.class);
@@ -182,7 +179,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldThrowIAEOnInvalidCreateDestination(){
+    public void shouldThrowIAEOnInvalidCreateDestination() {
 
         //  given
         Group g = new Group.Builder("testX").id(1l).build();
@@ -197,7 +194,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldListNonPagedGroups(){
+    public void shouldListNonPagedGroups() {
 
         //  given
         List<Group> expected = Arrays.asList(
@@ -218,7 +215,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldListPagedGroups(){
+    public void shouldListPagedGroups() {
 
         //  given
         List<Group> expected = Arrays.asList(
@@ -235,7 +232,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-    public void shouldReturnUniqueForNonExistingName(){
+    public void shouldReturnUniqueForNonExistingName() {
 
         //  when
         boolean isUnique = repository.isUnique(getSession(), "shouldReturnUniqueForNonExistingName");
@@ -245,7 +242,7 @@ public class GroupRepositoryTest extends RepositoryTest{
     }
 
     @Test
-     public void shouldReturnNonUniqueForExistingName(){
+    public void shouldReturnNonUniqueForExistingName() {
 
         //  when
         boolean isUnique = repository.isUnique(getSession(), UserDefaults.ADMINS_GROUP);
@@ -256,7 +253,7 @@ public class GroupRepositoryTest extends RepositoryTest{
 
 
     @Test
-    public void shouldReturnNonUniqueForExistingNameDifferentCase(){
+    public void shouldReturnNonUniqueForExistingNameDifferentCase() {
 
         //  when
         boolean isUnique = repository.isUnique(getSession(), UserDefaults.ADMINS_GROUP.toUpperCase());
