@@ -2,6 +2,7 @@ package org.jaffamq.persistence.database.repository;
 
 import com.google.common.collect.Sets;
 import org.hamcrest.Matchers;
+import org.jaffamq.persistence.database.CalendarUtilsTest;
 import org.jaffamq.persistence.database.group.Group;
 import org.jaffamq.persistence.database.group.GroupRepository;
 import org.jaffamq.persistence.database.user.User;
@@ -16,17 +17,24 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.jaffamq.persistence.database.DBConst.NO_LIMIT;
 import static org.jaffamq.persistence.database.DBConst.NO_OFFSET;
+import static org.jaffamq.persistence.database.repository.IdentifiableMatchers.hasId;
+import static org.jaffamq.persistence.database.repository.IdentifiableMatchers.hasIdSet;
+import static org.jaffamq.persistence.database.repository.UserMatchers.hasLogin;
+import static org.jaffamq.persistence.database.repository.UserMatchers.hasPassword;
+import static org.jaffamq.persistence.database.repository.UserMatchers.hasPasswordhash;
+import static org.jaffamq.persistence.database.repository.UserMatchers.isAssignedTo;
+import static org.jaffamq.persistence.database.repository.UserMatchers.noGroups;
+import static org.jaffamq.persistence.database.repository.UserMatchers.wasCreatedAt;
+import static org.jaffamq.persistence.database.repository.UserMatchers.wasJustCreated;
+
 
 /**
  * Created by urwisy on 12.01.14.
@@ -114,16 +122,21 @@ public class UserRepositoryTest extends RepositoryTest {
     @Test
     public void shouldHaveAdminUserCreatedAfterStart() throws Exception {
 
-        //  when
-        User admin = repository.getUser(getSession(), UserDefaults.SUPERADMIN_LOGIN, UserDefaults.SUPERADMIN_PASSWORD_DEFAULT);
+        //  given
         Set<Group> expectedGroups = Sets.newHashSet(groupRepository.get(getSession(), UserDefaults.ADMINS_GROUP_ID));
 
+        //  when
+        User admin = repository.getUser(getSession(), UserDefaults.SUPERADMIN_LOGIN, UserDefaults.SUPERADMIN_PASSWORD_DEFAULT);
+
         //  then
-        assertThat(admin, is(notNullValue()));
         assertThat(admin.getId(), is(greaterThan(0l)));
-        assertThat(admin.getLogin(), is(equalTo(UserDefaults.SUPERADMIN_LOGIN)));
-        assertThat(admin.getPasswordhash(), is(equalTo(UserDefaults.SUPERADMIN_PASSWORD_HASH)));
-        assertThat(admin.getGroups(), is(equalTo(expectedGroups)));
+        assertThat(admin, allOf(
+                wasCreatedAt(CalendarUtilsTest.TARGET_DATE),
+                hasLogin(UserDefaults.SUPERADMIN_LOGIN),
+                hasPasswordhash(UserDefaults.SUPERADMIN_PASSWORD_HASH),
+                hasPassword(null),
+                isAssignedTo(expectedGroups)
+        ));
     }
 
     @Test
@@ -145,11 +158,14 @@ public class UserRepositoryTest extends RepositoryTest {
         Set<Group> expectedGroups = Sets.newHashSet(groupRepository.get(getSession(), UserDefaults.ADMINS_GROUP_ID));
 
         //  then
-        assertThat(admin, is(notNullValue()));
-        assertThat(admin.getId().intValue(), is(equalTo(UserDefaults.SUPERADMIN_ID.intValue())));
-        assertThat(admin.getLogin(), is(equalTo(UserDefaults.SUPERADMIN_LOGIN)));
-        assertThat(admin.getPasswordhash(), is(equalTo(UserDefaults.SUPERADMIN_PASSWORD_HASH)));
-        assertThat(admin.getGroups(), is(equalTo(expectedGroups)));
+        assertThat(admin, allOf(
+                hasId(UserDefaults.SUPERADMIN_ID),
+                hasLogin(UserDefaults.SUPERADMIN_LOGIN),
+                hasPasswordhash(UserDefaults.SUPERADMIN_PASSWORD_HASH),
+                hasPassword(null),
+                wasCreatedAt(CalendarUtilsTest.TARGET_DATE),
+                isAssignedTo(expectedGroups)
+        ));
 
     }
 
@@ -192,10 +208,14 @@ public class UserRepositoryTest extends RepositoryTest {
 
         User userRetrieved = repository.get(getSession(), createdId);
 
-        assertThat(userRetrieved.getId(), is(greaterThan(0l)));
-        assertThat(userRetrieved.getLogin(), is(equalTo("somelogin")));
-        assertThat(userRetrieved.getPasswordhash(), is(equalTo(UserDefaults.SUPERADMIN_PASSWORD_HASH)));
-        assertThat(userRetrieved.getGroups(), is(empty()));
+        assertThat(userRetrieved, allOf(
+                wasJustCreated(),
+                hasIdSet(),
+                hasLogin("somelogin"),
+                hasPasswordhash(UserDefaults.SUPERADMIN_PASSWORD_HASH),
+                isAssignedTo(noGroups())
+        ));
+
     }
 
     @Test
@@ -212,12 +232,16 @@ public class UserRepositoryTest extends RepositoryTest {
         Long createdId = repository.create(getSession(), toCreate);
 
         //  then
-        assertThat(createdId, is(notNullValue()));
         User userRetrieved = repository.get(getSession(), createdId);
-        assertThat(userRetrieved.getLogin(), is(equalTo("a")));
-        assertThat(userRetrieved.getPasswordhash(), is(equalTo(UserDefaults.SUPERADMIN_PASSWORD_HASH)));
-        assertThat(userRetrieved.getGroups(), containsInAnyOrder(groups.toArray()));
 
+        assertThat(createdId, is(greaterThan(0l)));
+        assertThat(userRetrieved, allOf(
+                hasLogin("a"),
+                wasJustCreated(),
+                hasIdSet(),
+                hasPasswordhash(UserDefaults.SUPERADMIN_PASSWORD_HASH),
+                isAssignedTo(groups)
+        ));
     }
 
     @Test
@@ -275,10 +299,13 @@ public class UserRepositoryTest extends RepositoryTest {
         User afterUpdate = repository.get(getSession(), 1004l);
 
         assertThat(updated, is(true));
-        assertThat(afterUpdate, is(not(equalTo(beforeUpdate))));
-        assertThat(afterUpdate.getPasswordhash(), is(equalTo("55464335b2bcd6862428847e720152892edf299a2796dcd2657d9b1341e1ad65")));
-        assertThat("update should not affect creationtime", afterUpdate.getCreationTime(), is(equalTo(beforeUpdate.getCreationTime())));
-        assertThat(afterUpdate.getLogin(), is(equalTo(toUpdate.getLogin())));
+
+        assertThat(afterUpdate, allOf(
+                hasPasswordhash("55464335b2bcd6862428847e720152892edf299a2796dcd2657d9b1341e1ad65"),
+                hasLogin(toUpdate.getLogin()),
+                wasCreatedAt(beforeUpdate.getCreationTime())
+
+        ));
 
     }
 
@@ -298,9 +325,14 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  then
         assertThat(updated, is(true));
-        assertThat(afterUpdate.getLogin(), is(equalTo("shouldUpdateUserWithoutGroupsAssignedWithoutPasswordChange")));
-        assertThat(afterUpdate.getCreationTime(), is(equalTo(beforeChange.getCreationTime())));
-        assertThat(afterUpdate.getPasswordhash(), is(equalTo(beforeChange.getPasswordhash())));
+
+        assertThat(afterUpdate, allOf(
+                hasLogin("shouldUpdateUserWithoutGroupsAssignedWithoutPasswordChange"),
+                wasCreatedAt(beforeChange.getCreationTime()),
+                hasPasswordhash(beforeChange.getPasswordhash()),
+                isAssignedTo(noGroups())
+
+        ));
 
     }
 
@@ -320,10 +352,13 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  then
         assertThat(updated, is(true));
-        assertThat(afterUpdate.getLogin(), is(equalTo("shouldUpdateUserWithoutChangingGroups")));
-        assertThat(afterUpdate.getCreationTime(), is(equalTo(beforeChange.getCreationTime())));
-        assertThat(afterUpdate.getPasswordhash(), is(equalTo(beforeChange.getPasswordhash())));
-        assertThat(afterUpdate.getGroups(), is(equalTo(beforeChange.getGroups())));
+
+        assertThat(afterUpdate, allOf(
+                hasLogin("shouldUpdateUserWithoutChangingGroups"),
+                wasCreatedAt(beforeChange.getCreationTime()),
+                hasPasswordhash(beforeChange.getPasswordhash()),
+                isAssignedTo(beforeChange.getGroups())
+        ));
     }
 
 
@@ -347,10 +382,14 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  then
         assertThat(updated, is(true));
-        assertThat(afterUpdate.getLogin(), is(equalTo("shouldUpdateUserWithoutChangingGroups")));
-        assertThat(afterUpdate.getCreationTime(), is(equalTo(beforeChange.getCreationTime())));
-        assertThat(afterUpdate.getPasswordhash(), is(equalTo(beforeChange.getPasswordhash())));
-        assertThat(afterUpdate.getGroups(), is(equalTo(expectedGroups)));
+
+        assertThat(afterUpdate, allOf(
+                hasLogin("shouldUpdateUserWithoutChangingGroups"),
+                wasCreatedAt(beforeChange.getCreationTime()),
+                hasPasswordhash(beforeChange.getPasswordhash()),
+                isAssignedTo(expectedGroups)
+
+        ));
     }
 
     @Test

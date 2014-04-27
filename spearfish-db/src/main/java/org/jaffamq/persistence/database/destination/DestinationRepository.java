@@ -17,7 +17,6 @@ import org.jaffamq.persistence.database.sql.ListAllOperation;
 import org.jaffamq.persistence.database.sql.MNRelation;
 import org.jaffamq.persistence.database.sql.SelectByIdOperation;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,12 +57,12 @@ public class DestinationRepository implements CrudRepository<Destination>, Check
             return retval;
         }
 
-        decorateWithRelations(session, Arrays.asList(retval));
+        decorateWithRelations(session, retval);
 
         return retval;
     }
 
-    private void decorateWithRelations(JDBCSession session, List<Destination> destinations) {
+    private void decorateWithRelations(JDBCSession session, Destination... destinations) {
 
         for (Destination destination : destinations) {
             destination.setAdminAuthorizedGroups(new HashSet<>(groupsWithAdmin.execute(session, destination.getId())));
@@ -142,7 +141,7 @@ public class DestinationRepository implements CrudRepository<Destination>, Check
     @Override
     public List<Destination> list(JDBCSession session, int limit, int offset) {
         List<Destination> results = listAll.execute(session, limit, offset);
-        decorateWithRelations(session, results);
+        decorateWithRelations(session, results.toArray(new Destination[0]));
         return results;
     }
 

@@ -18,15 +18,23 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.jaffamq.persistence.database.destination.Destination.Type.QUEUE;
 import static org.jaffamq.persistence.database.destination.Destination.Type.TOPIC;
+import static org.jaffamq.persistence.database.repository.DestinationMatchers.canBeAdminBy;
+import static org.jaffamq.persistence.database.repository.DestinationMatchers.canBeReadBy;
+import static org.jaffamq.persistence.database.repository.DestinationMatchers.canBeWriteBy;
+import static org.jaffamq.persistence.database.repository.DestinationMatchers.everybody;
+import static org.jaffamq.persistence.database.repository.DestinationMatchers.hasName;
+import static org.jaffamq.persistence.database.repository.DestinationMatchers.isOfType;
+import static org.jaffamq.persistence.database.repository.DestinationMatchers.wasCreatedAt;
+import static org.jaffamq.persistence.database.repository.DestinationMatchers.wasJustCreated;
+import static org.jaffamq.persistence.database.repository.IdentifiableMatchers.hasId;
+import static org.jaffamq.persistence.database.repository.IdentifiableMatchers.hasIdSet;
+
 
 /**
  * Created by urwisy on 15.04.14.
@@ -51,17 +59,18 @@ public class DestinationRepositoryTest extends RepositoryTest {
 
         //  when
         Destination destination = repository.get(getSession(), 1000l);
-        //  FIXME: do date checking
-        //  then
-        assertThat(destination.getId(), is(equalTo(1000l)));
-        assertThat(destination.getName(), is(equalTo("queue/something1")));
-        assertThat(destination.getCreationTime(), is(notNullValue()));
-        assertThat(destination.getType(), is(equalTo(QUEUE)));
 
-        //  relations
-        assertThat(destination.getAdminAuthorizedGroups(), is(empty()));
-        assertThat(destination.getReadAuthorizedGroups(), is(empty()));
-        assertThat(destination.getWriteAuthorizedGroups(), is(empty()));
+        //  then
+        assertThat(destination, allOf(
+                hasId(1000l),
+                hasName("queue/something1"),
+                isOfType(QUEUE),
+                wasCreatedAt(CalendarUtilsTest.TARGET_DATE),
+                canBeAdminBy(everybody()),
+                canBeReadBy(everybody()),
+                canBeWriteBy(everybody())
+        ));
+
     }
 
     @Test
@@ -71,15 +80,15 @@ public class DestinationRepositoryTest extends RepositoryTest {
         Destination destination = repository.get(getSession(), 1001l);
 
         //  then
-        assertThat(destination.getId(), is(equalTo(1001l)));
-        assertThat(destination.getName(), is(equalTo("topic/something2")));
-        assertThat(destination.getCreationTime(), is(notNullValue()));
-        assertThat(destination.getType(), is(equalTo(TOPIC)));
-
-        //  relations
-        assertThat(destination.getAdminAuthorizedGroups(), is(empty()));
-        assertThat(destination.getReadAuthorizedGroups(), is(empty()));
-        assertThat(destination.getWriteAuthorizedGroups(), is(empty()));
+        assertThat(destination, allOf(
+                hasId(1001l),
+                hasName("topic/something2"),
+                wasCreatedAt(CalendarUtilsTest.TARGET_DATE),
+                isOfType(TOPIC),
+                canBeAdminBy(everybody()),
+                canBeWriteBy(everybody()),
+                canBeAdminBy(everybody())
+        ));
     }
 
     @Test
@@ -91,19 +100,18 @@ public class DestinationRepositoryTest extends RepositoryTest {
         Group group1004 = groupRepository.get(getSession(), 1004l);
         Group group1005 = groupRepository.get(getSession(), 1005l);
 
-
         //  when
         Destination destination = repository.get(getSession(), 1002l);
 
         //  then
-        assertThat(destination.getId(), is(equalTo(1002l)));
-        assertThat(destination.getName(), is(equalTo("queue/something3")));
-        assertThat(destination.getCreationTime(), is(notNullValue()));
-
-        //  relations
-        assertThat(destination.getReadAuthorizedGroups(), contains(group1002));
-        assertThat(destination.getWriteAuthorizedGroups(), contains(group1003));
-        assertThat(destination.getAdminAuthorizedGroups(), containsInAnyOrder(group1005, group1004));
+        assertThat(destination, allOf(
+                hasId(1002l),
+                hasName("queue/something3"),
+                wasCreatedAt(CalendarUtilsTest.TARGET_DATE),
+                canBeAdminBy(group1005, group1004),
+                canBeWriteBy(group1003),
+                canBeReadBy(group1002)
+        ));
     }
 
     @Test
@@ -250,11 +258,15 @@ public class DestinationRepositoryTest extends RepositoryTest {
         //  then
         assertThat(id, is(greaterThan(0l)));
         Destination created = repository.get(getSession(), id);
-        assertThat(created.getName(), is(equalTo(name)));
-        assertThat(created.getCreationTime().getMillis(), is(greaterThan(SOME_DATE_NOT_LONG_AGO)));
-        assertThat(created.getAdminAuthorizedGroups(), hasSize(0));
-        assertThat(created.getWriteAuthorizedGroups(), hasSize(0));
-        assertThat(created.getReadAuthorizedGroups(), hasSize(0));
+
+        assertThat(created, allOf(
+                hasName(name),
+                wasJustCreated(),
+                hasIdSet(),
+                canBeAdminBy(everybody()),
+                canBeWriteBy(everybody()),
+                canBeReadBy(everybody())
+        ));
 
     }
 
@@ -284,11 +296,15 @@ public class DestinationRepositoryTest extends RepositoryTest {
         //  then
         assertThat(id, is(greaterThan(0l)));
         Destination created = repository.get(getSession(), id);
-        assertThat(created.getName(), is(equalTo(name)));
         assertThat(created.getCreationTime().getMillis(), is(greaterThan(CalendarUtilsTest.TARGET_DATE_AS_LONG)));
-        assertThat(created.getAdminAuthorizedGroups(), is(equalTo(destination.getAdminAuthorizedGroups())));
-        assertThat(created.getReadAuthorizedGroups(), is(equalTo(destination.getReadAuthorizedGroups())));
-        assertThat(created.getWriteAuthorizedGroups(), is(equalTo(destination.getWriteAuthorizedGroups())));
+        assertThat(created, allOf(
+                hasName(name),
+                wasJustCreated(),
+                hasIdSet(),
+                canBeAdminBy(destination.getAdminAuthorizedGroups()),
+                canBeReadBy(destination.getReadAuthorizedGroups()),
+                canBeWriteBy(destination.getWriteAuthorizedGroups())
+        ));
 
 
     }
@@ -306,11 +322,13 @@ public class DestinationRepositoryTest extends RepositoryTest {
 
         //  then
         assertThat(updated, is(true));
-        assertThat(afterUpdate.getCreationTime(), is(equalTo(destinationBeforeUpdate.getCreationTime())));
-        assertThat(afterUpdate.getName(), is(equalTo("shouldUpdateDestinationWithoutRelations")));
-        assertThat(afterUpdate.getAdminAuthorizedGroups(), is(empty()));
-        assertThat(afterUpdate.getReadAuthorizedGroups(), is(empty()));
-        assertThat(afterUpdate.getWriteAuthorizedGroups(), is(empty()));
+        assertThat(afterUpdate, allOf(
+                wasCreatedAt(destinationBeforeUpdate.getCreationTime()),
+                hasName("shouldUpdateDestinationWithoutRelations"),
+                canBeAdminBy(everybody()),
+                canBeWriteBy(everybody()),
+                canBeReadBy(everybody())
+        ));
 
     }
 
@@ -343,11 +361,13 @@ public class DestinationRepositoryTest extends RepositoryTest {
         //  then
         assertThat(updated, is(true));
         Destination updatedDestination = repository.get(getSession(), 1002l);
-        assertThat(updatedDestination.getName(), is(equalTo(name)));
-        assertThat(updatedDestination.getCreationTime(), is(equalTo(toUpdate.getCreationTime())));
-        assertThat(updatedDestination.getAdminAuthorizedGroups(), is(equalTo(toUpdate.getAdminAuthorizedGroups())));
-        assertThat(updatedDestination.getReadAuthorizedGroups(), is(equalTo(toUpdate.getReadAuthorizedGroups())));
-        assertThat(updatedDestination.getWriteAuthorizedGroups(), is(equalTo(toUpdate.getWriteAuthorizedGroups())));
+        assertThat(updatedDestination, allOf(
+                hasName(name),
+                wasCreatedAt(toUpdate.getCreationTime()),
+                canBeAdminBy(toUpdate.getAdminAuthorizedGroups()),
+                canBeWriteBy(toUpdate.getWriteAuthorizedGroups()),
+                canBeReadBy(toUpdate.getReadAuthorizedGroups())
+        ));
     }
 
     @Test

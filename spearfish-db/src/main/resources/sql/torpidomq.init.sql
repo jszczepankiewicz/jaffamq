@@ -2,7 +2,7 @@
 -- Update Database Script
 -- *********************************************************************
 -- Change Log: C:/dev/intelij_workspace/JaffaMQ/spearfish-db/src/main/resources/org/torpidomq/db/changelog/db.changelog-master.xml
--- Ran at: 26.04.14 17:26
+-- Ran at: 27.04.14 15:55
 -- Against: @jdbc:h2:mem:
 -- Liquibase version: 3.0.8
 -- *********************************************************************
@@ -36,11 +36,11 @@ ALTER TABLE security_user_and_group ADD CONSTRAINT fk_security_user_and_group_id
 
 INSERT INTO security_group (id, name, creationtime) VALUES ('1', 'admins', '1398008282884');
 
-INSERT INTO security_user (id, login, passhash, creationtime) VALUES ('1', 'admin', '8be94e85158147d335c31e7401565942785e79d7d446cc41f6427422d6755371', '1');
+INSERT INTO security_user (id, login, passhash, creationtime) VALUES ('1', 'admin', '8be94e85158147d335c31e7401565942785e79d7d446cc41f6427422d6755371', '1398008282884');
 
 INSERT INTO security_user_and_group (id_user, id_group) VALUES ('1', '1');
 
-INSERT INTO DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, LIQUIBASE) VALUES ('1', 'jszczepankiewicz', 'C:/dev/intelij_workspace/JaffaMQ/spearfish-db/src/main/resources/org/torpidomq/db/changelog/1.x/db.changelog-1.0.xml', NOW(), 1, '7:82fee6e708fe32f727e7012ec42abb35', 'createSequence (x2), createTable (x3), addForeignKeyConstraint (x2), insert (x3)', '', 'EXECUTED', '3.0.8');
+INSERT INTO DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, LIQUIBASE) VALUES ('1', 'jszczepankiewicz', 'C:/dev/intelij_workspace/JaffaMQ/spearfish-db/src/main/resources/org/torpidomq/db/changelog/1.x/db.changelog-1.0.xml', NOW(), 1, '7:842cad6998458961bc6a58f9ad7db1af', 'createSequence (x2), createTable (x3), addForeignKeyConstraint (x2), insert (x3)', '', 'EXECUTED', '3.0.8');
 
 -- Changeset C:/dev/intelij_workspace/JaffaMQ/spearfish-db/src/main/resources/org/torpidomq/db/changelog/1.x/db.changelog-1.0.xml::100::jszczepankiewicz
 -- destination table and the rest of relations

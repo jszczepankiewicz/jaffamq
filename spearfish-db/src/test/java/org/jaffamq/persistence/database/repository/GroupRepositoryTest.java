@@ -15,12 +15,17 @@ import org.junit.rules.ExpectedException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
+import static org.jaffamq.persistence.database.repository.GroupMatchers.hasName;
+import static org.jaffamq.persistence.database.repository.GroupMatchers.wasCreatedAt;
+import static org.jaffamq.persistence.database.repository.IdentifiableMatchers.hasId;
+import static org.jaffamq.persistence.database.repository.IdentifiableMatchers.hasIdSet;
 
 /**
  * Created by urwisy on 19.01.14.
@@ -46,8 +51,12 @@ public class GroupRepositoryTest extends RepositoryTest {
         Group group = repository.get(getSession(), UserDefaults.ADMINS_GROUP_ID);
 
         //  then
-        assertThat(group.getId(), is(equalTo(UserDefaults.ADMINS_GROUP_ID)));
-        assertThat(group.getName(), is(equalTo(UserDefaults.ADMINS_GROUP)));
+        assertThat(group,
+                allOf(
+                        hasName(UserDefaults.ADMINS_GROUP),
+                        hasId(UserDefaults.ADMINS_GROUP_ID)
+                )
+        );
     }
 
     @Test
@@ -57,9 +66,8 @@ public class GroupRepositoryTest extends RepositoryTest {
         Group group = repository.get(getSession(), 1000l);
 
         //  then
-        assertThat(group.getId(), is(equalTo(1000l)));
-        assertThat(group.getName(), is(equalTo("test0")));
-        assertThat(group.getCreationtime(), is(equalTo(CalendarUtilsTest.TARGET_DATE)));
+        assertThat(group, allOf(
+                hasId(1000l), hasName("test0"), wasCreatedAt(CalendarUtilsTest.TARGET_DATE)));
 
     }
 
@@ -106,7 +114,7 @@ public class GroupRepositoryTest extends RepositoryTest {
         //  then
         Group updated = repository.get(getSession(), 1l);
         assertThat(isUpdated, is(true));
-        assertThat(updated.getName(), is(equalTo(groupToUpdate.getName())));
+        assertThat(updated, hasName(groupToUpdate.getName()));
 
     }
 
@@ -123,8 +131,10 @@ public class GroupRepositoryTest extends RepositoryTest {
 
         //  then
         assertThat(id, is(greaterThan(0l)));
-        assertThat(created.getName(), is(equalTo(EXPECTED_NAME)));
-        assertThat(created.getCreationtime(), is(equalTo(toCreate.getCreationtime())));
+        assertThat(created, allOf(
+                hasIdSet(),
+                hasName(EXPECTED_NAME),
+                wasCreatedAt(toCreate.getCreationtime())));
 
     }
 

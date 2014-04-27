@@ -95,7 +95,7 @@
             <column name="id" value="1"/>
             <column name="login" value="admin"/>
             <column name="passhash" value="8be94e85158147d335c31e7401565942785e79d7d446cc41f6427422d6755371"/>
-            <column name="creationtime" value="1"/>
+            <column name="creationtime" value="1398008282884"/>
         </insert>
 
         <insert tableName="security_user_and_group">
