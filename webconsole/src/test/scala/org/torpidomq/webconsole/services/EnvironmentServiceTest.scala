@@ -27,8 +27,7 @@ class EnvironmentServiceTest extends FlatSpec with EnvironmentService with Scala
         Get("/api/environment/system") ~> route ~> check {
             status should equal(OK)
             jsonArray("$.*").size should be > 10
-            val ref = jsonObject("$.[?(@.property=='PROCESSOR_LEVEL')]")
-            //  TODO: add machers for ref
+            //  unfortunatelly there is no shared environment variables that might be used here in assertion
         }
     }
 }
