@@ -40,9 +40,9 @@ No packaging option is available yet.
 
 ### Credits
 
-[Akka toolkit](http://http://akka.io/)
+[Akka toolkit](http://akka.io/)
 
-[H2 Database Engine](http://http://www.h2database.com/)
+[H2 Database Engine](http://www.h2database.com/)
 
 [The Scala Programming Language](http://www.scala-lang.org/)
 
