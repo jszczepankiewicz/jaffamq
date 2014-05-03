@@ -551,33 +551,34 @@ public class BlackBoxServerTest extends EndToEndTestSuite {
         clients[0].sendFrame("/COMMIT/commit_tx_b.txt");
         expectNoResponse(clients[1]);
 
-        String client1response = clients[2].getResponseOrTimeout();
-        String client2response = clients[3].getResponseOrTimeout();
-        String possibleAnswer1 = readResource("/MESSAGE/message_queue_subscription_6_m6.txt");
-        String possibleAnswer2 = readResource("/MESSAGE/message_queue_subscription_3_m6.txt");
+        String client2response = clients[2].getResponseOrTimeout();
+        String client3response = clients[3].getResponseOrTimeout();
+
+        String possibleAnswerSubscriptionId3 = readResource("/MESSAGE/message_queue_subscription_3_m12.txt");
+        String possibleAnswerSubscriptionId6 = readResource("/MESSAGE/message_queue_subscription_6_m12.txt");
 
         boolean found = false;
 
-        if(client1response.trim().length()>0){
+        if (client2response.trim().length() > 0) {
 
-            if(client1response.equals(possibleAnswer1)){
+            if (client2response.trim().equals(possibleAnswerSubscriptionId3.trim())) {
                 found = true;
             }
             else{
-                fail("Expected message different than received");
+                failWithMessages(possibleAnswerSubscriptionId3, client2response);
             }
         }
 
-        if(client2response.trim().length()>0){
+        if (client3response.trim().length() > 0) {
             if(found){
                 fail("Message received by more than one client");
             }
 
-            if(client2response.equals(possibleAnswer2)){
+            if (client3response.trim().equals(possibleAnswerSubscriptionId6.trim())) {
                 found = true;
             }
             else{
-                fail("Expected message different than received");
+                failWithMessages(possibleAnswerSubscriptionId6, client3response);
             }
         }
 

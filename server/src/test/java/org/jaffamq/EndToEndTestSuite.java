@@ -1,20 +1,11 @@
 package org.jaffamq;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
 import akka.testkit.JavaTestKit;
 import org.apache.commons.io.IOUtils;
 import org.jaffamq.broker.BrokerInstance;
-import org.jaffamq.broker.StompServer;
-import org.jaffamq.broker.destination.QueueDestinationManager;
-import org.jaffamq.broker.destination.TopicDestinationManager;
-import org.jaffamq.broker.destination.persistence.PollUnconsumedMessageService;
-import org.jaffamq.broker.destination.persistence.StoreUnconsumedMessageService;
 import org.jaffamq.org.jaffamq.test.StompTestBlockingClient;
 import org.jaffamq.org.jaffamq.test.StompTestClient;
-import org.jaffamq.persistence.PersistedMessageId;
-import org.jaffamq.persistence.journal.UnconsumedMessageJournalRepository;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
@@ -23,12 +14,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -67,6 +55,12 @@ public class EndToEndTestSuite {
         }
 
         initializedClients = null;
+    }
+
+    protected void failWithMessages(String expectedMessage, String found) {
+        String expTrimmed = expectedMessage.trim();
+        String foundTrimmed = found.trim();
+        Assert.fail(String.format("Expected message: --------------------------------------\n[%s]\n--------------------------------------\nbut found:--------------------------------------\n[%s]\n--------------------------------------", expTrimmed, foundTrimmed));
     }
 
     protected void createBroker(String unconsumedRepositoryDataDir) throws InterruptedException {
