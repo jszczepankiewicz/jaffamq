@@ -13,7 +13,7 @@ import static org.hamcrest.number.OrderingComparison.greaterThan;
 public class IdentifiableMatchers {
 
     public static <T extends Identifiable> Matcher<T> hasIdSet() {
-        return new FeatureMatcher<T, Long>((greaterThan(0l)), "id", "id") {
+        return new FeatureMatcher<T, Long>((greaterThan(0L)), "id", "id") {
             @Override
             protected Long featureValueOf(final T actual) {
                 return actual.getId();

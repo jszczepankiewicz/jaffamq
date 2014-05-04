@@ -1,8 +1,8 @@
 package org.jaffamq.persistence.journal;
 
+import journal.io.api.Location;
 import org.jaffamq.messages.StompMessage;
 import org.jaffamq.persistence.PersistedMessageId;
-
 import org.jaffamq.test.StompMessageFactory;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -10,12 +10,14 @@ import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import journal.io.api.Location;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -50,7 +52,7 @@ public class UnconsumedMessageJournalRepositoryTest {
     }
 
     @Test
-    public void shouldPersistMessageSuccessfully() throws Exception {
+    public void shouldPersistMessageSuccessfully() {
 
         //  given
         StompMessage msg1 = StompMessageFactory.createMessage();
@@ -67,7 +69,7 @@ public class UnconsumedMessageJournalRepositoryTest {
     }
 
     @Test
-    public void shouldPersistAndPollMessageSuccessfully() throws Exception {
+    public void shouldPersistAndPollMessageSuccessfully() {
 
         //  given
         StompMessage msg1 = StompMessageFactory.createMessage();
@@ -84,7 +86,7 @@ public class UnconsumedMessageJournalRepositoryTest {
 
     @Ignore("Not decided yet what to do with invalid location")
     @Test
-    public void shouldReturnNullIfMessageRetrievedForSecondTime() throws Exception {
+    public void shouldReturnNullIfMessageRetrievedForSecondTime() {
 
         //  given
         StompMessage msg1 = StompMessageFactory.createMessage();
@@ -105,10 +107,10 @@ public class UnconsumedMessageJournalRepositoryTest {
 
     @Ignore("Not decided yet what to do with invalid location")
     @Test
-    public void shouldReturnNullIfMessageIdNotFound() throws Exception {
+    public void shouldReturnNullIfMessageIdNotFound() {
 
         //  given
-        Location loc  = new Location();
+        Location loc = new Location();
         PersistedMessageId id = new JournalMessageMessageId(loc);
 
         //  when

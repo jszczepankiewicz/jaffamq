@@ -63,11 +63,11 @@ public class GroupRepositoryTest extends RepositoryTest {
     public void shouldSelectGroupById() {
 
         //  when
-        Group group = repository.get(getSession(), 1000l);
+        Group group = repository.get(getSession(), 1000L);
 
         //  then
         assertThat(group, allOf(
-                hasId(1000l), hasName("test0"), wasCreatedAt(CalendarUtilsTest.TARGET_DATE)));
+                hasId(1000L), hasName("test0"), wasCreatedAt(CalendarUtilsTest.TARGET_DATE)));
 
     }
 
@@ -75,13 +75,13 @@ public class GroupRepositoryTest extends RepositoryTest {
     public void shouldDeleteGroupWithoutRelations() {
 
         //  when
-        boolean deleted = repository.delete(getSession(), 1002l);
-        User user1 = userRepository.get(getSession(), 1003l);
-        User user2 = userRepository.get(getSession(), 1004l);
+        boolean deleted = repository.delete(getSession(), 1002L);
+        User user1 = userRepository.get(getSession(), 1003L);
+        User user2 = userRepository.get(getSession(), 1004L);
 
         //  then
         assertThat(deleted, is(true));
-        Group deletedGroup = repository.get(getSession(), 1002l);
+        Group deletedGroup = repository.get(getSession(), 1002L);
         assertThat(deletedGroup, is(nullValue()));
         assertThat(user1, is(notNullValue()));
         assertThat(user2, is(notNullValue()));
@@ -93,11 +93,11 @@ public class GroupRepositoryTest extends RepositoryTest {
     public void shouldDeleteGroupWithRelations() {
 
         //  when
-        boolean deleted = repository.delete(getSession(), 1003l);
+        boolean deleted = repository.delete(getSession(), 1003L);
 
         //  when
         assertThat(deleted, is(true));
-        Group deletedGroup = repository.get(getSession(), 1003l);
+        Group deletedGroup = repository.get(getSession(), 1003L);
         assertThat(deletedGroup, is(nullValue()));
 
     }
@@ -106,13 +106,13 @@ public class GroupRepositoryTest extends RepositoryTest {
     public void shouldUpdateGroup() {
 
         //  given
-        Group groupToUpdate = new Group.Builder("shouldUpdateGroup").id(1l).build();
+        Group groupToUpdate = new Group.Builder("shouldUpdateGroup").id(1L).build();
 
         //  when
         boolean isUpdated = repository.update(getSession(), groupToUpdate);
 
         //  then
-        Group updated = repository.get(getSession(), 1l);
+        Group updated = repository.get(getSession(), 1L);
         assertThat(isUpdated, is(true));
         assertThat(updated, hasName(groupToUpdate.getName()));
 
@@ -122,18 +122,18 @@ public class GroupRepositoryTest extends RepositoryTest {
     public void shouldCreateGroup() {
 
         //  given
-        final String EXPECTED_NAME = "shouldCreateGroupWithoutRelations";
-        Group toCreate = new Group.Builder(EXPECTED_NAME).build();
+        final String expectedName = "shouldCreateGroupWithoutRelations";
+        Group toCreate = new Group.Builder(expectedName).build();
 
         //  when
         Long id = repository.create(getSession(), toCreate);
         Group created = repository.get(getSession(), id);
 
         //  then
-        assertThat(id, is(greaterThan(0l)));
+        assertThat(id, is(greaterThan(0L)));
         assertThat(created, allOf(
                 hasIdSet(),
-                hasName(EXPECTED_NAME),
+                hasName(expectedName),
                 wasCreatedAt(toCreate.getCreationtime())));
 
     }
@@ -142,7 +142,7 @@ public class GroupRepositoryTest extends RepositoryTest {
     public void shouldReturnFalseForUpdatingNotRecognizedGroup() {
 
         //  given
-        Group group = new Group.Builder("999name").id(9999l).build();
+        Group group = new Group.Builder("999name").id(9999L).build();
 
         //  when
         boolean updated = repository.update(getSession(), group);
@@ -192,7 +192,7 @@ public class GroupRepositoryTest extends RepositoryTest {
     public void shouldThrowIAEOnInvalidCreateDestination() {
 
         //  given
-        Group g = new Group.Builder("testX").id(1l).build();
+        Group g = new Group.Builder("testX").id(1L).build();
 
         //  then
         thrown.expect(IllegalArgumentException.class);
@@ -208,13 +208,13 @@ public class GroupRepositoryTest extends RepositoryTest {
 
         //  given
         List<Group> expected = Arrays.asList(
-                new Group.Builder("admins").id(1l).build(),
-                new Group.Builder("test0").id(1000l).build(),
-                new Group.Builder("test1").id(1001l).build(),
-                new Group.Builder("test2").id(1002l).build(),
-                new Group.Builder("test3").id(1003l).build(),
-                new Group.Builder("test4").id(1004l).build(),
-                new Group.Builder("test5").id(1005l).build());
+                new Group.Builder("admins").id(1L).build(),
+                new Group.Builder("test0").id(1000L).build(),
+                new Group.Builder("test1").id(1001L).build(),
+                new Group.Builder("test2").id(1002L).build(),
+                new Group.Builder("test3").id(1003L).build(),
+                new Group.Builder("test4").id(1004L).build(),
+                new Group.Builder("test5").id(1005L).build());
 
         //  when
         List<Group> found = repository.list(getSession(), DBConst.NO_LIMIT, DBConst.NO_OFFSET);
@@ -229,9 +229,9 @@ public class GroupRepositoryTest extends RepositoryTest {
 
         //  given
         List<Group> expected = Arrays.asList(
-                new Group.Builder("test0").id(1000l).build(),
-                new Group.Builder("test1").id(1001l).build(),
-                new Group.Builder("test2").id(1002l).build());
+                new Group.Builder("test0").id(1000L).build(),
+                new Group.Builder("test1").id(1001L).build(),
+                new Group.Builder("test2").id(1002L).build());
 
         //  when
         List<Group> found = repository.list(getSession(), 3, 1);

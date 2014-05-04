@@ -5,9 +5,9 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.testkit.JavaTestKit;
-import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscribedStompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
+import org.jaffamq.messages.StompMessage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
@@ -27,7 +27,7 @@ public class TopicTest {
     public ExternalResource systemResource = new ExternalResource() {
 
         @Override
-        protected void before() throws Throwable {
+        protected void before() {
             system = ActorSystem.create();
         }
 

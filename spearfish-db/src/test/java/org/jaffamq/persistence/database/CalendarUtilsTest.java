@@ -14,8 +14,8 @@ import static org.hamcrest.number.OrderingComparison.greaterThan;
  */
 public class CalendarUtilsTest {
 
-    public static final long TARGET_DATE_AS_LONG = 1398008282884l;
-    public static final DateTime TARGET_DATE = new DateTime(2014,4,20,15,38,2,884, CalendarUtils.DB_TIMEZONE);
+    public static final long TARGET_DATE_AS_LONG = 1398008282884L;
+    public static final DateTime TARGET_DATE = new DateTime(2014, 4, 20, 15, 38, 2, 884, CalendarUtils.DB_TIMEZONE);
 
     @Test
     public void shouldReturnNow() {
@@ -52,7 +52,7 @@ public class CalendarUtilsTest {
     }
 
     @Test
-    public void shouldConvertToNullFromNulledInput(){
+    public void shouldConvertToNullFromNulledInput() {
 
         //  when
         Long convertedLong = CalendarUtils.asLong(null);

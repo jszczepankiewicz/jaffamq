@@ -46,11 +46,7 @@ public class EndToEndTestSuite {
 
                 StompTestClient testClient = initializedClients.get(i);
 
-                try {
-                    testClient.close();
-                } catch (IOException e) {
-                    LOG.warn("Exception while disposing StompTestClient", e);
-                }
+                testClient.close();
             }
         }
 
@@ -104,7 +100,7 @@ public class EndToEndTestSuite {
     public ExternalResource serverResource = new ExternalResource() {
 
         @Override
-        protected void before() throws Throwable {
+        protected void before() throws InterruptedException {
             createBroker();
         }
 
@@ -115,12 +111,11 @@ public class EndToEndTestSuite {
     };
 
 
-
     protected StompTestClient createClient() {
         return createClients(1)[0];
     }
 
-    protected StompTestClient createConnectedClient() throws IOException {
+    protected StompTestClient createConnectedClient() {
         StompTestClient client = createClient();
         connectClient(client);
         return client;
@@ -141,11 +136,11 @@ public class EndToEndTestSuite {
         return initializedClients.toArray(new StompTestClient[]{});
     }
 
-    protected void connectClient(StompTestClient client) throws IOException {
+    protected void connectClient(StompTestClient client) {
         connectClients(new StompTestClient[]{client});
     }
 
-    protected void connectClients(StompTestClient[] clients) throws IOException {
+    protected void connectClients(StompTestClient[] clients) {
 
         for (int i = 0; i < clients.length; i++) {
 
@@ -161,11 +156,15 @@ public class EndToEndTestSuite {
 
     }
 
-    protected static void waitToPropagateTCP() throws InterruptedException {
-        Thread.sleep(1000);
+    protected static void waitToPropagateTCP() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException("Unexpected InterruptedException during waitToPropagateTCP", e);
+        }
     }
 
-    protected String readResource(String classpathResource) throws IOException {
+    protected String readResource(String classpathResource) {
 
         StringWriter writer = new StringWriter();
         InputStream is = this.getClass().getResourceAsStream(classpathResource);
@@ -174,11 +173,15 @@ public class EndToEndTestSuite {
             throw new IllegalArgumentException("Classpath resource: " + classpathResource + " not found");
         }
 
-        IOUtils.copy(is, writer, UTF8);
+        try {
+            IOUtils.copy(is, writer, UTF8);
+        } catch (IOException e) {
+            throw new IllegalStateException("Enexpected IOException while readResource", e);
+        }
         return writer.getBuffer().toString().trim();
     }
 
-    protected void expectNoResponse(StompTestClient client) throws IOException {
+    protected void expectNoResponse(StompTestClient client) {
 
         String response = client.getResponseOrTimeout();
 
@@ -187,7 +190,7 @@ public class EndToEndTestSuite {
         }
     }
 
-    protected void expectResponse(StompTestClient client, String expectedFrame) throws IOException {
+    protected void expectResponse(StompTestClient client, String expectedFrame) {
 
         String response = client.getResponseOrTimeout();
         assertThat("Response from server", response, is(equalTo(readResource(expectedFrame))));

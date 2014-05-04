@@ -22,16 +22,16 @@ public class NotFoundInSetPredicateTest {
     public void shouldFoundDifference() {
 
         //  given
-        Set<Group> groupsStored = Sets.newHashSet(build(1l, "a"), build(2l, "b"), build(3l, "c"), build(4l, "d"));
-        Set<Group> groupsToStore = Sets.newHashSet(build(1l, "a"), build(3l, "c"), build(4l, "d"), build(5l, "f"), build(6l, "g"));
+        Set<Group> groupsStored = Sets.newHashSet(build(1L, "a"), build(2L, "b"), build(3L, "c"), build(4L, "d"));
+        Set<Group> groupsToStore = Sets.newHashSet(build(1L, "a"), build(3L, "c"), build(4L, "d"), build(5L, "f"), build(6L, "g"));
 
         //  when
         Set<Group> toPersist = Sets.filter(groupsToStore, new NotFoundInSetPredicate(groupsStored));
         Set<Group> toRemove = Sets.filter(groupsStored, new NotFoundInSetPredicate(groupsToStore));
 
         //  then
-        assertThat(toPersist, is(equalTo((Set) Sets.newHashSet(build(5l, "f"), build(6l, "g")))));
-        assertThat(toRemove, is(equalTo((Set) Sets.newHashSet(build(2l, "b")))));
+        assertThat(toPersist, is(equalTo((Set) Sets.newHashSet(build(5L, "f"), build(6L, "g")))));
+        assertThat(toRemove, is(equalTo((Set) Sets.newHashSet(build(2L, "b")))));
     }
 
 }

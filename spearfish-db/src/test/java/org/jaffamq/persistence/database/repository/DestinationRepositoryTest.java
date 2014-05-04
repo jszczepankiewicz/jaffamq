@@ -43,7 +43,6 @@ public class DestinationRepositoryTest extends RepositoryTest {
 
     private DestinationRepository repository;
     private GroupRepository groupRepository;
-    private long SOME_DATE_NOT_LONG_AGO = 1398008282884l;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -58,11 +57,11 @@ public class DestinationRepositoryTest extends RepositoryTest {
     public void shouldSelectQueueDestinationByIdWithoutRelations() {
 
         //  when
-        Destination destination = repository.get(getSession(), 1000l);
+        Destination destination = repository.get(getSession(), 1000L);
 
         //  then
         assertThat(destination, allOf(
-                hasId(1000l),
+                hasId(1000L),
                 hasName("queue/something1"),
                 isOfType(QUEUE),
                 wasCreatedAt(CalendarUtilsTest.TARGET_DATE),
@@ -77,11 +76,11 @@ public class DestinationRepositoryTest extends RepositoryTest {
     public void shouldSelectTopicDestinationByIdWithoutRelations() {
 
         //  when
-        Destination destination = repository.get(getSession(), 1001l);
+        Destination destination = repository.get(getSession(), 1001L);
 
         //  then
         assertThat(destination, allOf(
-                hasId(1001l),
+                hasId(1001L),
                 hasName("topic/something2"),
                 wasCreatedAt(CalendarUtilsTest.TARGET_DATE),
                 isOfType(TOPIC),
@@ -95,17 +94,17 @@ public class DestinationRepositoryTest extends RepositoryTest {
     public void shouldSelectDestinationByIdWithRelations() {
 
         //  given
-        Group group1002 = groupRepository.get(getSession(), 1002l);
-        Group group1003 = groupRepository.get(getSession(), 1003l);
-        Group group1004 = groupRepository.get(getSession(), 1004l);
-        Group group1005 = groupRepository.get(getSession(), 1005l);
+        Group group1002 = groupRepository.get(getSession(), 1002L);
+        Group group1003 = groupRepository.get(getSession(), 1003L);
+        Group group1004 = groupRepository.get(getSession(), 1004L);
+        Group group1005 = groupRepository.get(getSession(), 1005L);
 
         //  when
-        Destination destination = repository.get(getSession(), 1002l);
+        Destination destination = repository.get(getSession(), 1002L);
 
         //  then
         assertThat(destination, allOf(
-                hasId(1002l),
+                hasId(1002L),
                 hasName("queue/something3"),
                 wasCreatedAt(CalendarUtilsTest.TARGET_DATE),
                 canBeAdminBy(group1005, group1004),
@@ -118,11 +117,11 @@ public class DestinationRepositoryTest extends RepositoryTest {
     public void shouldDeleteDestinationByIdWithoutRelations() {
 
         //  when
-        boolean deleted = repository.delete(getSession(), 1001l);
+        boolean deleted = repository.delete(getSession(), 1001L);
 
         //  then
         assertThat(deleted, is(true));
-        Destination deletedDestination = repository.get(getSession(), 1001l);
+        Destination deletedDestination = repository.get(getSession(), 1001L);
         assertThat(deletedDestination, is(nullValue()));
 
     }
@@ -131,12 +130,12 @@ public class DestinationRepositoryTest extends RepositoryTest {
     public void shouldDeleteDestinationByIdWithRelations() {
 
         //  when
-        boolean deleted = repository.delete(getSession(), 1002l);
-        Group groupAssociatedWithDestination = groupRepository.get(getSession(), 1002l);
+        boolean deleted = repository.delete(getSession(), 1002L);
+        Group groupAssociatedWithDestination = groupRepository.get(getSession(), 1002L);
 
         //  then
         assertThat(deleted, is(true));
-        Destination deletedDestination = repository.get(getSession(), 1002l);
+        Destination deletedDestination = repository.get(getSession(), 1002L);
         assertThat(deletedDestination, is(nullValue()));
 
         assertThat(groupAssociatedWithDestination, is(notNullValue()));
@@ -150,7 +149,7 @@ public class DestinationRepositoryTest extends RepositoryTest {
         //  given
         Destination destination = new Destination.Builder(
                 "shouldReturnFalseForUpdatingNotRecognizedDestination", QUEUE)
-                .id(999999l)
+                .id(999999L)
                 .build();
 
         //  when
@@ -165,9 +164,9 @@ public class DestinationRepositoryTest extends RepositoryTest {
 
         //  given
         List<Destination> expected = Arrays.asList(
-                repository.get(getSession(), 1000l),
-                repository.get(getSession(), 1002l),
-                repository.get(getSession(), 1001l)
+                repository.get(getSession(), 1000L),
+                repository.get(getSession(), 1002L),
+                repository.get(getSession(), 1001L)
         );
 
         //  when
@@ -182,8 +181,8 @@ public class DestinationRepositoryTest extends RepositoryTest {
 
         //  given
         List<Destination> expected = Arrays.asList(
-                repository.get(getSession(), 1000l),
-                repository.get(getSession(), 1002l));
+                repository.get(getSession(), 1000L),
+                repository.get(getSession(), 1002L));
 
         //  when
         List<Destination> destinations = repository.list(getSession(), 2, 0);
@@ -234,7 +233,7 @@ public class DestinationRepositoryTest extends RepositoryTest {
     public void shouldThrowIAEOnInvalidCreateDestination() {
 
         //  given
-        Destination destination = new Destination.Builder("queue/test2", QUEUE).id(1l).build();
+        Destination destination = new Destination.Builder("queue/test2", QUEUE).id(1L).build();
 
         //  then
         thrown.expect(IllegalArgumentException.class);
@@ -256,7 +255,7 @@ public class DestinationRepositoryTest extends RepositoryTest {
         Long id = repository.create(getSession(), destination);
 
         //  then
-        assertThat(id, is(greaterThan(0l)));
+        assertThat(id, is(greaterThan(0L)));
         Destination created = repository.get(getSession(), id);
 
         assertThat(created, allOf(
@@ -276,12 +275,12 @@ public class DestinationRepositoryTest extends RepositoryTest {
         //  given
         String name = "queue/testcreate";
 
-        Group g1000 = groupRepository.get(getSession(), 1000l);
-        Group g1001 = groupRepository.get(getSession(), 1001l);
-        Group g1002 = groupRepository.get(getSession(), 1002l);
-        Group g1003 = groupRepository.get(getSession(), 1003l);
-        Group g1004 = groupRepository.get(getSession(), 1004l);
-        Group g1005 = groupRepository.get(getSession(), 1005l);
+        Group g1000 = groupRepository.get(getSession(), 1000L);
+        Group g1001 = groupRepository.get(getSession(), 1001L);
+        Group g1002 = groupRepository.get(getSession(), 1002L);
+        Group g1003 = groupRepository.get(getSession(), 1003L);
+        Group g1004 = groupRepository.get(getSession(), 1004L);
+        Group g1005 = groupRepository.get(getSession(), 1005L);
 
         Destination destination = new Destination.Builder(name, QUEUE)
                 .groupsAuthorizedToAdmin(Sets.newHashSet(g1000, g1001))
@@ -294,7 +293,7 @@ public class DestinationRepositoryTest extends RepositoryTest {
         Long id = repository.create(getSession(), destination);
 
         //  then
-        assertThat(id, is(greaterThan(0l)));
+        assertThat(id, is(greaterThan(0L)));
         Destination created = repository.get(getSession(), id);
         assertThat(created.getCreationTime().getMillis(), is(greaterThan(CalendarUtilsTest.TARGET_DATE_AS_LONG)));
         assertThat(created, allOf(
@@ -313,7 +312,7 @@ public class DestinationRepositoryTest extends RepositoryTest {
     public void shouldUpdateDestinationWithoutRelations() {
 
         //  given
-        Destination destination = new Destination.Builder("shouldUpdateDestinationWithoutRelations", QUEUE).id(1000l).build();
+        Destination destination = new Destination.Builder("shouldUpdateDestinationWithoutRelations", QUEUE).id(1000L).build();
         Destination destinationBeforeUpdate = repository.get(getSession(), destination.getId());
 
         //  when
@@ -337,14 +336,14 @@ public class DestinationRepositoryTest extends RepositoryTest {
 
         //  given
         String name = "queue/testcreate";
-        Destination beforeUpdate = repository.get(getSession(), 1002l);
+        Destination beforeUpdate = repository.get(getSession(), 1002L);
 
-        Group g1000 = groupRepository.get(getSession(), 1000l);
-        Group g1001 = groupRepository.get(getSession(), 1001l);
-        Group g1002 = groupRepository.get(getSession(), 1002l);
-        Group g1003 = groupRepository.get(getSession(), 1003l);
-        Group g1004 = groupRepository.get(getSession(), 1004l);
-        Group g1005 = groupRepository.get(getSession(), 1005l);
+        Group g1000 = groupRepository.get(getSession(), 1000L);
+        Group g1001 = groupRepository.get(getSession(), 1001L);
+        Group g1002 = groupRepository.get(getSession(), 1002L);
+        Group g1003 = groupRepository.get(getSession(), 1003L);
+        Group g1004 = groupRepository.get(getSession(), 1004L);
+        Group g1005 = groupRepository.get(getSession(), 1005L);
 
         Destination toUpdate = new Destination.Builder(name, QUEUE)
                 .creationtime(beforeUpdate.getCreationTime())
@@ -360,7 +359,7 @@ public class DestinationRepositoryTest extends RepositoryTest {
 
         //  then
         assertThat(updated, is(true));
-        Destination updatedDestination = repository.get(getSession(), 1002l);
+        Destination updatedDestination = repository.get(getSession(), 1002L);
         assertThat(updatedDestination, allOf(
                 hasName(name),
                 wasCreatedAt(toUpdate.getCreationTime()),

@@ -55,7 +55,7 @@ public abstract class SelectOperation<T> extends SQLOperation {
 
         List<T> tuples = execute(session, args);
 
-        if (tuples.size() == 0) {
+        if (tuples.isEmpty()) {
             return null;
         }
 

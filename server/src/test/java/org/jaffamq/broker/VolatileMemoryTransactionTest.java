@@ -1,9 +1,9 @@
 package org.jaffamq.broker;
 
 import org.jaffamq.RequestValidationFailedException;
-import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.transaction.Transaction;
 import org.jaffamq.broker.transaction.TransactionFactory;
+import org.jaffamq.messages.StompMessage;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class VolatileMemoryTransactionTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Before
-    public void init(){
+    public void init() {
         messageCommitedCounter = 0;
         sender = new StompMessageSender() {
             @Override
@@ -46,7 +46,7 @@ public class VolatileMemoryTransactionTest {
     }
 
     @Test
-    public void shouldReturnClientTransactionName(){
+    public void shouldReturnClientTransactionName() {
 
         //  then
         assertThat(tx.getName(), is(equalTo("txABC")));
@@ -54,10 +54,10 @@ public class VolatileMemoryTransactionTest {
 
 
     @Test
-    public void shouldAllowToCommitTransactionOnlyOnce() throws Exception{
+    public void shouldAllowToCommitTransactionOnlyOnce() throws RequestValidationFailedException {
 
         //  given
-        StompMessage m1 = new StompMessage("dest1", "body1", new HashMap<String,String>(),"m1");
+        StompMessage m1 = new StompMessage("dest1", "body1", new HashMap<String, String>(), "m1");
         tx.addStompMessage(m1);
 
         //  when
@@ -68,10 +68,10 @@ public class VolatileMemoryTransactionTest {
     }
 
     @Test
-    public void shouldAllowToRollbackTransactionOnlyOnce() throws Exception{
+    public void shouldAllowToRollbackTransactionOnlyOnce() throws RequestValidationFailedException {
 
         //  given
-        StompMessage m1 = new StompMessage("dest1", "body1", new HashMap<String,String>(),"m1");
+        StompMessage m1 = new StompMessage("dest1", "body1", new HashMap<String, String>(), "m1");
         tx.addStompMessage(m1);
 
         //  when
@@ -82,12 +82,12 @@ public class VolatileMemoryTransactionTest {
     }
 
     @Test
-    public void shouldCorrectlyAddMessagesAndIterateThroughThem()throws Exception{
+    public void shouldCorrectlyAddMessagesAndIterateThroughThem() {
 
         //  given
-        StompMessage m1 = new StompMessage("dest1", "body1", new HashMap<String,String>(),"m1");
-        StompMessage m2 = new StompMessage("dest2", "body2", new HashMap<String,String>(),"m2");
-        StompMessage m3 = new StompMessage("dest3", "body3", new HashMap<String,String>(),"m3");
+        StompMessage m1 = new StompMessage("dest1", "body1", new HashMap<String, String>(), "m1");
+        StompMessage m2 = new StompMessage("dest2", "body2", new HashMap<String, String>(), "m2");
+        StompMessage m3 = new StompMessage("dest3", "body3", new HashMap<String, String>(), "m3");
 
         //  when
         tx.addStompMessage(m1);
@@ -97,7 +97,7 @@ public class VolatileMemoryTransactionTest {
         List<StompMessage> messages = new ArrayList<>();
         Iterator<StompMessage> iterator = tx.getMessagesInTransaction();
 
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             messages.add(iterator.next());
         }
 

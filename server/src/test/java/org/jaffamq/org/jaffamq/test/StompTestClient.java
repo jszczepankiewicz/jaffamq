@@ -12,24 +12,27 @@ import java.nio.charset.Charset;
  */
 public interface StompTestClient {
 
-    static final Charset ENC=Charset.forName("UTF-8");
+    static final Charset ENC = Charset.forName("UTF-8");
 
     /**
      * Release all resources.
+     *
      * @throws IOException
      */
-    void close() throws IOException;
+    void close();
 
     /**
      * Send Stomp frame and wait for response maximum X miliseconds.
+     *
      * @param frameResource
      * @return
      * @throws IOException
      */
     String sendFrameAndWaitForResponseFrame(String frameResource) throws IOException;
-    String getResponseOrTimeout() throws IOException;
 
-    void sendFrame(String frameResource) throws IOException;
+    String getResponseOrTimeout();
 
-    String connectSendAndGrabAnswer(String requestResourcePath) throws IOException;
+    void sendFrame(String frameResource);
+
+    String connectSendAndGrabAnswer(String requestResourcePath);
 }

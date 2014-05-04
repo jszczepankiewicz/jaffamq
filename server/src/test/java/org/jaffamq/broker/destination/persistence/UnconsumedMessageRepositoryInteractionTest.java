@@ -45,7 +45,7 @@ public class UnconsumedMessageRepositoryInteractionTest {
     public ExternalResource systemResource = new ExternalResource() {
 
         @Override
-        protected void before() throws Throwable {
+        protected void before() {
             system = ActorSystem.create();
             repo = new UnconsumedMessageJournalRepository(org.jaffamq.test.IOTestHelper.getTempDataDir());
             repo.init();

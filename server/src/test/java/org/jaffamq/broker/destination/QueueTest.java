@@ -5,9 +5,9 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.testkit.JavaTestKit;
-import org.jaffamq.messages.StompMessage;
 import org.jaffamq.broker.messages.SubscribedStompMessage;
 import org.jaffamq.broker.messages.SubscriberRegister;
+import org.jaffamq.messages.StompMessage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
-import java.util.Collections;
 
 /**
  * Integration tests for Queue.
@@ -30,7 +29,7 @@ public class QueueTest {
     public ExternalResource systemResource = new ExternalResource() {
 
         @Override
-        protected void before() throws Throwable {
+        protected void before() {
             system = ActorSystem.create();
         }
 

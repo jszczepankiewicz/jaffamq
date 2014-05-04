@@ -16,15 +16,6 @@ import static org.hamcrest.number.OrderingComparison.greaterThan;
  */
 public class GroupMatchers {
 
-    public static Matcher<Group> hasIdSet() {
-        return new FeatureMatcher<Group, Long>((greaterThan(0l)), "id", "id") {
-            @Override
-            protected Long featureValueOf(final Group actual) {
-                return actual.getId();
-            }
-        };
-    }
-
     /**
      * Tests whether object was created no more than couple seconds ago
      *

@@ -4,7 +4,10 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
-import org.jaffamq.broker.messages.*;
+import org.jaffamq.broker.messages.SubscribedStompMessage;
+import org.jaffamq.broker.messages.SubscriberRegister;
+import org.jaffamq.broker.messages.UnsubscribeRequest;
+import org.jaffamq.broker.messages.UnsubscriptionConfirmed;
 import org.jaffamq.messages.StompMessage;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,7 +32,7 @@ public class TopicDestinationManagerTest {
     public ExternalResource systemResource = new ExternalResource() {
 
         @Override
-        protected void before() throws Throwable {
+        protected void before() {
             system = ActorSystem.create();
         }
 
@@ -41,11 +44,10 @@ public class TopicDestinationManagerTest {
     };
 
     @Test
-    public void shouldCorrectlyServeTopics(){
+    public void shouldCorrectlyServeTopics() {
         new JavaTestKit(system) {{
             final Props props = Props.create(TopicDestinationManager.class);
             final ActorRef destinationManager = system.actorOf(props);
-
 
 
             StompMessage tz = new StompMessage("destinationz", null, null, "1");
@@ -89,7 +91,6 @@ public class TopicDestinationManagerTest {
             destinationManager.tell(tb, getRef());
             LOG.debug("Message to destinationb sent");
             expectNoMsg();
-
 
 
         }};

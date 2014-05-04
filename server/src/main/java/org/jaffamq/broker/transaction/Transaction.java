@@ -44,7 +44,7 @@ public interface Transaction {
 
     enum Status{
         STARTED,
-        COMMITED,
+        COMMITTED,
         ROLLBACKED;
     }
 }

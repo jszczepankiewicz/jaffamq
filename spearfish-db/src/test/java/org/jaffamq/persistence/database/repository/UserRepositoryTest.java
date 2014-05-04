@@ -58,9 +58,9 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  given
         List<User> expected = Arrays.asList(
-                repository.get(getSession(), 1001l),
-                repository.get(getSession(), 1002l),
-                repository.get(getSession(), 1003l)
+                repository.get(getSession(), 1001L),
+                repository.get(getSession(), 1002L),
+                repository.get(getSession(), 1003L)
         );
 
         //  when
@@ -77,12 +77,12 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  given
         List<User> expected = Arrays.asList(
-                repository.get(getSession(), 1l),
-                repository.get(getSession(), 1000l),
-                repository.get(getSession(), 1001l),
-                repository.get(getSession(), 1002l),
-                repository.get(getSession(), 1003l),
-                repository.get(getSession(), 1004l)
+                repository.get(getSession(), 1L),
+                repository.get(getSession(), 1000L),
+                repository.get(getSession(), 1001L),
+                repository.get(getSession(), 1002L),
+                repository.get(getSession(), 1003L),
+                repository.get(getSession(), 1004L)
         );
 
         //  when
@@ -97,7 +97,7 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldThrowIAEOnInvalidUserToCreate() {
 
         //  given
-        User user = new User.Builder("some").id(9999l).password("somex").build();
+        User user = new User.Builder("some").id(9999L).password("somex").build();
 
         //  then
         thrown.expect(IllegalArgumentException.class);
@@ -109,7 +109,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldReturnNullForNotFoundUser() throws Exception {
+    public void shouldReturnNullForNotFoundUser() {
 
         //  when
         User notFoundUser = repository.getUser(getSession(), "nonexisting", "notimportant");
@@ -120,7 +120,7 @@ public class UserRepositoryTest extends RepositoryTest {
 
 
     @Test
-    public void shouldHaveAdminUserCreatedAfterStart() throws Exception {
+    public void shouldHaveAdminUserCreatedAfterStart() {
 
         //  given
         Set<Group> expectedGroups = Sets.newHashSet(groupRepository.get(getSession(), UserDefaults.ADMINS_GROUP_ID));
@@ -129,7 +129,7 @@ public class UserRepositoryTest extends RepositoryTest {
         User admin = repository.getUser(getSession(), UserDefaults.SUPERADMIN_LOGIN, UserDefaults.SUPERADMIN_PASSWORD_DEFAULT);
 
         //  then
-        assertThat(admin.getId(), is(greaterThan(0l)));
+        assertThat(admin.getId(), is(greaterThan(0L)));
         assertThat(admin, allOf(
                 wasCreatedAt(CalendarUtilsTest.TARGET_DATE),
                 hasLogin(UserDefaults.SUPERADMIN_LOGIN),
@@ -143,7 +143,7 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldReturnNullForGetUserWithNonExistedUser() {
 
         //  when
-        User admin = repository.get(getSession(), 0l);
+        User admin = repository.get(getSession(), 0L);
 
         //  then
         assertThat(admin, is(nullValue()));
@@ -170,7 +170,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldThrowNPEforCreateUserWithNull() throws Exception {
+    public void shouldThrowNPEforCreateUserWithNull() {
 
         //  then
         thrown.expect(NullPointerException.class);
@@ -181,7 +181,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldThrowNPEForCreateUserWithNulledPassword() throws Exception {
+    public void shouldThrowNPEForCreateUserWithNulledPassword() {
 
         //  given
         User user = new User.Builder("somex").build();
@@ -196,7 +196,7 @@ public class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    public void shouldCreateUserWithoutGroup() throws Exception {
+    public void shouldCreateUserWithoutGroup() {
 
         //  when
         User user = new User.Builder("somelogin").password(UserDefaults.SUPERADMIN_PASSWORD_DEFAULT).build();
@@ -204,7 +204,7 @@ public class UserRepositoryTest extends RepositoryTest {
         Long createdId = repository.create(getSession(), user);
 
         //  then
-        assertThat(createdId, is(greaterThan(0l)));
+        assertThat(createdId, is(greaterThan(0L)));
 
         User userRetrieved = repository.get(getSession(), createdId);
 
@@ -223,8 +223,8 @@ public class UserRepositoryTest extends RepositoryTest {
 
         //  given
         Set<Group> groups = Sets.newHashSet(
-                new Group.Builder("test1").id(1001l).build(),
-                new Group.Builder("test2").id(1002l).build()
+                new Group.Builder("test1").id(1001L).build(),
+                new Group.Builder("test2").id(1002L).build()
         );
 
         //  when
@@ -234,7 +234,7 @@ public class UserRepositoryTest extends RepositoryTest {
         //  then
         User userRetrieved = repository.get(getSession(), createdId);
 
-        assertThat(createdId, is(greaterThan(0l)));
+        assertThat(createdId, is(greaterThan(0L)));
         assertThat(userRetrieved, allOf(
                 hasLogin("a"),
                 wasJustCreated(),
@@ -274,8 +274,8 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldReturnFalseForUpdatingNotRecognizedUser() {
 
         //  given
-        User beforeUpdate = repository.get(getSession(), 1004l);
-        User toUpdate = new User.Builder("newlogin").id(99999l).passwordhash(beforeUpdate.getPasswordhash()).build();
+        User beforeUpdate = repository.get(getSession(), 1004L);
+        User toUpdate = new User.Builder("newlogin").id(99999L).passwordhash(beforeUpdate.getPasswordhash()).build();
 
         //  when
         boolean updated = repository.update(getSession(), toUpdate);
@@ -288,7 +288,7 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldUpdateUserWithoutGroupsAssignedWithPasswordChange() {
 
         //  given
-        User beforeUpdate = repository.get(getSession(), 1004l);
+        User beforeUpdate = repository.get(getSession(), 1004L);
         User toUpdate = new User.Builder("newlogin").id(beforeUpdate.getId())
                 .passwordhash(beforeUpdate.getPasswordhash()).password("newpassword").build();
 
@@ -296,7 +296,7 @@ public class UserRepositoryTest extends RepositoryTest {
         boolean updated = repository.update(getSession(), toUpdate);
 
         //  then
-        User afterUpdate = repository.get(getSession(), 1004l);
+        User afterUpdate = repository.get(getSession(), 1004L);
 
         assertThat(updated, is(true));
 
@@ -314,14 +314,14 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldUpdateUserWithoutGroupsAssignedWithoutPasswordChange() {
 
         //  given
-        User beforeChange = repository.get(getSession(), 1002l);
+        User beforeChange = repository.get(getSession(), 1002L);
         User toChange = new User.Builder("shouldUpdateUserWithoutGroupsAssignedWithoutPasswordChange")
-                .id(1002l)
+                .id(1002L)
                 .passwordhash("thisshouldnotbesaved").build();
 
         //  when
         boolean updated = repository.update(getSession(), toChange);
-        User afterUpdate = repository.get(getSession(), 1002l);
+        User afterUpdate = repository.get(getSession(), 1002L);
 
         //  then
         assertThat(updated, is(true));
@@ -340,15 +340,15 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldUpdateUserWithoutChangingGroups() {
 
         //  given
-        User beforeChange = repository.get(getSession(), 1003l);
+        User beforeChange = repository.get(getSession(), 1003L);
         User toChange = new User.Builder("shouldUpdateUserWithoutChangingGroups")
-                .id(1003l)
+                .id(1003L)
                 .passwordhash("thisshouldnotbesaved")
                 .groups(beforeChange.getGroups()).build();
 
         //  when
         boolean updated = repository.update(getSession(), toChange);
-        User afterUpdate = repository.get(getSession(), 1003l);
+        User afterUpdate = repository.get(getSession(), 1003L);
 
         //  then
         assertThat(updated, is(true));
@@ -366,19 +366,19 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldUpdateUserWithChangedGroups() {
 
         //  given
-        User beforeChange = repository.get(getSession(), 1003l);
+        User beforeChange = repository.get(getSession(), 1003L);
         Set<Group> expectedGroups = Sets.newHashSet(
-                groupRepository.get(getSession(), 1002l),
-                groupRepository.get(getSession(), 1003l),
-                groupRepository.get(getSession(), 1004l));
+                groupRepository.get(getSession(), 1002L),
+                groupRepository.get(getSession(), 1003L),
+                groupRepository.get(getSession(), 1004L));
         User toChange = new User.Builder("shouldUpdateUserWithoutChangingGroups")
-                .id(1003l)
+                .id(1003L)
                 .passwordhash("thisshouldnotbesaved")
                 .groups(expectedGroups).build();
 
         //  when
         boolean updated = repository.update(getSession(), toChange);
-        User afterUpdate = repository.get(getSession(), 1003l);
+        User afterUpdate = repository.get(getSession(), 1003L);
 
         //  then
         assertThat(updated, is(true));
@@ -396,8 +396,8 @@ public class UserRepositoryTest extends RepositoryTest {
     public void shouldDeleteUser() {
 
         //  when
-        boolean deleted = repository.delete(getSession(), 1004l);
-        User userAfterUpdate = repository.get(getSession(), 1004l);
+        boolean deleted = repository.delete(getSession(), 1004L);
+        User userAfterUpdate = repository.get(getSession(), 1004L);
 
         //  then
         assertThat(deleted, is(true));

@@ -9,7 +9,7 @@ import org.junit.Test;
 public class WithBrokerRestartsTests extends EndToEndTestSuite {
 
     @Test
-    public void shouldRestoreUnconsumedQueueMessagesFromPreviousServerRun() throws Exception {
+    public void shouldRestoreUnconsumedQueueMessagesFromPreviousServerRun() throws InterruptedException {
 
         //  given
         StompTestClient[] clients = createClients(2);

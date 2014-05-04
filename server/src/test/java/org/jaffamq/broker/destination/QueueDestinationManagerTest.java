@@ -4,7 +4,10 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.JavaTestKit;
-import org.jaffamq.broker.messages.*;
+import org.jaffamq.broker.messages.SubscribedStompMessage;
+import org.jaffamq.broker.messages.SubscriberRegister;
+import org.jaffamq.broker.messages.UnsubscribeRequest;
+import org.jaffamq.broker.messages.UnsubscriptionConfirmed;
 import org.jaffamq.broker.messages.persistence.StoreUnconsumedMessageRequest;
 import org.jaffamq.messages.StompMessage;
 import org.junit.Rule;
@@ -29,7 +32,7 @@ public class QueueDestinationManagerTest {
     public ExternalResource systemResource = new ExternalResource() {
 
         @Override
-        protected void before() throws Throwable {
+        protected void before() {
             system = ActorSystem.create();
         }
 
@@ -41,7 +44,7 @@ public class QueueDestinationManagerTest {
     };
 
     @Test
-    public void shouldCorrectlyServeQueues(){
+    public void shouldCorrectlyServeQueues() {
         new JavaTestKit(system) {{
 
             final Props props = Props.create(QueueDestinationManager.class, getRef(), getRef(), Collections.emptyMap());
@@ -88,7 +91,6 @@ public class QueueDestinationManagerTest {
             destinationManager.tell(tb, getRef());
             LOG.debug("Message to destinationb sent");
             expectMsgAnyClassOf(StoreUnconsumedMessageRequest.class);
-
 
 
         }};

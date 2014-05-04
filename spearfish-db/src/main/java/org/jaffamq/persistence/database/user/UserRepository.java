@@ -73,7 +73,7 @@ public class UserRepository implements CrudRepository<User>, CheckEntityUnique {
 
         List<User> users = selectById.execute(session, id);
 
-        if (users.size() == 0) {
+        if (users.isEmpty()) {
             return null;
         }
 

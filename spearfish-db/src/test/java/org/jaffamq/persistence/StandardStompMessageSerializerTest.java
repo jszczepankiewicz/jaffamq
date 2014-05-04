@@ -13,19 +13,13 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 
-/**
- * Created with IntelliJ IDEA.
- * User: urwisy
- * Date: 25.10.13
- * Time: 22:18
- * To change this template use File | Settings | File Templates.
- */
+
 public class StandardStompMessageSerializerTest {
 
     private StompMessageSerializer serializer = new StandardStompMessageSerializer();
 
     @Test
-    public void shouldSerializeToAndFromBytes() throws Exception {
+    public void shouldSerializeToAndFromBytes() {
 
         //  given
         StompMessage msg = StompMessageFactory.createMessage();

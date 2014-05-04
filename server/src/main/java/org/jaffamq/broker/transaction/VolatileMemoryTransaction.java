@@ -48,14 +48,14 @@ public class VolatileMemoryTransaction implements Transaction {
 
         LOG.info("Transaction [{}] has {} uncommited messages", clientTransactionName, uncommitedMessages.size());
 
-        TransactionStatusVerifier.assertTransactionStatus(Status.COMMITED, status);
+        TransactionStatusVerifier.assertTransactionStatus(Status.COMMITTED, status);
 
         Iterator<StompMessage> messagesIterator = getMessagesInTransaction();
         while (messagesIterator.hasNext()) {
             sender.sendStompMessage(messagesIterator.next());
         }
 
-        this.status = Status.COMMITED;
+        this.status = Status.COMMITTED;
     }
 
 

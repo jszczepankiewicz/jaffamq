@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -22,13 +23,13 @@ public class JDBCSessionTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Test
-    public void shouldCreateAndCompilePreparedStatementOnDemand() throws Exception {
+    public void shouldCreateAndCompilePreparedStatementOnDemand() throws SQLException {
 
         //  given
         String sql = "Select * from torpidomq";
-        String SELECT_NAME = "SELECT_FROM_TORPIDOMQ";
+        String selectName = "SELECT_FROM_TORPIDOMQ";
 
-        SelectOperation query = new SelectOperation(SELECT_NAME, sql, DBConst.LONG_MAPPER) {
+        SelectOperation query = new SelectOperation(selectName, sql, DBConst.LONG_MAPPER) {
         };
 
         Connection connection = Mockito.mock(Connection.class);
@@ -45,13 +46,13 @@ public class JDBCSessionTest {
     }
 
     @Test
-    public void shouldCloseAllPreparedStatementsOnDispose() throws Exception {
+    public void shouldCloseAllPreparedStatementsOnDispose() throws SQLException {
 
         //  given
         String sql = "Select * from torpidomq";
-        String SELECT_NAME = "SELECT_FROM_TORPIDOMQ";
+        String selectName = "SELECT_FROM_TORPIDOMQ";
 
-        SelectOperation query = new SelectOperation(SELECT_NAME, sql, DBConst.LONG_MAPPER) {
+        SelectOperation query = new SelectOperation(selectName, sql, DBConst.LONG_MAPPER) {
         };
 
         Connection connection = Mockito.mock(Connection.class);

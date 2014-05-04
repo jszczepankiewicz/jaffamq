@@ -1,6 +1,10 @@
 package org.jaffamq.broker.destination.persistence;
 
-import akka.actor.*;
+import akka.actor.ActorIdentity;
+import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
+import akka.actor.Identify;
+import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.jaffamq.Errors;
@@ -11,7 +15,11 @@ import org.jaffamq.messages.StompMessage;
 import org.jaffamq.persistence.PersistedMessageId;
 import org.jaffamq.persistence.UnconsumedMessageRepository;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Handler for PollUnconsumedMessageRequest.
@@ -52,10 +60,11 @@ public class PollUnconsumedMessageHandler extends UntypedActor {
 
     /**
      * Qeurying for QueueDestinationManager using Identify
+     *
      * @throws Exception
      */
     @Override
-    public void preStart() throws Exception {
+    public void preStart() {
         ActorSelection queueDestinationManager = getContext().actorSelection(QueueDestinationManager.LOCAL_PATH);
         queueDestinationManager.tell(new Identify(null), getSelf());
     }
@@ -74,20 +83,18 @@ public class PollUnconsumedMessageHandler extends UntypedActor {
 
             destinationManager.tell(response, getSelf());
 
-        }
-        else if(o instanceof ActorIdentity){
+        } else if (o instanceof ActorIdentity) {
 
-            ActorIdentity identity = (ActorIdentity)o;
-            if(QueueDestinationManager.LOCAL_PATH.equals(identity.getRef().path().toString())){
+            ActorIdentity identity = (ActorIdentity) o;
+            if (QueueDestinationManager.LOCAL_PATH.equals(identity.getRef().path().toString())) {
                 log.info("Successfully discovered QueueDestinationManager");
                 destinationManager = identity.getRef();
-            }
-            else{
+            } else {
                 //  TODO: add error code
                 throw new IllegalStateException("ActorIdentity retrieved. Expected path: " + QueueDestinationManager.LOCAL_PATH + ", but was: " + identity.getRef().path());
             }
             return;
-        }else {
+        } else {
             unhandled(o);
         }
     }

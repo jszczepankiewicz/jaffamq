@@ -64,7 +64,7 @@ public class RepositoryTest {
 
     }
 
-    private void initializeTestData()  throws SQLException{
+    private void initializeTestData() throws SQLException {
 
         LOG.debug("Initializing test data...");
 
@@ -84,7 +84,7 @@ public class RepositoryTest {
     public ExternalResource jdbcConnectionResource = new ExternalResource() {
 
         @Override
-        protected void before() throws Throwable {
+        protected void before() throws SQLException {
             connection = DriverManager.getConnection("jdbc:h2:mem:");
             session = new JDBCSession(connection);
 

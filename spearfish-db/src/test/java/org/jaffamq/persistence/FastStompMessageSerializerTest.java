@@ -4,7 +4,11 @@ import org.jaffamq.messages.StompMessage;
 import org.jaffamq.test.StompMessageFactory;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.notNullValue;
@@ -17,7 +21,7 @@ public class FastStompMessageSerializerTest {
     private FastStompMessageSerializer serializer = new FastStompMessageSerializer();
 
     @Test
-    public void shouldSerializeToAndFromBytes() throws Exception {
+    public void shouldSerializeToAndFromBytes() {
 
         //  given
         StompMessage msg = StompMessageFactory.createMessage();
@@ -34,6 +38,7 @@ public class FastStompMessageSerializerTest {
                 allOf(
                         notNullValue(),
                         not(sameInstance(msg)),
-                        equalTo(msg)));
+                        equalTo(msg))
+        );
     }
 }
