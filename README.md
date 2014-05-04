@@ -14,6 +14,37 @@ Please note: project is not yet compatible with STOMP 1.2 and we do not recommen
 Broker is implemented in Scala (used in REST container) and Java for the rest. It is build using Maven. Scala modules are build using scala maven plugin.
 For persistence of incoming messages fast journaling is used. For configuration H2 embedded database is used.
 
+### Progress
+Table below show progress towards 1.0 release:
+
+
+<table>
+    <tr>
+        <td><strong>Feature</strong></td><td><strong>Status</strong></td>
+    </tr>
+    <tr>
+        <td>Core STOMP</td><td>done</td>
+    </tr>
+    <tr>
+        <td>REST webservice</td><td>started</td>
+        </tr>
+    <tr>
+        <td>Security (on core)</td><td>not started</td>
+    </tr>
+    <tr>
+        <td>Security (on REST)</td><td>not started</td>
+    </tr>
+    <tr>
+        <td>Admin HTML5 console</td><td>not started</td>
+    </tr>
+    <tr>
+        <td>Stomp over websocket</td><td>not started</td>
+    </tr>
+    <tr>
+        <td>Windows (NSIS) + zip based dist packages</td><td>not started</td>
+    </tr>
+</table>
+
 ### Limitations
 
 ##### Known unimplemented yet Stomp 1.2 specification features
