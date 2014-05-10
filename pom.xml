@@ -17,6 +17,7 @@
         <module>server</module>
         <module>webconsole</module>
         <module>scala-parent</module>
+        <module>distribution</module>
     </modules>
 
 </project>
