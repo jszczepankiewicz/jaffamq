@@ -1,6 +1,5 @@
 package org.jaffamq.persistence.database.destination;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.jaffamq.persistence.database.CalendarUtils;
 import org.jaffamq.persistence.database.CheckEntityUnique;
@@ -20,6 +19,9 @@ import org.jaffamq.persistence.database.sql.SelectByIdOperation;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Created by urwisy on 15.04.14.
@@ -79,8 +81,8 @@ public class DestinationRepository implements CrudRepository<Destination>, Check
     @Override
     public Long create(JDBCSession session, Destination toCreate) {
 
-        Preconditions.checkNotNull(toCreate, "Object to persist should not be null");
-        Preconditions.checkArgument(toCreate.getId() == null, "Object to create should not have identity set");
+        checkNotNull(toCreate, "Object to persist should not be null");
+        checkArgument(toCreate.getId() == null, "Object to create should not have identity set");
 
         Long id = IdentityProvider.getNextIdFor(session, Destination.class);
         insertDestination.execute(session, id, toCreate.getName(), CalendarUtils.nowAsLong(), String.valueOf(toCreate.getType().toValue()));
@@ -117,8 +119,8 @@ public class DestinationRepository implements CrudRepository<Destination>, Check
     @Override
     public boolean update(JDBCSession session, Destination toUpdate) {
 
-        Preconditions.checkNotNull(toUpdate, "Object to update should not be null");
-        Preconditions.checkArgument(toUpdate.getId() != null, "Object to update should have identity set");
+        checkNotNull(toUpdate, "Object to update should not be null");
+        checkArgument(toUpdate.getId() != null, "Object to update should have identity set");
 
         boolean updated = updateDestination.execute(session, toUpdate.getName(), toUpdate.getId()) > 0;
 

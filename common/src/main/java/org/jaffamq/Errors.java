@@ -5,7 +5,7 @@ package org.jaffamq;
  */
 public class Errors {
 
-    private Errors(){
+    private Errors() {
 
     }
 
@@ -39,7 +39,7 @@ public class Errors {
         }
 
         @Override
-        public String toString(){
+        public String toString() {
             return "[Error : " + id + "]";
         }
     }
@@ -71,13 +71,14 @@ public class Errors {
     public static final Code UNCONSUMED_MESSAGE_POLL_UNEXPECTED_ERROR = new Code("STM-3002", "Error polling unconsumed message", "Unexpected exception occured while polling unconsumed message", "Please check log for details.");
 
     //  sql persistence layer messages
-    public static final Code PREPARED_STATEMENT_CREATION_EXCEPTION = new Code ("STM-4001", "SQLException while creating PreparedStatement", "", "");
+    public static final Code PREPARED_STATEMENT_CREATION_EXCEPTION = new Code("STM-4001", "SQLException while creating PreparedStatement", "", "");
     public static final Code PREPARED_STATEMENT_EXECUTE_WITHOUT_PARAMETERS_PASSED = new Code("STM-4002", "SQL Statement requires some parameters but none given to execute method", "", "");
     public static final Code SQL_EXECUTE_QUERY_FAILED = new Code("STM-4003", "General SQLException while executing sql", "", "");
     public static final Code PREPARED_STATEMENT_PARAMETERS_LENGTH_NOT_EQUAL = new Code("STM-4004", "Passed different number of parameters than declared in sql query for prepared statement", "", "");
     public static final Code SQL_EXCEPTION_ON_LOOPING_RESULT_SET = new Code("STM-4005", "SQLException during resultSet.next()", "", "");
     public static final Code SQL_EXCEPTION_WHILE_SET_VALUE_ON_STATEMENT = new Code("STM-4006", "SQLException on set value on statement", "", "");
     public static final Code SQL_EXCEPTION_ON_EXECUTE_UPDATE = new Code("STM-4007", "SQLException on executeUpdate", "", "");
+    public static final Code ON_CONNECTION_CLOSE_EXCEPTION = new Code("STM-4008", "SQLException while closing connection", "", "");
 
 
 }

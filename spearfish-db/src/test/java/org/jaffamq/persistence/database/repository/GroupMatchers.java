@@ -17,6 +17,15 @@ import static org.hamcrest.number.OrderingComparison.greaterThan;
 public class GroupMatchers {
 
     /**
+     * Simplified test if group is taken from db. It just checks whether group has Id > 0, creationtime != null and name.length > 0
+     *
+     * @return
+     */
+    public static Matcher<Group> isSane() {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    /**
      * Tests whether object was created no more than couple seconds ago
      *
      * @return

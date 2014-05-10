@@ -1,19 +1,19 @@
 package org.jaffamq.persistence.database.repository;
 
+import org.jaffamq.persistence.database.SingleConnectionInMemoryDataSource;
 import org.jaffamq.persistence.database.sql.JDBCSession;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Created by urwisy on 12.01.14.
+ * Base class for tests that use in-memory h2 database with DDL and content initialization.
  */
 public class RepositoryTest {
 
@@ -21,16 +21,7 @@ public class RepositoryTest {
 
     private JDBCSession session;
     private Connection connection;
-
-    @BeforeClass
-    public static void initClass() {
-
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            LOG.error("Could not load H2 JDBC driver", e);
-        }
-    }
+    private SingleConnectionInMemoryDataSource dataSource;
 
     private void initializeDDL() throws SQLException {
 
@@ -85,7 +76,9 @@ public class RepositoryTest {
 
         @Override
         protected void before() throws SQLException {
-            connection = DriverManager.getConnection("jdbc:h2:mem:");
+
+            dataSource = new SingleConnectionInMemoryDataSource();
+            connection = dataSource.getConnection();
             session = new JDBCSession(connection);
 
             initializeDDL();
@@ -111,12 +104,25 @@ public class RepositoryTest {
                     LOG.warn("Unexpected SQLException while closing sql connection", e);
                 }
             }
+
+            /*try {
+                dataSource.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }*/
+
         }
     };
 
     protected JDBCSession getSession() {
         return session;
     }
+
+    protected DataSource getDataSource() {
+        return dataSource;
+    }
+
+    ;
 
 
 }

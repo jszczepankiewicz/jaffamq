@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Created by urwisy on 06.01.14.
  */
@@ -23,6 +25,7 @@ public class JDBCSession {
     private Map<String, PreparedStatement> compiledStatements = new HashMap<>();
 
     public JDBCSession(Connection connection) {
+        checkNotNull(connection, "Connection can not be null");
         this.connection = connection;
     }
 
@@ -59,6 +62,12 @@ public class JDBCSession {
             } catch (SQLException e) {
                 LOG.warn("SQLException while closing prepared statement", e);
             }
+        }
+
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            throw new InternalException(Errors.ON_CONNECTION_CLOSE_EXCEPTION, e, "In dispose");
         }
     }
 }

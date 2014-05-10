@@ -1,6 +1,5 @@
 package org.jaffamq.persistence.database.user;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.jaffamq.persistence.database.CalendarUtils;
 import org.jaffamq.persistence.database.CheckEntityUnique;
@@ -24,6 +23,9 @@ import org.slf4j.LoggerFactory;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Repository for User table interaction.
@@ -111,9 +113,9 @@ public class UserRepository implements CrudRepository<User>, CheckEntityUnique {
     @Override
     public Long create(JDBCSession session, User toCreate) {
 
-        Preconditions.checkNotNull(toCreate, "User to create can not be null");
-        Preconditions.checkNotNull(toCreate.getPassword(), "Password can not be left empty for new user");
-        Preconditions.checkArgument(toCreate.getId() == null, "User to create should not contain identity");
+        checkNotNull(toCreate, "User to create can not be null");
+        checkNotNull(toCreate.getPassword(), "Password can not be left empty for new user");
+        checkArgument(toCreate.getId() == null, "User to create should not contain identity");
 
         Long id = IdentityProvider.getNextIdFor(session, User.class);
         insertUser.execute(session,
@@ -151,8 +153,8 @@ public class UserRepository implements CrudRepository<User>, CheckEntityUnique {
     @Override
     public boolean update(JDBCSession session, User toUpdate) {
 
-        Preconditions.checkNotNull(toUpdate, "User to update can not be null");
-        Preconditions.checkArgument(toUpdate.getId() != null, "Object to update should have identity set");
+        checkNotNull(toUpdate, "User to update can not be null");
+        checkArgument(toUpdate.getId() != null, "Object to update should have identity set");
 
         int affected;
         if (toUpdate.getPassword() == null) {

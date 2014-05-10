@@ -21,7 +21,12 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.github.sbtourist</groupId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+        </dependency>
+
+        <dependency>
+        <groupId>com.github.sbtourist</groupId>
             <artifactId>journalio</artifactId>
         </dependency>
 
@@ -68,6 +73,11 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-testkit_2.10</artifactId>
         </dependency>
 
     </dependencies>

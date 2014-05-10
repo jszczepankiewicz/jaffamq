@@ -25,4 +25,6 @@ public interface CrudRepository<T> {
     boolean update(JDBCSession session, T toUpdate);
 
     List<T> list(JDBCSession session, int limit, int offset);
+
+    boolean isUnique(JDBCSession session, String name);
 }

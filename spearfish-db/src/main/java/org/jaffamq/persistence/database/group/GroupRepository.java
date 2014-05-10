@@ -1,6 +1,5 @@
 package org.jaffamq.persistence.database.group;
 
-import com.google.common.base.Preconditions;
 import org.jaffamq.persistence.database.CalendarUtils;
 import org.jaffamq.persistence.database.CheckEntityUnique;
 import org.jaffamq.persistence.database.CrudRepository;
@@ -14,6 +13,9 @@ import org.jaffamq.persistence.database.sql.ListAllOperation;
 import org.jaffamq.persistence.database.sql.SelectByIdOperation;
 
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Repository for operation on groups
@@ -45,8 +47,8 @@ public class GroupRepository implements CrudRepository<Group>, CheckEntityUnique
     @Override
     public Long create(JDBCSession session, Group toCreate) {
 
-        Preconditions.checkNotNull(toCreate, "Object to persist should not be null");
-        Preconditions.checkArgument(toCreate.getId() == null, "Object to create should not have identity set");
+        checkNotNull(toCreate, "Object to persist should not be null");
+        checkArgument(toCreate.getId() == null, "Object to create should not have identity set");
 
         Long id = IdentityProvider.getNextIdFor(session, Group.class);
 
@@ -57,8 +59,8 @@ public class GroupRepository implements CrudRepository<Group>, CheckEntityUnique
     @Override
     public boolean update(JDBCSession session, Group toUpdate) {
 
-        Preconditions.checkNotNull(toUpdate, "Object to update should not be null");
-        Preconditions.checkArgument(toUpdate.getId() != null, "Object to update should have identity set");
+        checkNotNull(toUpdate, "Object to update should not be null");
+        checkArgument(toUpdate.getId() != null, "Object to update should have identity set");
 
         return updateGroup.execute(session, toUpdate.getName(), toUpdate.getId()) > 0;
     }
