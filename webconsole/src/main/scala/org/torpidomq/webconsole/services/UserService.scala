@@ -8,7 +8,7 @@ import spray.httpx.SprayJsonSupport
  */
 trait UserService extends HttpService with SprayJsonSupport {
 
-    val route = {
+    /*val route = {
 
         //  convert to implicit trait see
 
@@ -29,5 +29,5 @@ trait UserService extends HttpService with SprayJsonSupport {
 
             }
         }
-    }
+    }*/
 }
