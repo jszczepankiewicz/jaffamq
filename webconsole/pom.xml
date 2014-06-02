@@ -24,6 +24,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jaffamq</groupId>
+            <artifactId>spearfish-db</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_2.10</artifactId>
         </dependency>
@@ -82,6 +88,21 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>0.9.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- for explanation why it is needed please see: http://www.scala-lang.org/old/node/10575 -->
+        <dependency>
+            <groupId>org.joda</groupId>
+            <artifactId>joda-convert</artifactId>
+            <version>1.6</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -97,9 +118,9 @@
 
             <plugin>
 
-                    <groupId>org.scalatest</groupId>
-                    <artifactId>scalatest-maven-plugin</artifactId>
-                    <version>1.0-M4-SNAP1</version>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>1.0-M4-SNAP1</version>
 
 
                 <configuration>

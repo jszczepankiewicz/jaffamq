@@ -26,6 +26,7 @@
         <fst.version>1.28</fst.version>
         <h2.version>1.3.174</h2.version>
         <joda-time.version>2.3</joda-time.version>
+        <joda-convert.version>1.6</joda-convert.version>
         <dbcp.version>2.0</dbcp.version>
 
     </properties>
@@ -40,7 +41,7 @@
             </dependency>
 
             <dependency>
-            <groupId>org.jaffamq</groupId>
+                <groupId>org.jaffamq</groupId>
                 <artifactId>common</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -129,6 +130,13 @@
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
+            </dependency>
+
+            <!-- please see: http://stackoverflow.com/questions/13856266/class-broken-error-with-joda-time-using-scala -->
+            <dependency>
+                <groupId>org.joda</groupId>
+                <artifactId>joda-convert</artifactId>
+                <version>${joda-convert.version}</version>
             </dependency>
 
         </dependencies>

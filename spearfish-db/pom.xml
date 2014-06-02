@@ -26,7 +26,7 @@
         </dependency>
 
         <dependency>
-        <groupId>com.github.sbtourist</groupId>
+            <groupId>com.github.sbtourist</groupId>
             <artifactId>journalio</artifactId>
         </dependency>
 
@@ -41,8 +41,18 @@
         </dependency>
 
         <dependency>
+            <groupId>org.joda</groupId>
+            <artifactId>joda-convert</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.jaffamq</groupId>
             <artifactId>common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jaffamq</groupId>
+            <artifactId>spearfish-db</artifactId>
         </dependency>
 
         <dependency>
@@ -91,8 +101,10 @@
                 <configuration>
                     <driver>org.h2.Driver</driver>
                     <url>jdbc:h2:mem:</url>
-                    <changeLogFile>${basedir}/src/main/resources/org/torpidomq/db/changelog/db.changelog-master.xml</changeLogFile>
-                    <migrationSqlOutputFile>${basedir}/src/main/resources/sql/torpidomq.init.sql</migrationSqlOutputFile>
+                    <changeLogFile>${basedir}/src/main/resources/org/torpidomq/db/changelog/db.changelog-master.xml
+                    </changeLogFile>
+                    <migrationSqlOutputFile>${basedir}/src/main/resources/sql/torpidomq.init.sql
+                    </migrationSqlOutputFile>
                 </configuration>
             </plugin>
         </plugins>
