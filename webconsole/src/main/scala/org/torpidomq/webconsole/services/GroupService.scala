@@ -35,7 +35,8 @@ trait GroupService extends HttpService with SprayJsonSupport {
 
     val groupServiceRoute = {
 
-        //  convert to implicit trait see
+        //  convert to implicit trait, this SHOULD NOT be removed, do not optimise this source
+        import org.torpidomq.webconsole.json.GroupJsonProtocol._
 
         get {
             pathPrefix("api") {
