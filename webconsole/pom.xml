@@ -89,12 +89,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>0.9.1</version>
-            <scope>test</scope>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
         </dependency>
-
         <!-- for explanation why it is needed please see: http://www.scala-lang.org/old/node/10575 -->
         <dependency>
             <groupId>org.joda</groupId>

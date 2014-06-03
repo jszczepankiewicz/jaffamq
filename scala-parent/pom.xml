@@ -33,7 +33,13 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.scalatest</groupId>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
+        </dependency>
+
+        <dependency>
+        <groupId>org.scalatest</groupId>
             <artifactId>scalatest_2.10</artifactId>
             <version>${scalatest.version}</version>
         </dependency>

@@ -52,11 +52,6 @@
 
         <dependency>
             <groupId>org.jaffamq</groupId>
-            <artifactId>spearfish-db</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jaffamq</groupId>
             <artifactId>common-test</artifactId>
         </dependency>
 

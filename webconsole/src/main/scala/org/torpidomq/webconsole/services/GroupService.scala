@@ -51,7 +51,7 @@ trait GroupService extends HttpService with SprayJsonSupport {
                                 else {
                                     ctx.complete(resp.getEntity)
                                 }
-                            //  can not use case cause it is not optional
+
                             case Failure(e) =>
                                 logAndFail(ctx, e)
                         }

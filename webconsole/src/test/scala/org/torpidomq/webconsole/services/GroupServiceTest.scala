@@ -57,21 +57,9 @@ class GroupServiceTest extends FlatSpec with ShouldMatchers with ScalatestRouteT
             //  then
             group.getName() should be("nameForExists");
             group.getId() should be(99);
-            val i = group.getCreationtime().toDateTime(CalendarUtils.DB_TIMEZONE)
-            i should be(TestDateTime.A)
+            group.getCreationtime().toDateTime(CalendarUtils.DB_TIMEZONE) should be(TestDateTime.A)
         }
     }
 
-    /*describe("the service show") {
-        it("should return a group if it exists") {
-            _repoActor = Mocks.exists
-
-            Get("/api/todo/TEST") ~> route ~> check {
-                val todo = entityAs[String]
-                todo should include("title")
-                todo should include("TEST")
-            }
-        }
-    }*/
 
 }
