@@ -58,6 +58,15 @@ public class Destination implements Identifiable {
             this.adminAuthorizedGroups = groups;
             return this;
         }
+        public Builder(String name, String type){
+            this.name = name;
+
+            if(type.length()!=1){
+                throw new IllegalArgumentException("Type of destination should be of type character[1]");
+            }
+
+            this.type = Type.ofValue(type.charAt(0));
+        }
 
         public Builder(String name, Type type) {
             this.name = name;
