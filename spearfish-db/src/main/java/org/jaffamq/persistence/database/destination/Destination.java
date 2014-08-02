@@ -5,8 +5,9 @@ import org.jaffamq.persistence.database.Identifiable;
 import org.jaffamq.persistence.database.group.Group;
 import org.joda.time.DateTime;
 
-import java.util.Collections;
 import java.util.Set;
+
+import static java.util.Collections.EMPTY_SET;
 
 /**
  * Represents destination configuration
@@ -30,9 +31,9 @@ public class Destination implements Identifiable {
         //  optional
         private Long id;
         private DateTime creationtime;
-        private Set<Group> readAuthorizedGroups = Collections.EMPTY_SET;
-        private Set<Group> writeAuthorizedGroups = Collections.EMPTY_SET;
-        private Set<Group> adminAuthorizedGroups = Collections.EMPTY_SET;
+        private Set<Group> readAuthorizedGroups = EMPTY_SET;
+        private Set<Group> writeAuthorizedGroups = EMPTY_SET;
+        private Set<Group> adminAuthorizedGroups = EMPTY_SET;
 
         public Builder id(Long id) {
             this.id = id;

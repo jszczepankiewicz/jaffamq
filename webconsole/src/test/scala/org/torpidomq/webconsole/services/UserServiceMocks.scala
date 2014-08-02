@@ -1,40 +1,39 @@
 package org.torpidomq.webconsole.services
 
-import akka.actor.Props
+import akka.actor.{Actor, Props, ActorRef, ActorSystem}
+import org.jaffamq.persistence.database.actor.{EntityResponse, GetByIdRequest}
+import org.jaffamq.persistence.database.user.User
+import org.torpidomq.webconsole.TestDateTime
 
 
 /**
  * Created by urwisy on 2014-05-10.
  */
 object UserServiceMocks {
-    /*implicit val askTimeout: Timeout = 3 second span
 
-    val exists = system.actorOf(Props(
-        new Actor {
-            def receive = {
-                 Object x;
-                if(x instanceof GetByIdRequest){
+    def createUserExist(system: ActorSystem):ActorRef = {
 
+        system.actorOf(Props(
+            new Actor {
+
+                def receive = {
+                    case request: GetByIdRequest => sender ! new EntityResponse[User](
+                        new User.Builder("nameForExists").id(request.getId).creationtime(TestDateTime.A).build());
                 }
-                //case GetByIdRequest(id) => sender !=
-                /*case ShowMessage(id) => sender ! new ShowResponse(Some(Todo(Some(id),"title",false)))
-                case UpdateMessage(_) | DeleteMessage(_) => sender ! new UpdateResponse(1)
-                case _:ListMessage => sender ! new ListResponse(List(Todo(Some("TEST"),"title2",false)))
-                case _:CreateMessage => sender ! new CreateResponse(Left("TEST"))*/
-            }
-        }
-    ))*/
+            })
+        );
+    }
 
-    /*
-    val exists = system.actorOf(Props(
-		    new Actor {
-		      def receive = {
-		        case ShowMessage(id) => sender ! new ShowResponse(Some(Todo(Some(id),"title",false)))
-		        case UpdateMessage(_) | DeleteMessage(_) => sender ! new UpdateResponse(1)
-		        case _:ListMessage => sender ! new ListResponse(List(Todo(Some("TEST"),"title2",false)))
-		        case _:CreateMessage => sender ! new CreateResponse(Left("TEST"))
-		      }
-		    }
-		))
-     */
+    def createUserNotExist(system: ActorSystem) {
+
+        system.actorOf(Props(
+            new Actor {
+
+                def receive = {
+                    case request: GetByIdRequest => sender ! new EntityResponse[User](
+                        null)
+                }
+            })
+        );
+    }
 }

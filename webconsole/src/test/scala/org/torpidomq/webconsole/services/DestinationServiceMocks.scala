@@ -1,23 +1,24 @@
 package org.torpidomq.webconsole.services
 
-import akka.actor.{ActorRef, Actor, ActorSystem, Props}
+import akka.actor.{Actor, Props, ActorRef, ActorSystem}
 import org.jaffamq.persistence.database.actor.{EntityResponse, GetByIdRequest}
 import org.jaffamq.persistence.database.group.Group
+import org.jaffamq.persistence.database.destination.Destination
 import org.torpidomq.webconsole.TestDateTime
 
 /**
- * Created by urwisy on 2014-05-11.
+ * Created by urwisy on 2014-07-08.
  */
-object GroupServiceMocks {
+object DestinationServiceMocks {
 
-    def createGroupExist(system: ActorSystem):ActorRef = {
+    def createDestinationExist(system: ActorSystem):ActorRef = {
 
         system.actorOf(Props(
             new Actor {
 
                 def receive = {
-                    case request: GetByIdRequest => sender ! new EntityResponse[Group](
-                        new Group.Builder("nameForExists").id(request.getId).creationtime(TestDateTime.A).build());
+                    case request: GetByIdRequest => sender ! new EntityResponse[Destination](
+                        new Destination.Builder("nameForExists", Destination.Type.QUEUE).id(request.getId).creationtime(TestDateTime.A).build());
                 }
             })
         );
@@ -29,11 +30,10 @@ object GroupServiceMocks {
             new Actor {
 
                 def receive = {
-                    case request: GetByIdRequest => sender ! new EntityResponse[Group](
+                    case request: GetByIdRequest => sender ! new EntityResponse[Destination](
                         null)
                 }
             })
         );
     }
-
 }
