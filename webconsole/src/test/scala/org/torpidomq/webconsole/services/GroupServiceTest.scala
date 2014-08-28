@@ -53,9 +53,34 @@ class GroupServiceTest extends FlatSpec with Matchers with ScalatestRouteTest wi
 
         //  when
         Get("/api/groups/99") ~> route ~> check {
+
             response.status should be(StatusCodes.NotFound)
         }
     }
+
+  it should "return paged list of groups for GET request" in {
+
+    //  given
+    _repoActor = GroupServiceMocks.createGroupList(system)
+
+    //  when
+    Get("/api/groups/") ~> route ~> check {
+      System.out.println(responseAs[String])
+      val groups = responseAs[List[Group]]
+      val group1 = groups(0)
+      group1.getName() should be("namefor10");
+      group1.getId() should be(10);
+      group1.getCreationtime().toDateTime(CalendarUtils.DB_TIMEZONE) should be(TestDateTime.A)
+
+      val group2 = groups(1)
+      group2.getName() should be("namefor20");
+      group2.getId() should be(20);
+      group2.getCreationtime().toDateTime(CalendarUtils.DB_TIMEZONE) should be(TestDateTime.A)
+
+      response.status should be(StatusCodes.OK)
+    }
+
+  }
 
 
 }

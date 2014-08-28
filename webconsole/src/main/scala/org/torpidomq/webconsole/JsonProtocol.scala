@@ -11,25 +11,24 @@ import org.torpidomq.webconsole.system.NamedProperty
  */
 object JsonProtocol extends DefaultJsonProtocol {
 
-    import spray.json._
+  import spray.json._
 
+  implicit object NamedPropertiesMapJsonFormat extends RootJsonFormat[Map[String, NamedProperty]] {
 
-    implicit object NamedPropertiesMapJsonFormat extends RootJsonFormat[Map[String, NamedProperty]] {
+    def write(map: Map[String, NamedProperty]) = {
 
-        def write(map: Map[String, NamedProperty]) = {
+      val listToConvert = for ((k, v) <- map) yield {
+        JsObject(
+          "property" -> JsString(k),
+          "value" -> JsString(v.value)
+        )
+      }
 
-            val listToConvert = for ((k, v) <- map) yield {
-                JsObject(
-                    "property" -> JsString(k),
-                    "value" -> JsString(v.value)
-                )
-            }
-
-            listToConvert.toJson
-        }
-
-        def read(json: JsValue) = null
-
+      listToConvert.toJson
     }
+
+    def read(json: JsValue) = null
+
+  }
 
 }

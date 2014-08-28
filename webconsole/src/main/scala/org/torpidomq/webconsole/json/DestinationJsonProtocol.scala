@@ -1,6 +1,7 @@
 package org.torpidomq.webconsole.json
 
 import org.jaffamq.persistence.database.destination.Destination
+import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import spray.json._
 
@@ -34,8 +35,8 @@ object DestinationJsonProtocol extends DefaultJsonProtocol{
         }
 
         override def read(json: JsValue): Destination = {
-            json.asJsObject.getFields("name", "nature") match {
-                case Seq(JsString(name), JsString(nature)) => new Destination.Builder(name, nature).build()
+            json.asJsObject.getFields("name", "id", "nature", "creationtime") match {
+                case Seq(JsString(name), JsNumber(id), JsString(nature), JsString(creationtime)) => new Destination.Builder(name, nature).id(id.toInt).creationtime(new DateTime(creationtime)).build()
                 case _ => deserializationError("Expected fields: 'name' (string), 'nature' (string)")
             }
         }

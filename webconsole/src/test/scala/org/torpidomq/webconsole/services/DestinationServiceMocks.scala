@@ -24,7 +24,7 @@ object DestinationServiceMocks {
         );
     }
 
-    def createGroupNotExist(system: ActorSystem):ActorRef = {
+    def createDestinationNotExist(system: ActorSystem):ActorRef = {
 
         system.actorOf(Props(
             new Actor {
