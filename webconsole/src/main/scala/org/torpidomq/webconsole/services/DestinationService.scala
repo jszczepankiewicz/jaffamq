@@ -2,9 +2,8 @@ package org.torpidomq.webconsole.services
 
 import akka.actor.ActorRef
 import akka.util.Timeout
-import org.jaffamq.persistence.database.actor.{EntityResponse, GetByIdRequest}
+import org.jaffamq.persistence.database.actor.{EntityListResponse, GetPagedListRequest, EntityResponse, GetByIdRequest}
 import org.jaffamq.persistence.database.destination.Destination
-import org.jaffamq.persistence.database.group.Group
 import spray.http.StatusCodes._
 import akka.pattern.ask
 import spray.httpx.SprayJsonSupport
@@ -32,7 +31,6 @@ trait DestinationService extends HttpService with SprayJsonSupport {
 
     val destinationServiceRoute = {
 
-        //  convert to implicit trait, this SHOULD NOT be removed, do not optimise this source
         import org.torpidomq.webconsole.json.DestinationJsonProtocol._
 
         get {
@@ -54,6 +52,26 @@ trait DestinationService extends HttpService with SprayJsonSupport {
                                 logAndFail(ctx, e)
                         }
                     }
+                }~
+                path("destinations" /) {
+                  get {
+                    parameters('offset ? 0, 'limit ? 50) { (offset, limit) => ctx =>
+                      ask(repoActor, new GetPagedListRequest(limit, offset))
+                        .mapTo[EntityListResponse[Destination]]
+                        .onComplete {
+                        case Success(resp) =>
+                          if (resp.getPage == null) {
+                            ctx.complete(NotFound)
+                          }
+                          else {
+                            ctx.complete(resp.getPage)
+                          }
+
+                        case Failure(e) =>
+                          logAndFail(ctx, e)
+                      }
+                    }
+                  }
                 }
             }
         }
