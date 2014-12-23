@@ -1,6 +1,7 @@
 package org.torpidomq.webconsole.json
 
 import org.jaffamq.persistence.database.destination.Destination
+import org.jaffamq.persistence.database.destination.Destination.Builder
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import scala.collection.JavaConversions._
@@ -38,8 +39,9 @@ object DestinationJsonProtocol extends DefaultJsonProtocol {
     }
 
     override def read(json: JsValue): Destination = {
-      json.asJsObject.getFields("name", "id", "nature", "creationtime") match {
-        case Seq(JsString(name), JsNumber(id), JsString(nature), JsString(creationtime)) => new Destination.Builder(name, nature).id(id.toInt).creationtime(new DateTime(creationtime)).build()
+      json.asJsObject.getFields("name", "nature", "id", "creationtime") match {
+        case Seq(JsString(name), JsString(nature)) => new Builder(name,nature).build()
+        case Seq(JsString(name), JsString(nature), JsNumber(id), JsString(creationtime)) => new Destination.Builder(name, nature).id(id.toInt).creationtime(new DateTime(creationtime)).build()
         case _ => deserializationError("Expected fields: 'name' (string), 'nature' (string)")
       }
     }

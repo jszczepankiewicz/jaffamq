@@ -11,6 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.10.2" level="project" />
     <orderEntry type="library" name="Maven: com.jayway.jsonpath:json-path:0.9.1" level="project" />
     <orderEntry type="library" name="Maven: net.minidev:json-smart:1.2" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.5" level="project" />
@@ -24,4 +25,3 @@
     <orderEntry type="library" name="Maven: junit:junit:4.11" level="project" />
   </component>
 </module>
-
