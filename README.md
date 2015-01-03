@@ -58,7 +58,7 @@ Table below show progress towards 1.0 release:
 - whole project is using default type of akka mailboxes (unbounded in memory) which may lead to JVM heap memory problems in some unfriendly conditions
 
 ### Requirements to compile / build / test
-- Java 7 (tested on OpenJDK 7 and Oracle JDK 7).
+- Java 7 or Java 8 (tested on OpenJDK 7, Oracle JDK 7, Oracle JDK 8).
 - Maven 3
 
 ### Testing and building
