@@ -54,4 +54,15 @@ class DestinationServiceTest  extends FlatSpec with Matchers with ScalatestRoute
     }
   }
 
+  it should "return 400 for GET request with id provided as non integer" in {
+
+    //  given
+    _repoActor = DestinationServiceMocks.createDestinationNotExist(system)
+
+    //  when
+    Get("/api/destinations/a") ~> route ~> check {
+      response.status should be(StatusCodes.BadRequest)
+    }
+  }
+
 }

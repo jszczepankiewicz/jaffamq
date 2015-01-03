@@ -4,10 +4,11 @@ import akka.actor.ActorRef
 import akka.util.Timeout
 import org.jaffamq.persistence.database.actor.{EntityListResponse, GetPagedListRequest, EntityResponse, GetByIdRequest}
 import org.jaffamq.persistence.database.destination.Destination
+import spray.http.StatusCodes
 import spray.http.StatusCodes._
 import akka.pattern.ask
 import spray.httpx.SprayJsonSupport
-import spray.routing.{RequestContext, HttpService}
+import spray.routing.{ExceptionHandler, RequestContext, HttpService}
 import spray.util.LoggingContext
 
 import scala.concurrent.ExecutionContext
@@ -24,6 +25,15 @@ trait DestinationService extends HttpService with SprayJsonSupport {
 
     implicit def executionContext: ExecutionContext = actorRefFactory.dispatcher
 
+  implicit def myExceptionHandler(implicit log: LoggingContext) =
+    ExceptionHandler {
+      case e: NumberFormatException =>
+        requestUri { uri =>
+          log.warning("Request to {} could not be handled normally due to NumberFormatException", uri)
+          complete(StatusCodes.BadRequest, "Invalid request")
+        }
+    }
+
     def logAndFail(ctx: RequestContext, e: Throwable)(implicit log: LoggingContext) {
         log.error(e, "Request {} could not be handled normally", ctx.request)
         ctx.complete(InternalServerError)
@@ -35,7 +45,7 @@ trait DestinationService extends HttpService with SprayJsonSupport {
 
         get {
             pathPrefix("api") {
-                path("destinations" / "\\w+".r) { id =>
+                path("destinations" / "\\w+".r ) { id =>
                     get { ctx =>
                         ask(repoActor, new GetByIdRequest(id.toLong))
                                 .mapTo[EntityResponse[Destination]]

@@ -24,7 +24,7 @@ object UserServiceMocks {
         );
     }
 
-    def createUserNotExist(system: ActorSystem) {
+    def createUserNotExist(system: ActorSystem):ActorRef = {
 
         system.actorOf(Props(
             new Actor {

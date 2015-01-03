@@ -2,7 +2,7 @@ package org.torpidomq.webconsole.services
 
 import spray.http.StatusCodes
 import StatusCodes._
-import spray.routing.{RequestContext, HttpService}
+import spray.routing.{ExceptionHandler, RequestContext, HttpService}
 import spray.httpx.SprayJsonSupport
 import akka.actor.ActorRef
 import akka.pattern.ask
@@ -25,6 +25,15 @@ trait GroupService extends HttpService with SprayJsonSupport {
   implicit val timeout = Timeout(3000)
 
   implicit def executionContext: ExecutionContext = actorRefFactory.dispatcher
+
+  implicit def myExceptionHandler(implicit log: LoggingContext) =
+    ExceptionHandler {
+      case e: NumberFormatException =>
+        requestUri { uri =>
+          log.warning("Request to {} could not be handled normally due to NumberFormatException", uri)
+          complete(StatusCodes.BadRequest, "Invalid request")
+        }
+    }
 
   def logAndFail(ctx: RequestContext, e: Throwable)(implicit log: LoggingContext) {
     log.error(e, "Request {} could not be handled normally", ctx.request)

@@ -5,9 +5,10 @@ import akka.pattern.ask
 import akka.util.Timeout
 import org.jaffamq.persistence.database.actor.{EntityListResponse, EntityResponse, GetByIdRequest, GetPagedListRequest}
 import org.jaffamq.persistence.database.user.User
+import spray.http.StatusCodes
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport
-import spray.routing.{HttpService, RequestContext}
+import spray.routing.{ExceptionHandler, HttpService, RequestContext}
 import spray.util.LoggingContext
 
 import scala.concurrent.ExecutionContext
@@ -23,7 +24,14 @@ trait UserService extends HttpService with SprayJsonSupport {
   implicit val timeout = Timeout(3000)
 
   implicit def executionContext: ExecutionContext = actorRefFactory.dispatcher
-
+  implicit def myExceptionHandler(implicit log: LoggingContext) =
+    ExceptionHandler {
+      case e: NumberFormatException =>
+        requestUri { uri =>
+          log.warning("Request to {} could not be handled normally due to NumberFormatException", uri)
+          complete(StatusCodes.BadRequest, "Invalid request")
+        }
+    }
   def logAndFail(ctx: RequestContext, e: Throwable)(implicit log: LoggingContext) {
     log.error(e, "Request {} could not be handled normally", ctx.request)
     ctx.complete(InternalServerError)

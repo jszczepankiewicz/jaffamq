@@ -82,5 +82,16 @@ class GroupServiceTest extends FlatSpec with Matchers with ScalatestRouteTest wi
 
   }
 
+  it should "return 400 for GET request with id provided as non integer" in {
+
+    //  given
+    _repoActor = GroupServiceMocks.createGroupNotExist(system)
+
+    //  when
+    Get("/api/groups/a") ~> route ~> check {
+      response.status should be(StatusCodes.BadRequest)
+    }
+  }
+
 
 }
