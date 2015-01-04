@@ -33,6 +33,7 @@ class DestinationServiceTest  extends FlatSpec with Matchers with ScalatestRoute
 
     //  when
     Get("/api/destinations/99") ~> route ~> check {
+      response.status should be(StatusCodes.OK)
       val destination = responseAs[Destination]
 
       //  then

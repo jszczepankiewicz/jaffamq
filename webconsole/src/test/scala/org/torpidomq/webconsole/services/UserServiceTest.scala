@@ -60,6 +60,7 @@ class UserServiceTest  extends FlatSpec with Matchers with ScalatestRouteTest wi
 
     //  when
     Get("/api/users/2") ~> route ~> check {
+      response.status should be(StatusCodes.OK)
       val user = responseAs[User]
       user.getId should be (2)
       user.getLogin should be ("nameForExists")

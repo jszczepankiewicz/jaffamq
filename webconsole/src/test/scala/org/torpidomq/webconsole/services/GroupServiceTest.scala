@@ -37,6 +37,7 @@ class GroupServiceTest extends FlatSpec with Matchers with ScalatestRouteTest wi
 
         //  when
         Get("/api/groups/99") ~> route ~> check {
+            response.status should be(StatusCodes.OK)
             val group = responseAs[Group]
 
             //  then
