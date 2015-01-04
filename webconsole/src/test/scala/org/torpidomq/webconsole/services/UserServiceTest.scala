@@ -1,9 +1,13 @@
 package org.torpidomq.webconsole.services
 
 import akka.actor.ActorRef
+import org.jaffamq.persistence.database.CalendarUtils
+import org.jaffamq.persistence.database.destination.Destination
+import org.jaffamq.persistence.database.user.User
 import org.scalatest.{Matchers, FlatSpec}
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
+import org.torpidomq.webconsole.TestDateTime
 import org.torpidomq.webconsole.services.UserService
 import spray.http.StatusCodes
 import spray.testkit.ScalatestRouteTest
@@ -35,6 +39,31 @@ class UserServiceTest  extends FlatSpec with Matchers with ScalatestRouteTest wi
     //  when
     Get("/api/users/a") ~> route ~> check {
       response.status should be(StatusCodes.BadRequest)
+    }
+  }
+
+  it should "return 404 for GET request to retrieve non-existing user" in {
+
+    //  given
+    _repoActor = UserServiceMocks.createUserNotExist(system)
+
+    //  when
+    Get("/api/users/999") ~> route ~> check {
+      response.status should be(StatusCodes.NotFound)
+    }
+  }
+
+  it should "return User for GET request to retrieve existing user id" in {
+
+    //  given
+    _repoActor = UserServiceMocks.createUserExist(system)
+
+    //  when
+    Get("/api/users/2") ~> route ~> check {
+      val user = responseAs[User]
+      user.getId should be (2)
+      user.getLogin should be ("nameForExists")
+      user.getCreationTime.toDateTime(CalendarUtils.DB_TIMEZONE) should be(TestDateTime.A)
     }
   }
 

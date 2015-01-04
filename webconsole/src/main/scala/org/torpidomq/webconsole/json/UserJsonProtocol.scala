@@ -2,6 +2,7 @@ package org.torpidomq.webconsole.json
 
 
 import org.jaffamq.persistence.database.user.User
+import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import scala.collection.JavaConversions._
 import spray.json._
@@ -32,7 +33,8 @@ object UserJsonProtocol extends DefaultJsonProtocol {
     }
 
     override def read(json: JsValue): User = {
-      json.asJsObject.getFields("login", "password") match {
+      json.asJsObject.getFields("id", "login", "creationtime" , "password") match {
+        case Seq(JsNumber(id), JsString(login), JsString(creationtime)) => new User.Builder(login).id(id.toInt).creationtime(new DateTime(creationtime)).build()
         case Seq(JsString(login), JsString(password)) => new User.Builder(login).password(password).build()
         case _ => deserializationError("Expected fields: 'login' (string), 'password' (string)")
       }

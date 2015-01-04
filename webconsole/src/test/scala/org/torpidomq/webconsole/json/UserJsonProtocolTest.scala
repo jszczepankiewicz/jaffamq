@@ -1,6 +1,7 @@
 package org.torpidomq.webconsole.json
 
 
+import org.jaffamq.persistence.database.CalendarUtils
 import org.jaffamq.persistence.database.user.User
 import org.scalatest.{Matchers, FlatSpec}
 import org.torpidomq.webconsole.TestDateTime
@@ -21,7 +22,7 @@ class UserJsonProtocolTest extends FlatSpec with Matchers with DefaultJsonProtoc
         UserJsonFormat.write(user).compactPrint shouldEqual expected
     }
 
-    it should "unmarshall User with login and password" in {
+    it should "unmarshall User with login and password as expected during create" in {
 
         //  given
         val expected = new User.Builder("spiderman").password("deathToBatman!").build()
@@ -41,5 +42,28 @@ class UserJsonProtocolTest extends FlatSpec with Matchers with DefaultJsonProtoc
         marshalled.getPasswordhash should be (null)
         marshalled.getCreationTime should not be (null)
     }
+
+    it should "unmarshall User with id, login, creationtime as expected during GET (by id)" in {
+
+        //  given
+        val expected = new User.Builder("spiderman").password("deathToBatman!").build()
+
+        //  when
+        val marshalled = JsonParser( """{ "id": 2, "login": "somelogin", "creationtime":"2014-04-20T15:38:02.884Z" }""").convertTo[User]
+
+        //  then
+        /*
+            Because under the hood creationtime is being set up we can not use shouldEqual on whole objects
+            we need to test the fields individually
+         */
+        marshalled.getLogin should be ("somelogin")
+        marshalled.getPassword should be (null)
+        marshalled.getId should be (2)
+        marshalled.getGroups.size() should be (0)
+        marshalled.getPasswordhash should be (null)
+        marshalled.getCreationTime.toDateTime(CalendarUtils.DB_TIMEZONE) should be(TestDateTime.A)
+    }
+
+
 
 }
